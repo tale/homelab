@@ -3,3 +3,10 @@ creation_rules:
     encrypted_regex: "^(data|stringData)$"
     age: >-
       age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
+  - path_regex: "^talos/patches/.*\\.sops\\.yaml$"
+    encrypted_regex: "^(environment)$"
+    age: >-
+      age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
+  - path_regex: "^talos/.*\\.sops\\.yaml$"
+    age: >-
+      age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr

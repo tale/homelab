@@ -5,6 +5,10 @@ default:
 	@echo "Usage: just <command> [<args>]"
 	@echo "Available commands:"
 	@echo "  k <project> [task] - Run the Justfile in 'k8s/<project>'"
+	@echo "  t <task> - Run the Justfile in 'talos'"
 
 k *args:
     cd "k8s/$1" && shift && just "$@"
+
+t *args:
+	cd "talos" && just "$@"
