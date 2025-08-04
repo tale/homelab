@@ -1,0 +1,13 @@
+[tools]
+"ubi:siderolabs/talos" = "1.10.6"
+"aqua:helm/helm" = "3.18.4"
+
+[tasks.talos-gen]
+alias = ['tg']
+description = 'Generate a talos configuration with the correct patches'
+run = """
+talos mc patch talos/controlplane.yaml \
+	--patch @talos/patches/tailscale.yaml \
+	--patch @talos/patches/{{arg(name="node")}}.yaml \
+	-o gen/{{arg(name="node")}}.yaml
+"""
