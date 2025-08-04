@@ -1,0 +1,19 @@
+namespace := "metallb-system"
+release := "oci://quay.io/metallb/chart/metallb"
+version := "0.15.2"
+
+default: ns helm ips
+
+ns:
+	@echo "👉 Creating namespace {{namespace}} with PodSecurityPolicy configured"
+	kubectl apply -f {{justfile_directory()}}/manifests/1-metallb-ns.yaml
+
+helm:
+	@echo "👉 Installing MetalLB Helm chart"
+	helm upgrade --install metallb {{release}} \
+	  --version {{version}} \
+	  --namespace {{namespace}}
+
+ips:
+	@echo "👉 Creating IP address pools"
+	kubectl apply -f {{justfile_directory()}}/manifests/2-traefik-pool.yaml

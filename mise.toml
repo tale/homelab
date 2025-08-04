@@ -1,6 +1,7 @@
 [tools]
 "ubi:siderolabs/talos" = "1.10.6"
 "aqua:helm/helm" = "3.18.4"
+"ubi:casey/just" = "1.42.4"
 
 [tasks.talos-gen]
 alias = ['tg']
