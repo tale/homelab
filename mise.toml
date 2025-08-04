@@ -7,13 +7,3 @@
 
 [env]
 SOPS_AGE_KEY_FILE = "{{env.HOME}}/.config/sops/age/keys.txt"
-
-[tasks.talos-gen]
-alias = ['tg']
-description = 'Generate a talos configuration with the correct patches'
-run = """
-talos mc patch talos/controlplane.yaml \
-	--patch @talos/patches/tailscale.yaml \
-	--patch @talos/patches/{{arg(name="node")}}.yaml \
-	-o gen/{{arg(name="node")}}.yaml
-"""
