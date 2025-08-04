@@ -1,0 +1,22 @@
+namespace := "cert-manager"
+release := "oci://quay.io/jetstack/charts/cert-manager"
+version := "v1.18.2"
+
+default: helm issuers
+
+helm:
+	@echo "👉 Installing cert-manager Helm chart"
+	helm upgrade --install cert-manager {{release}} \
+		--version {{version}} \
+		--namespace {{namespace}} \
+		--create-namespace \
+		-f {{justfile_directory()}}/values.yaml
+
+issuers: cf-sops
+	@echo "👉 Creating ClusterIssuer(s)"
+	kubectl apply -f {{justfile_directory()}}/manifests/2-test-issuer.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/3-prod-issuer.yaml
+
+cf-sops:
+	@echo "👉 Decrypting Cloudflare API credentials"
+	sops -d {{justfile_directory()}}/manifests/1-cf-apikey.sops.yaml | kubectl apply -f -
