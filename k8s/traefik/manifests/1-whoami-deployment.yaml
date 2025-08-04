@@ -1,0 +1,31 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whoami
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: me.tale.whoami
+  template:
+    metadata:
+      labels:
+        app: me.tale.whoami
+    spec:
+      containers:
+        - name: whoami
+          image: traefik/whoami:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            runAsUser: 1000
+            runAsGroup: 1000
+          ports:
+            - containerPort: 80
