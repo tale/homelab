@@ -2,7 +2,7 @@ namespace := "metallb-system"
 release := "oci://quay.io/metallb/chart/metallb"
 version := "0.15.2"
 
-default: ns helm ips
+default: ns helm ips ddns
 
 ns:
 	@echo "👉 Creating namespace {{namespace}} with PodSecurityPolicy configured"
@@ -17,3 +17,11 @@ helm:
 ips:
 	@echo "👉 Creating IP address pools"
 	kubectl apply -f {{justfile_directory()}}/manifests/2-traefik-pool.yaml
+
+ddns: config-sops
+	@echo "👉 Setting up Cloudflare DDNS for MetalLB"
+	kubectl apply -f {{justfile_directory()}}/manifests/4-ddns-deployment.yaml
+
+config-sops:
+	@echo "👉 Decrypting DDNS configuration"
+	sops -d {{justfile_directory()}}/manifests/3-ddns-config.sops.yaml | kubectl apply -f -
