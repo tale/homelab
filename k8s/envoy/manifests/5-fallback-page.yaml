@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: envoy-fallback-html
+  namespace: default
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Unavailable</title>
+      <style>
+        html, body {
+          height: 100%;
+          margin: 0;
+          background: #0f1117;
+          color: #e0e0e0;
+          font-family: system-ui, sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .container {
+          text-align: center;
+          padding: 2rem;
+        }
+        img {
+          height: 48px;
+          margin-bottom: 1rem;
+          opacity: 0.85;
+        }
+        h1 {
+          font-weight: 500;
+          font-size: 1.5rem;
+          margin-bottom: 0.5rem;
+        }
+        p {
+          font-size: 0.95rem;
+          color: #999;
+          margin: 0;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <img src="https://gateway.envoyproxy.io/icons/logo-white.svg" alt="Envoy" />
+        <h1>This endpoint is not active</h1>
+        <p>Powered by Envoy Gateway</p>
+      </div>
+    </body>
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: envoy-fallback
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: me.tale.envoy-fallback
+  template:
+    metadata:
+      labels:
+        app: me.tale.envoy-fallback
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: envoy-fallback
+          image: halverneus/static-file-server
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: html
+              mountPath: /web
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: html
+          configMap:
+            name: envoy-fallback-html
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: envoy-fallback
+  namespace: default
+spec:
+  selector:
+    app: me.tale.envoy-fallback
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: https-envoy-fallback
+  namespace: default
+spec:
+  parentRefs:
+    - name: envoy-gw
+      sectionName: https
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: envoy-fallback
+          port: 80

@@ -14,7 +14,7 @@ checked all of those boxes and includes tons of extra goodies for homelabbers.
 
 - General
 	- [**MetalLB**](./k8s/metallb/README.md): Load balancer for the cluster
-	- [**Traefik**](./k8s/traefik/README.md): Ingress controller for the cluster
+	- [**Envoy Gateway**](./k8s/envoy/README.md): Gateway for the cluster
 	- [**cert-manager**](./k8s/cert-manager/README.md): TLS certificate issuer
 
 ### Deployment Tools

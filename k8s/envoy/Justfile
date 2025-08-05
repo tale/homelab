@@ -1,0 +1,27 @@
+namespace := "envoy-gateway-system"
+release := "oci://docker.io/envoyproxy/gateway-helm"
+version := "v1.4.2"
+
+default: helm gateway fallback
+
+fallback:
+	@echo "👉 Creating fallback service for Envoy Gateway"
+	kubectl apply -f {{justfile_directory()}}/manifests/5-fallback-page.yaml
+
+gateway:
+	@echo "👉 Creating Envoy Gateway"
+	kubectl apply -f {{justfile_directory()}}/manifests/2-gateway-class.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/3-gateway.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/4-gateway-grant.yaml
+
+helm: metallb-pool
+	@echo "👉 Installing Envoy Gateway Helm chart"
+	helm upgrade --install envoy-gateway {{release}} \
+		--version {{version}} \
+		--namespace {{namespace}} \
+		--create-namespace \
+		-f {{justfile_directory()}}/values.yaml
+
+metallb-pool:
+	@echo "👉 Creating MetalLB pool for Envoy Gateway"
+	kubectl apply -f {{justfile_directory()}}/manifests/1-metallb.yaml

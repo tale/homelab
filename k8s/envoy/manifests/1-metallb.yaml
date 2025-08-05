@@ -2,16 +2,16 @@ apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   namespace: metallb-system
-  name: traefik-pool
+  name: envoy-pool
 spec:
   addresses:
-    - 10.0.0.225/32
+    - 10.0.0.220/32
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   namespace: metallb-system
-  name: traefik-l2
+  name: envoy-l2
 spec:
   ipAddressPools:
-    - traefik-pool
+    - envoy-pool
