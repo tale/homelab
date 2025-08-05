@@ -1,0 +1,18 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: hubble-ui-oidc
+  namespace: kube-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: hubble-ui
+  oidc:
+    provider:
+      issuer: https://idp.tale.me
+    clientID: 85c11401-2b6a-4c58-8db4-62283d593560
+    clientSecret:
+      name: hubble-ui-oidc-secret
+    redirectURL: https://hubble.tale.me/oauth2/callback
+    logoutPath: /logout

@@ -1,5 +1,6 @@
 cluster-name := "tale-lab"
 endpoint-ip := "https://172.31.42.100:6443"
+cilium-version := "1.18.0"
 
 gen-node-config node: gen-base-config
 	@echo "👉 Rendering controlplane.yaml for {{node}}"
@@ -9,12 +10,14 @@ gen-node-config node: gen-base-config
 
 gen-base-config: config-sops
 	@echo "👉 Rendering Talos configuration files"
+	@just --justfile {{justfile_directory()}}/../k8s/cilium/Justfile gen-cilium-template
 	talos gen config {{cluster-name}} {{endpoint-ip}} \
 		--with-docs=false --with-examples=false --output-types controlplane \
 		--force --output {{justfile_directory()}}/control.gen.yaml \
 		--with-secrets {{justfile_directory()}}/secrets.gen.yaml \
 		--config-patch @{{justfile_directory()}}/patches/shared.yaml \
-		--config-patch @{{justfile_directory()}}/patches/tailscale.gen.yaml
+		--config-patch @{{justfile_directory()}}/patches/tailscale.gen.yaml \
+		--config-patch @{{justfile_directory()}}/patches/cilium.gen.yaml
 
 config-sops:
 	@echo "👉 Decrypting Talos secrets"

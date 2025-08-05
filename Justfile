@@ -8,7 +8,7 @@ default:
 	@echo "  t <task> - Run the Justfile in 'talos'"
 
 k *args:
-    cd "k8s/$1" && shift && just "$@"
+    @cd "k8s/$1" && shift && just "$@"
 
 t *args:
-	cd "talos" && just "$@"
+	@cd "talos" && just "$@"

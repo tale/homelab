@@ -37,9 +37,9 @@ machine:
 
   sysctls:
     kernel.domainname: talos.dev
-    net/ipv6/conf/eth0.100/disable_ipv6: "1"
 
 cluster:
+  allowSchedulingOnControlPlanes: true
   # We want the kubelet to support a proper metrics-server for kubectl top
   extraManifests:
     - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml

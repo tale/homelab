@@ -1,0 +1,10 @@
+cluster:
+  network:
+    cni:
+      name: none
+  proxy:
+    disabled: true
+  inlineManifests:
+    - name: cilium
+      # The Cilium Helm manifest gets templated below contents
+      contents: |

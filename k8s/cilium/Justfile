@@ -1,0 +1,23 @@
+release := "https://helm.cilium.io/cilium" # Not OCI yet :(
+version := "1.18.0"
+
+default: hubble-ui
+
+gen-cilium-template:
+	@echo "👉 Rendering Cilium template"
+	cp {{justfile_directory()}}/patch.yaml \
+		{{justfile_directory()}}/../../talos/patches/cilium.gen.yaml
+
+	helm template cilium {{release}}-{{version}}.tgz \
+		--namespace kube-system --create-namespace \
+		-f {{justfile_directory()}}/values.yaml \
+	| sed 's/^/        /' >> {{justfile_directory()}}/../../talos/patches/cilium.gen.yaml
+
+hubble-ui: config-sops
+	@echo "👉 Setting up Hubble UI Gateway HTTPRoute"
+	kubectl apply -f {{justfile_directory()}}/manifests/2-hubble-route.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/3-hubble-security-policy.yaml
+
+config-sops:
+	@echo "👉 Decrypting Hubble OIDC client secret"
+	sops -d {{justfile_directory()}}/manifests/1-hubble-oidc.sops.yaml | kubectl apply -f -
