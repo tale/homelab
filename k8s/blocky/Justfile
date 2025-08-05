@@ -1,0 +1,15 @@
+default: dns routing
+
+routing:
+	@echo "👉 Creating routing service for Blocky HA"
+	kubectl apply -f {{justfile_directory()}}/manifests/4-metallb.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/5-services.yaml
+
+dns: redis
+	@echo "👉 Creating DNS service for Blocky HA"
+	kubectl apply -f {{justfile_directory()}}/manifests/2-configmap.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/3-daemonset.yaml
+
+redis:
+	@echo "👉 Creating Redis cache for Blocky HA"
+	kubectl apply -f {{justfile_directory()}}/manifests/1-redis-cache.yaml

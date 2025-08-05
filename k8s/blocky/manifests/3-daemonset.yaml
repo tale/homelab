@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: blocky
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: me.tale.blocky
+  template:
+    metadata:
+      labels:
+        app: me.tale.blocky
+    spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: blocky
+          image: ghcr.io/0xerr0r/blocky:latest
+          ports:
+            - name: dns
+              containerPort: 53
+              protocol: UDP
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+            - name: http
+              containerPort: 4000
+              protocol: TCP
+          env:
+            - name: TZ
+              value: America/New_York
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yml
+              subPath: config.yml
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop: ["ALL"]
+              add:
+                - NET_BIND_SERVICE
+          readinessProbe:
+            tcpSocket:
+              port: 53
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 53
+            initialDelaySeconds: 10
+            periodSeconds: 30
+      volumes:
+        - name: config
+          configMap:
+            name: blocky-config
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: blocky-pdb
+  namespace: default
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: me.tale.blocky
