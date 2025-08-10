@@ -2,6 +2,13 @@ cluster-name := "tale-lab"
 endpoint-ip := "https://172.31.42.100:6443"
 cilium-version := "1.18.0"
 
+apply-node-config node ip *args: (gen-node-config node)
+	@echo "👉 Applying Talos configuration for {{node}}"
+	talosctl apply-config \
+		--nodes {{ip}} \
+		--file {{justfile_directory()}}/{{node}}.gen.yaml \
+		{{args}}
+
 gen-node-config node: gen-base-config
 	@echo "👉 Rendering controlplane.yaml for {{node}}"
 	talos machineconfig patch {{justfile_directory()}}/control.gen.yaml \

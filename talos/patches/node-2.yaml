@@ -1,0 +1,23 @@
+machine:
+  network:
+    interfaces:
+      # 1GBe LAN interface
+      - deviceSelector:
+          hardwareAddr: b8:85:84:9a:e0:d0
+        dhcp: false
+        mtu: 1500
+        addresses:
+          - 10.0.0.202/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 10.0.0.1
+
+      # 2.5GBe VPC interface
+      - deviceSelector:
+          hardwareAddr: 98:b7:85:22:9b:61
+        dhcp: false
+        mtu: 9000
+        addresses:
+          - 172.31.42.3/24
+        vip:
+          ip: 172.31.42.100
