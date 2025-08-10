@@ -1,0 +1,14 @@
+default: ns home-assistant routing
+
+routing:
+	@echo "👉 Creating routing service for home automations"
+	kubectl apply -f {{justfile_directory()}}/manifests/4-ha-http-route.yaml
+
+home-assistant: ns
+	@echo "👉 Creating Home Assistant service"
+	kubectl apply -f {{justfile_directory()}}/manifests/2-ha-pvc.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/3-ha-deployment.yaml
+
+ns:
+	@echo "👉 Creating privileged home-automation namespace"
+	kubectl apply -f {{justfile_directory()}}/manifests/1-ns.yaml

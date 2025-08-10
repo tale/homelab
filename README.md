@@ -13,9 +13,15 @@ checked all of those boxes and includes tons of extra goodies for homelabbers.
 > Helm installations, Kubernetes YAML, and SOPS secrets.
 
 - General
-	- [**MetalLB**](./k8s/metallb/README.md): Load balancer for the cluster
-	- [**Envoy Gateway**](./k8s/envoy/README.md): Gateway for the cluster
 	- [**cert-manager**](./k8s/cert-manager/README.md): TLS certificate issuer
+	- [**Cilium**](./k8s/cilium/README.md): CNI plugin for the cluster
+	- [**Envoy Gateway**](./k8s/envoy/README.md): Gateway for the cluster
+	- [**MetalLB**](./k8s/metallb/README.md): Load balancer for the cluster
+	- [**OpenEBS**](./k8s/openebs/README.md): Storage for the cluster
+
+- Home
+	- [**Blocky**](./k8s/blocky/README.md): DNS server for ad-blocking
+	- [**Home Assistant**](./k8s/home-assistant/README.md): Home automation
 
 ### Deployment Tools
 Because Talos is a Kubernetes distribution, all of the cluster deployments are
