@@ -1,0 +1,16 @@
+engines:
+  local:
+    lvm:
+      enabled: false
+    zfs:
+      enabled: false
+  replicated:
+    mayastor:
+      enabled: true
+mayastor:
+  io_engine:
+    envcontext: "iova-mode=pa"
+  csi:
+    node:
+      initContainers:
+        enabled: false

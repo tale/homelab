@@ -1,0 +1,15 @@
+release := "https://openebs.github.io/openebs/openebs" # OCI on 4.4.0!
+version := "4.3.2"
+
+default: helm disk-pool
+
+disk-pool: helm
+	@echo "👉 Creating OpenEBS disk pool"
+	kubectl apply -f {{justfile_directory()}}/manifests/1-disk-pools.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/2-storage-class.yaml
+
+helm:
+	@echo "👉 Installing OpenEBS Helm chart"
+	helm upgrade --install openebs {{release}}-{{version}}.tgz \
+		--namespace openebs --create-namespace \
+		-f {{justfile_directory()}}/values.yaml

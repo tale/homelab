@@ -18,8 +18,7 @@ machine:
     disk:
       $patch: delete
     diskSelector:
-      size: 240GB
-      model: CT240BX500SSD
+      model: CT240BX500SSD1
 
   nodeLabels:
     $patch: delete

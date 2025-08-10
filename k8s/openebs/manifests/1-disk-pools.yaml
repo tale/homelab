@@ -1,0 +1,26 @@
+apiVersion: "openebs.io/v1beta3"
+kind: DiskPool
+metadata:
+  name: pool-n1
+  namespace: openebs
+spec:
+  node: talos-pk9-lp1
+  disks: ["aio:///dev/disk/by-id/nvme-Timetec_35TTD34PCIE-2TB_QY250425B2F0680"]
+---
+apiVersion: "openebs.io/v1beta3"
+kind: DiskPool
+metadata:
+  name: pool-n2
+  namespace: openebs
+spec:
+  node: talos-z4f-vra
+  disks: ["aio:///dev/disk/by-id/nvme-TIMETEC_PCIe_3.0_2TB_TA250508B2F0185"]
+---
+apiVersion: "openebs.io/v1beta3"
+kind: DiskPool
+metadata:
+  name: pool-n3
+  namespace: openebs
+spec:
+  node: talos-74p-1fd
+  disks: ["aio:///dev/disk/by-id/nvme-TIMETEC_PCIe_3.0_2TB_TA250508B2F0179"]

@@ -16,6 +16,7 @@ gen-base-config: config-sops
 		--force --output {{justfile_directory()}}/control.gen.yaml \
 		--with-secrets {{justfile_directory()}}/secrets.gen.yaml \
 		--config-patch @{{justfile_directory()}}/patches/shared.yaml \
+		--config-patch @{{justfile_directory()}}/patches/openebs.yaml \
 		--config-patch @{{justfile_directory()}}/patches/tailscale.gen.yaml \
 		--config-patch @{{justfile_directory()}}/patches/cilium.gen.yaml
 
