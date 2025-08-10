@@ -1,8 +1,18 @@
-default: ns home-assistant routing
+default: ns home-assistant eufy-ws routing
 
 routing:
 	@echo "👉 Creating routing service for home automations"
 	kubectl apply -f {{justfile_directory()}}/manifests/4-ha-http-route.yaml
+
+eufy-ws: ns eufy-sops
+	@echo "👉 Creating Eufy WebSocket service"
+	kubectl apply -f {{justfile_directory()}}/manifests/5-eufy-pvc.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/7-eufy-deployment.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/8-eufy-svc.yaml
+
+eufy-sops:
+	@echo "👉 Decrypting Eufy WebSocket configuration"
+	sops -d {{justfile_directory()}}/manifests/6-eufy-config.sops.yaml | kubectl apply -f -
 
 home-assistant: ns
 	@echo "👉 Creating Home Assistant service"

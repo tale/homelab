@@ -8,3 +8,4 @@ use in our home.
 - Custom namespace with lax security context to allow host networking
 - Home Assistant runs using host networking for discovery
 - Web UI is publicly accessible through Envoy gateway
+- A custom EufySecurity WebSocket provides MQTT integration with Eufy cameras
