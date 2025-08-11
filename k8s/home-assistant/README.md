@@ -9,3 +9,4 @@ use in our home.
 - Home Assistant runs using host networking for discovery
 - Web UI is publicly accessible through Envoy gateway
 - A custom EufySecurity WebSocket provides MQTT integration with Eufy cameras
+- Scrypted for HomeKit Secure Video integration with a Ring doorbell
