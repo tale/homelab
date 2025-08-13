@@ -1,0 +1,6 @@
+server:
+  retentionPeriod: 60d
+  persistentVolume:
+    enabled: true
+    storageClassName: cluster-nvmf
+    size: 150Gi

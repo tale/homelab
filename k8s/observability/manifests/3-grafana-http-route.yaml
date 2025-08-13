@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: grafana
+  namespace: observability-system
+spec:
+  parentRefs:
+    - name: envoy-gw
+      sectionName: https
+      namespace: default
+  hostnames:
+    - grafana.tale.me
+  rules:
+    - backendRefs:
+        - name: prometheus-grafana
+          port: 80

@@ -1,0 +1,32 @@
+namespace := "observability-system"
+prometheus-release := "oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack"
+prometheus-version := "76.2.0"
+victoriametrics-release := "oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-single"
+victoriametrics-version := "0.24.2"
+
+default: ns helm routing
+
+routing:
+	@echo "👉 Creating routing service for Grafana"
+	kubectl apply -f {{justfile_directory()}}/manifests/3-grafana-http-route.yaml
+
+ns:
+	@echo "👉 Creating namespace {{namespace}} with PodSecurityPolicy configured"
+	kubectl apply -f {{justfile_directory()}}/manifests/1-namespace.yaml
+
+helm: ns grafana-sops
+	@echo "👉 Installing VictoriaMetrics"
+	helm upgrade --install victoriametrics {{victoriametrics-release}} \
+		--version {{victoriametrics-version}} \
+		--namespace {{namespace}} \
+		-f {{justfile_directory()}}/victoriametrics.values.yaml
+
+	@echo "👉 Installing Prometheus Kube Stack Helm chart"
+	helm upgrade --install prometheus {{prometheus-release}} \
+		--version {{prometheus-version}} \
+		--namespace {{namespace}} \
+		-f {{justfile_directory()}}/prometheus.values.yaml
+
+grafana-sops:
+	@echo "👉 Decrypting Grafana OIDC configuration"
+	sops -d {{justfile_directory()}}/manifests/2-grafana-oidc.sops.yaml | kubectl apply -f -

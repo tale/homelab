@@ -18,6 +18,7 @@ checked all of those boxes and includes tons of extra goodies for homelabbers.
 	- [**Envoy Gateway**](./k8s/envoy/README.md): Gateway for the cluster
 	- [**MetalLB**](./k8s/metallb/README.md): Load balancer for the cluster
 	- [**OpenEBS**](./k8s/openebs/README.md): Storage for the cluster
+	- [**Observability Stack**](./k8s/observability/README.md): Monitoring
 
 - Home
 	- [**Blocky**](./k8s/blocky/README.md): DNS server for ad-blocking
