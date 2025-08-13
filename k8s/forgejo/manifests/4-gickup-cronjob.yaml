@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: gickup
+  namespace: forgejo
+  labels:
+    app.kubernetes.io/name: gickup
+spec:
+  schedule: 0 */3 * * *
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: gickup
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: gickup
+              image: buddyspencer/gickup:latest
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: TZ
+                  value: America/New_York
+              volumeMounts:
+                - name: config
+                  mountPath: /gickup/conf.yml
+                  subPath: conf.yml
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                runAsUser: 1000
+                runAsGroup: 1000
+                capabilities:
+                  drop:
+                    - ALL
+                seccompProfile:
+                  type: RuntimeDefault
+          volumes:
+            - name: config
+              configMap:
+                name: gickup-config

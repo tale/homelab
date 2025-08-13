@@ -1,0 +1,26 @@
+namespace := "forgejo"
+release := "oci://code.forgejo.org/forgejo-helm/forgejo"
+version := "13.0.1"
+
+default: helm config-sops route mirroring
+
+mirroring:
+	@echo "👉 Creating Gickup mirroring resources"
+	sops -d {{justfile_directory()}}/manifests/3-gickup-config.sops.yaml | kubectl apply -f -
+	kubectl apply -f {{justfile_directory()}}/manifests/4-gickup-cronjob.yaml
+
+route:
+	@echo "👉 Creating Forgejo HTTP route"
+	kubectl apply -f {{justfile_directory()}}/manifests/2-forgejo-http-route.yaml
+
+helm:
+	@echo "👉 Installing Forgejo Helm chart"
+	helm upgrade --install forgejo {{release}} \
+		--version {{version}} \
+		--namespace {{namespace}} \
+		--create-namespace \
+		-f {{justfile_directory()}}/values.yaml
+
+config-sops: helm
+	@echo "👉 Decrypting Forgejoe OIDC client details"
+	sops -d {{justfile_directory()}}/manifests/1-forgejo-oidc.sops.yaml | kubectl apply -f -

@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: forgejo-oidc
+  namespace: forgejo
+type: Opaque
+stringData:
+  key: ENC[AES256_GCM,data:Tk66LuWa1bPNH4WsWxSjfHJXHJI5Q/biUv/r8SJpOJxEYnBT,iv:WY4OD5nZemg3WXTqHi2muvtZwWtCnbfCZiJy7hyNS70=,tag:SGul7SAg3qwtPT4RFwJZrA==,type:str]
+  secret: ENC[AES256_GCM,data:uIl9cVxV/veial/UHiL75R6TkJIxs/DOMylvluWQsv0=,iv:Jak+cjjHgYsU4TBhvHmejHmBwsyPrguIGFMfHa6822Q=,tag:H0cuONh2DTEVNElxgN7NJQ==,type:str]
+sops:
+  age:
+    - recipient: age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB5Vi9nWTlOYmlMdGlXZU5r
+        R1dvaTNxQnNmY1Z1M1ptVnBrQ1RqMm0rTjBJClBmTTVBV1B5b2ZRaWVNZDd4TGo2
+        dEt3K3poOXhJZTlwWE5wZ3BEck5BWEkKLS0tIHd1RTNtZm43SXRtWlVXZ1hGdWdm
+        Q05abWkyd1FXODBESWp6ZlRPeEMyNWsKhjIiR3BXA4iGTxZJ5M0iRh7lGKHB+YWM
+        sGnQAZUwU50R491M7p+NoDulE5Thiso0gEUmAQDlzaau3VvKTLSUmg==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2025-08-11T15:40:53Z"
+  mac: ENC[AES256_GCM,data:BaTToqrXru9pmValu9IiK5QFp4EyiRjOYxlOUZfmEeg1wN6viIlS2sR4G9Tceoll7quj5HxvhOmoiLgJNgTEJFzWbUWB13F2tRFZsyvEtVUllFABrSxJL3kHbtQ1y5Q27g8HOJZNWhXztb80JDOdijx7RAyZASxEYbvCqmoPo5Y=,iv:TjjXsulZ/kSX95z+hJzQ7xVpr7lMcZXOJagfwLc8mOs=,tag:2vjIgiU/UpxM7ibHBpDPsg==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  version: 3.10.2

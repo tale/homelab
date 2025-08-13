@@ -22,4 +22,4 @@ To address all of these constraints this is how I set up MetalLB and the LAN:
 - MetalLB IP assignments are higher (Envoy is given `10.0.0.220`)
 - Dynamic DNS is done via Cloudflare with
 [timothymiller/cloudflare-ddns](https://github.com/timothymiller/cloudflare-ddns)
-- `10.0.0.220` is port-forwarded on the router for Ingress traffic (port 443)
+- `10.0.0.225` is port-forwarded on the router for Envoy Gateway

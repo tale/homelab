@@ -22,6 +22,7 @@ checked all of those boxes and includes tons of extra goodies for homelabbers.
 - Home
 	- [**Blocky**](./k8s/blocky/README.md): DNS server for ad-blocking
 	- [**Home Assistant**](./k8s/home-assistant/README.md): Home automation
+	- [**Forgejo**](./k8s/forgejo/README.md): Self-hosted Git server
 
 ### Deployment Tools
 Because Talos is a Kubernetes distribution, all of the cluster deployments are

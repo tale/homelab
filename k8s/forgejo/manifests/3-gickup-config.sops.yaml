@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gickup-config
+  namespace: forgejo
+data:
+  conf.yml: ENC[AES256_GCM,data:4Kbgyv1H4r15HIfjecGjczmmHFVIexi7PWZxNjpsUg36A5BUf4u3uTqRR/rR2lsw2xfNJIWxazDBU6Sb8AtYaMnOUwA/4vf5ovAcSs0H1q8FzD/tiVwBDYxuFdL2vvEv0wCXSB9H7/UusSSYa0an8CFsWTFPfRMmhcvzt9baVpAKZ9JtMVlwup9C2D9RFeJZjrtFi+s0KgLysiSNGf+j/zPq8XdNBTsexQnv1xBUMjwe/XjUIQhnevhpVbFkZwoWdHXVoy2ijKaxH+5oGThSs5aAHFRGLUCXwGDcLomeA2QJMNcln6fQxF2ydhPmBatq34LKvc04Sp6/4CP7ncAsOetUnQ7Jxj8h0gbw87+9DPvr/6bjECdC4VcsDp7nfUocbT7FhIfYU4g3Du5E4VQ88KO33DGzn078O6sC2sncjM+0xcX9ilOnS+Ffq38iACJKWV1qr4gQP9zjEioIkj0CzFVEg+YZpFWE7yZkSS6ZspZ9DyXq8UpLE3DgCxPJqbuU0mwf6NUsawIO60b+umYgr87aj3eKaKs2qh2JvcxMTojJu+XIHOSVQ/v3rdiKchr+U1RcL21y4QC0PlDqgNp3xXtwuknZ8O2VFcpoNwwAHYen1ckKH+PWPtVwGVydhKbTly/IoOv5MS4U+OKnyxlJJQlVsJEq78h+Dnyvc9s3CuF887yDRaDrrPyCztudofMXlQ2VDcxAwc5Xb1k7pYDQOL4HrrIBF6+1CoD/LOqytogrnwtbDEPKJQaWDGIClCIUiBXeUlbZUuAyNLnTgnvA4Hjc/ITCXoh/MArJI5EHRfrwUFGfRg==,iv:2qNHmZTierIrgT2NF8fvGXHW88qtjgDu6YKYE6vX+i8=,tag:hrRkqDBzVWfhPW2Q/5JC8Q==,type:str]
+sops:
+  age:
+    - recipient: age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAvTUw2VWdYek9RUUU4WGN1
+        NVZKeFlNQklvZnBzaUhkQktqMmxkeXVnb2lrCkRkUm8vVFBUZWxNUHhhS2xSazlM
+        ZklDbjF2SFdjLzZoT3UxTnBXWTZxdHcKLS0tIDB2THVQN1IrN1JoWmZUZkhWSkg4
+        MmlXNHNjRFdIWlZyUDZGL1JaOHV5OWMKBdOlq1HY5yjvHXu6tPgwWni71o1/wY2C
+        +WQ4oHNSn0TAAWF5GFyRHdRWRfa3We8+szPUfNArI54lanKXJSo7sA==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2025-08-12T19:30:57Z"
+  mac: ENC[AES256_GCM,data:oIc9M4ZvX7uwmAwwS74trdgsgdDNxKq+zu0POhRBk5qR686tW5MveC1usIFvQNVGgQRKAPJcJbAw3SaWeV+tY3kS3jYV9V3iqrSWOg1pN+FRpMfj6nof2k2+addNjsQpTnibX7VBQilbHM31R1e/MsLPY4c7a6Ar89Geyn0SM9g=,iv:L1JPOcyJDoZXB4z6EqsX1JL6ZdDN57QY6NGwXSIDWSo=,tag:6573bjR7894rqhnOtHA94w==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  version: 3.10.2

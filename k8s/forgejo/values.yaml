@@ -1,0 +1,35 @@
+global:
+  storageClass: cluster-nvmf
+valkey-cluster:
+  enabled: false
+valkey:
+  enabled: true
+postgresql:
+  enabled: true
+postgresql-ha:
+  enabled: false
+persistence:
+  enabled: true
+  size: 25Gi
+gitea:
+  config:
+    APP_NAME: Tale Git
+    server:
+      ROOT_URL: "https://git.tale.me"
+      LANDING_PAGE: login
+    service:
+      DISABLE_REGISTRATION: true
+      ALLOW_ONLY_EXTERNAL_REGISTRATION: true
+      REQUIRE_SIGNIN_VIEW: true
+    database:
+      DB_TYPE: postgres
+    indexer:
+      ISSUE_INDEXER_TYPE: bleve
+      REPO_INDEXER_ENABLED: true
+  oauth:
+    - name: pocket-id
+      provider: openidConnect
+      autoDiscoverUrl: "https://idp.tale.me/.well-known/openid-configuration"
+      existingSecret: forgejo-oidc
+      scopes: "openid profile email"
+      skipLocal2fa: true
