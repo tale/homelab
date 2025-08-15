@@ -1,0 +1,103 @@
+---
+- name: 'Deploy Assetto Corsa Server Manager'
+  hosts: 'oracle'
+  become: true
+  gather_facts: false
+  vars:
+    acsm_workdir: '/mnt/tale-opsv/acsm'
+    acsm_domain: 'assetto-corsa.tale.me'
+    acsm_port: 8772
+  tasks:
+    - name: 'Ensure ACSM group exists'
+      ansible.builtin.group:
+        name: 'acsm'
+        system: true
+
+    - name: 'Ensure ACSM user exists'
+      ansible.builtin.user:
+        name: 'acsm'
+        group: 'acsm'
+        system: true
+        create_home: false
+      register: '_user'
+
+    - name: 'Assert ACSM directory exists'
+      register: 'acsm_bin_stat'
+      ansible.builtin.stat:
+        path: '{{ acsm_workdir }}/server-manager'
+
+    - name: 'Fail if ACSM binary not found'
+      when: 'not acsm_bin_stat.stat.exists'
+      ansible.builtin.fail:
+        msg: 'Binary ''server-manager'' not found in {{ acsm_workdir }}. Please ensure it is built and placed there.'
+
+    - name: 'Create systemd unit for assetto-corsa-server-manager'
+      notify: 'Restart assetto-corsa-server-manager'
+      ansible.builtin.copy:
+        dest: '/etc/systemd/system/assetto-corsa-server-manager.service'
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Assetto Corsa Server Manager
+          After=network-online.target
+          Wants=network-online.target
+          [Service]
+          User=acsm
+          Group=acsm
+          WorkingDirectory={{ acsm_workdir }}
+          ExecStart={{ acsm_workdir }}/server-manager
+          Restart=on-failure
+          RestartSec=3
+          NoNewPrivileges=true
+          PrivateTmp=true
+          LimitNOFILE=65536
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: 'Reload systemd'
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: 'Enable & start assetto-corsa-server-manager'
+      ansible.builtin.systemd:
+        name: 'assetto-corsa-server-manager'
+        enabled: true
+        state: 'started'
+
+    - name: 'Wait for ACSM to listen on port {{ acsm_port }}'
+      ansible.builtin.wait_for:
+        host: '127.0.0.1'
+        port: '{{ acsm_port }}'
+        timeout: 30
+
+    - name: 'Ensure Traefik rules dir exists'
+      ansible.builtin.file:
+        path: '/etc/traefik/rules'
+        state: 'directory'
+        mode: '0755'
+
+    - name: 'Install Traefik rule for Assetto Corsa Server Manager'
+      ansible.builtin.copy:
+        dest: '/etc/traefik/rules/assetto-corsa-server-manager.yaml'
+        mode: '0644'
+        content: |
+          http:
+            routers:
+              acsm:
+                rule: "Host(`{{ acsm_domain }}`)"
+                entryPoints:
+                  - https
+                tls:
+                  certResolver: letsencrypt
+                service: acsm
+            services:
+              acsm:
+                loadBalancer:
+                  servers:
+                    - url: "http://host.containers.internal:{{ acsm_port }}"
+
+  handlers:
+    - name: 'Restart assetto-corsa-server-manager'
+      ansible.builtin.systemd:
+        name: 'assetto-corsa-server-manager'
+        state: 'restarted'

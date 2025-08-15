@@ -7,6 +7,9 @@ default:
 	@echo "  k <project> [task] - Run the Justfile in 'k8s/<project>'"
 	@echo "  t <task> - Run the Justfile in 'talos'"
 
+a *args:
+	@cd "cloud" && just a "$@"
+
 k *args:
     @cd "k8s/$1" && shift && just "$@"
 

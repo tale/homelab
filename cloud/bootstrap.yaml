@@ -1,0 +1,17 @@
+---
+- name: 'Bootstrap Cloud VM'
+  hosts: 'oracle'
+  become: true
+  gather_facts: false
+  tasks:
+    - name: 'Install Podman'
+      ansible.builtin.dnf:
+        state: 'latest'
+        name: 'podman'
+
+    - name: 'Enable Podman socket'
+      ansible.builtin.systemd:
+        name: 'podman.socket'
+        enabled: true
+        state: 'started'
+        daemon_reload: true

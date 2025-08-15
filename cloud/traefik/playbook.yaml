@@ -1,0 +1,63 @@
+---
+- name: 'Setup Traefik'
+  hosts: 'oracle'
+  become: true
+  gather_facts: false
+  vars:
+    traefik_version: '3.5.0'
+  tasks:
+    - name: 'Decrypt secrets via SOPS'
+      community.sops.load_vars:
+        file: 'secrets.sops.yaml'
+
+    - name: 'Ensure /etc/traefik and /var/lib/traefik exist'
+      ansible.builtin.file:
+        path: '{{ item.path }}'
+        mode: '{{ item.mode }}'
+        state: 'directory'
+      loop:
+        - path: '/etc/traefik/rules'
+          mode: '0755'
+        - path: '/var/lib/traefik'
+          mode: '0700'
+
+    - name: 'Copy configuration files'
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: '/etc/traefik/{{ item }}'
+        mode: '0644'
+        directory_mode: '0755'
+      loop:
+        - 'traefik.yaml'
+        - 'rules/canister.yaml'
+
+    - name: 'Create shared container network'
+      containers.podman.podman_network:
+        name: 'traefik-net'
+        state: 'present'
+
+    - name: 'Create Traefik container'
+      containers.podman.podman_container:
+        name: 'traefik'
+        image: 'docker.io/library/traefik:{{ traefik_version }}'
+        state: 'started'
+        restart_policy: 'always'
+        healthcheck: 'traefik healthcheck'
+        ports:
+          - '443:443'
+          - '8080:8080'
+        volumes:
+          - '/var/run/podman/podman.sock:/var/run/docker.sock:Z'
+          - '/etc/traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro'
+          - '/etc/traefik/rules:/etc/traefik/rules:ro'
+          - '/var/lib/traefik:/var/lib/traefik:Z'
+        network:
+          - 'traefik-net'
+        env:
+          TZ: 'America/New_York'
+          CF_DNS_API_TOKEN: '{{ cloudflare_api_token }}'
+        labels:
+          traefik.enable: 'true'
+          traefik.http.routers.traefik.rule: 'Host(`traefik.tale.me`)'
+          traefik.http.routers.traefik.service: 'api@internal'
+          traefik.http.routers.traefik.middlewares: 'tinyauth'

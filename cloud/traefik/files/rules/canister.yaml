@@ -1,0 +1,27 @@
+---
+http:
+  routers:
+    clickhouse:
+      rule: 'Host(`ck.canister.me`)'
+      service: 'canister'
+      tls:
+        certResolver: 'letsencrypt'
+      middlewares:
+        - 'cors'
+  services:
+    canister:
+      loadBalancer:
+        servers:
+          - url: 'http://host.containers.internal:2086'
+  middlewares:
+    cors:
+      headers:
+        accessControlAllowHeaders: '*'
+        accessControlAllowMethods:
+          - 'GET'
+          - 'POST'
+          - 'PUT'
+        accessControlAllowOriginList:
+          - 'https://ck.canister.me'
+        accessControlMaxAge: 100
+        addVaryHeader: true

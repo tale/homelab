@@ -1,0 +1,75 @@
+---
+- name: 'Setup Pocket ID'
+  hosts: 'oracle'
+  become: true
+  gather_facts: false
+  vars:
+    pocketid_version: 'v1.7.0'
+    tinyauth_version: 'v3.6.2'
+    pocketid_subdomain: 'idp'
+    tinyauth_subdomain: 'auth-services'
+    cookie_domain: '.tale.me'
+  tasks:
+    - name: 'Decrypt secrets via SOPS'
+      community.sops.load_vars:
+        file: 'secrets.sops.yaml'
+
+    - name: 'Create Pocket ID container'
+      containers.podman.podman_container:
+        name: 'pocket-id'
+        image: 'ghcr.io/pocket-id/pocket-id:{{ pocketid_version }}'
+        state: 'started'
+        restart_policy: 'always'
+        healthcheck: '/app/pocket-id healthcheck'
+        volumes:
+          - '/var/lib/pocket-id:/app/data:Z'
+        env:
+          APP_URL: 'https://{{ pocketid_subdomain }}{{ cookie_domain }}'
+          TRUST_PROXY: 'true'
+          APP_NAME: 'Tale Lab'
+          SESSION_DURATION: '180'
+          EMAILS_VERIFIED: 'true'
+          ALLOW_OWN_ACCOUNT_EDIT: 'true'
+          SMTP_HOST: 'email-smtp.us-east-1.amazonaws.com'
+          SMTP_PORT: '587'
+          SMTP_FROM: 'noreply@tale.me'
+          SMTP_TLS: 'starttls'
+          EMAIL_LOGIN_NOTIFICATION_ENABLED: 'true'
+          EMAIL_ONE_TIME_ACCESS_ENABLED: 'true'
+          MAXMIND_LICENSE_KEY: '{{ maxmind_license_key }}'
+          SMTP_USER: '{{ smtp_user }}'
+          SMTP_PASSWORD: '{{ smtp_password }}'
+        labels:
+          traefik.enable: 'true'
+          traefik.http.routers.pocket-id.rule: 'Host(`{{ pocketid_subdomain }}{{ cookie_domain }}`)'
+
+    - name: 'Ensure Traefik network exists'
+      containers.podman.podman_network:
+        name: 'traefik-net'
+        state: 'present'
+
+    - name: 'Create Tinyauth container'
+      containers.podman.podman_container:
+        name: 'tinyauth'
+        image: 'ghcr.io/steveiliop56/tinyauth:{{ tinyauth_version }}'
+        state: 'started'
+        restart_policy: 'always'
+        healthcheck: 'curl -f http://localhost:3000/api/healthcheck || exit 1'
+        network:
+          - 'traefik-net'
+        env:
+          SECRET: '{{ tinyauth_cookie_secret }}'
+          APP_URL: 'https://{{ tinyauth_subdomain }}{{ cookie_domain }}'
+          OAUTH_AUTO_REDIRECT: 'generic'
+          DISABLE_CONTINUE: 'true'
+          GENERIC_CLIENT_ID: '{{ tinyauth_client_id }}'
+          GENERIC_CLIENT_SECRET: '{{ tinyauth_client_secret }}'
+          GENERIC_AUTH_URL: 'https://{{ pocketid_subdomain }}{{ cookie_domain }}/authorize'
+          GENERIC_TOKEN_URL: 'https://{{ pocketid_subdomain }}{{ cookie_domain }}/api/oidc/token'
+          GENERIC_USER_URL: 'https://{{ pocketid_subdomain }}{{ cookie_domain }}/api/oidc/userinfo'
+          GENERIC_SCOPES: 'openid email profile groups'
+          GENERIC_NAME: 'Pocket ID'
+        labels:
+          traefik.enable: 'true'
+          traefik.http.routers.tinyauth.rule: 'Host(`{{ tinyauth_subdomain }}{{ cookie_domain }}`)'
+          traefik.http.middlewares.tinyauth.forwardauth.address: 'http://tinyauth:3000/api/auth/traefik'

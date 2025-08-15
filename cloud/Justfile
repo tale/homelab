@@ -1,0 +1,7 @@
+a playbook_path: bootstrap
+	ansible-playbook -i {{justfile_directory()}}/inventory.yaml \
+		{{justfile_directory()}}/{{playbook_path}}/playbook.yaml
+
+bootstrap:
+	ansible-playbook -i {{justfile_directory()}}/inventory.yaml \
+	{{justfile_directory()}}/bootstrap.yaml

@@ -6,6 +6,9 @@ actual cluster software, I was aiming to have a very simple setup that is
 secure by default, easy to manage, and optionally immutable. Talos Linux
 checked all of those boxes and includes tons of extra goodies for homelabbers.
 
+> I also use the cloud for a few strategic workloads, for more information and a
+> list of deployments on OCI, see the [Cloud](./cloud/README.md) documentation.
+
 ## Deployments
 > All deployments are accessible by running `just k <deployment>`, where
 > `<deployment>` is the name of the deployment directory (ie. `just k metallb`).
