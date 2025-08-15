@@ -9,6 +9,7 @@ services, I have provisioned a 4 core 24GB RAM ARM server on Oracle Cloud (OCI).
 - **Traefik**: Reverse proxy for production and homelab-cloud services
 - **Pocket ID & Tinyauth**: OIDC/identity provider and forward-auth service
 - **AC Server Manager**: Web UI to manage an Assetto Corsa racing server
+- **Wakapi**: Self-hosted WakaTime upstream for tracking coding activity
 
 ### Deployment Tools
 Since this server also runs bare-metal production workloads for important APIs

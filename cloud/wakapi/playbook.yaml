@@ -1,0 +1,55 @@
+---
+- name: 'Setup Wakapi'
+  hosts: 'oracle'
+  become: true
+  gather_facts: false
+  vars:
+    wakapi_version: '2.14.1'
+    wakapi_domain: 'wakatime.tale.me'
+  tasks:
+    - name: 'Decrypt secrets via SOPS'
+      community.sops.load_vars:
+        file: 'secrets.sops.yaml'
+
+    - name: 'Ensure /var/lib/wakapi directory exists'
+      ansible.builtin.file:
+        path: '/var/lib/wakapi'
+        mode: '0700'
+        state: 'directory'
+        owner: 'opc'
+        group: 'opc'
+
+    - name: 'Create Wakapi container'
+      containers.podman.podman_container:
+        name: 'wakapi'
+        image: 'ghcr.io/muety/wakapi:{{ wakapi_version }}'
+        state: 'started'
+        restart_policy: 'always'
+        healthcheck: 'wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1'
+        volumes:
+          - '/var/lib/wakapi:/data:Z'
+        env:
+          ENVIRONMENT: 'production'
+          WAKAPI_LEADERBOARD_ENABLED: 'false'
+          WAKAPI_AVATAR_URL_TEMPLATE: 'https://github.com/{username}.png?size=256'
+          WAKAPI_LISTEN_IPV4: '0.0.0.0'
+          WAKAPI_LISTEN_IPV6: '-'
+          WAKAPI_PUBLIC_URL: 'https://{{ wakapi_domain }}'
+          WAKAPI_PASSWORD_SALT: '{{ wakapi_password_salt }}'
+          WAKAPI_DISABLE_FRONTPAGE: 'true'
+          WAKAPI_TRUSTED_HEADER_AUTH: 'true'
+          WAKAPI_TRUSTED_HEADER_AUTH_KEY: 'Remote-User'
+          WAKAPI_TRUSTED_HEADER_AUTH_ALLOW_SIGNUP: 'true'
+          WAKAPI_TRUST_REVERSE_PROXY_IPS: '0.0.0.0/0'
+          WAKAPI_DB_TYPE: 'sqlite3'
+          WAKAPI_DB_NAME: '/data/wakatime.db'
+          WAKAPI_MAIL_ENABLED: 'true'
+          WAKAPI_MAIL_SENDER: 'Wakapi <noreply@tale.me>'
+          WAKAPI_MAIL_SMTP_HOST: 'email-smtp.us-east-1.amazonaws.com'
+          WAKAPI_MAIL_SMTP_PORT: '587'
+          WAKAPI_MAIL_SMTP_USER: '{{ wakapi_mail_smtp_user }}'
+          WAKAPI_MAIL_SMTP_PASS: '{{ wakapi_mail_smtp_pass }}'
+        labels:
+          traefik.enable: 'true'
+          traefik.http.routers.wakapi.rule: 'Host(`{{ wakapi_domain }}`)'
+          traefik.http.routers.wakapi.middlewares: 'tinyauth'

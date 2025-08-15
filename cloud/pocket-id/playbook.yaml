@@ -73,3 +73,4 @@
           traefik.enable: 'true'
           traefik.http.routers.tinyauth.rule: 'Host(`{{ tinyauth_subdomain }}{{ cookie_domain }}`)'
           traefik.http.middlewares.tinyauth.forwardauth.address: 'http://tinyauth:3000/api/auth/traefik'
+          traefik.http.middlewares.tinyauth.forwardauth.authResponseHeaders: 'remote-user'
