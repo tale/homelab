@@ -2,6 +2,6 @@
 all:
   hosts:
     oracle:
-      ansible_host: 'taleprod-ops1.heron-mahi.ts.net'
+      ansible_host: 'lab-cloud.heron-mahi.ts.net'
       ansible_user: 'opc'
       ansible_become: true
