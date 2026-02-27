@@ -12,7 +12,11 @@ machine:
 
   install:
     # This image includes the siderolabs/tailscale extension
-    image: factory.talos.dev/metal-installer-secureboot/4a0d65c669d46663f377e7161e50cfd570c401f26fd9e7bda34a0216b6f1922b:v1.10.6
+    # image: factory.talos.dev/metal-installer-secureboot/4a0d65c669d46663f377e7161e50cfd570c401f26fd9e7bda34a0216b6f1922b:v1.10.6
+    # image: factory.talos.dev/metal-installer-secureboot/4a0d65c669d46663f377e7161e50cfd570c401f26fd9e7bda34a0216b6f1922b:v1.10.8
+    # image: factory.talos.dev/metal-installer-secureboot/4a0d65c669d46663f377e7161e50cfd570c401f26fd9e7bda34a0216b6f1922b:v1.11.6
+    image: factory.talos.dev/metal-installer-secureboot/4a0d65c669d46663f377e7161e50cfd570c401f26fd9e7bda34a0216b6f1922b:v1.12.4
+
     wipe: false
 
     disk:

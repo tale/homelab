@@ -4,7 +4,7 @@ cilium-version := "1.18.0"
 
 apply-node-config node ip *args: (gen-node-config node)
 	@echo "👉 Applying Talos configuration for {{node}}"
-	talosctl apply-config \
+	talos apply-config \
 		--nodes {{ip}} \
 		--file {{justfile_directory()}}/{{node}}.gen.yaml \
 		{{args}}
@@ -15,7 +15,7 @@ gen-node-config node: gen-base-config
 		--output {{justfile_directory()}}/{{node}}.gen.yaml \
 		--patch @{{justfile_directory()}}/patches/{{node}}.yaml \
 
-gen-base-config: config-sops
+gen-base-config:
 	@echo "👉 Rendering Talos configuration files"
 	@just --justfile {{justfile_directory()}}/../k8s/cilium/Justfile gen-cilium-template
 	talos gen config {{cluster-name}} {{endpoint-ip}} \
