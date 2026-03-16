@@ -1,0 +1,25 @@
+omada_release := "oci://registry-1.docker.io/mbentley/omada-controller-helm"
+omada_version := "1.1.5"
+
+default: mongodb routing helm
+
+mongodb: mongodb-sops
+	@echo "👉 Creating MongoDB for Omada Controller"
+	kubectl apply -f {{justfile_directory()}}/manifests/6-mongodb-init.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/5-mongodb.yaml
+
+mongodb-sops:
+	@echo "👉 Decrypting MongoDB credentials"
+	sops -d {{justfile_directory()}}/manifests/3-mongodb-secret.sops.yaml | kubectl apply -f -
+	sops -d {{justfile_directory()}}/manifests/4-omada-mongodb-uri.sops.yaml | kubectl apply -f -
+
+helm: mongodb
+	@echo "👉 Installing Omada Controller Helm chart"
+	helm upgrade --install omada-controller {{omada_release}} \
+		--version {{omada_version}} \
+		-f {{justfile_directory()}}/values.yaml
+
+routing:
+	@echo "👉 Creating MetalLB pool and routing for Omada Controller"
+	kubectl apply -f {{justfile_directory()}}/manifests/1-metallb.yaml
+	kubectl apply -f {{justfile_directory()}}/manifests/2-http-route.yaml

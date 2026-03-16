@@ -1,0 +1,18 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: omada-pool
+  namespace: metallb-system
+spec:
+  autoAssign: false
+  addresses:
+    - 10.0.0.240/32
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: omada-l2
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - omada-pool
