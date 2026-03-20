@@ -109,6 +109,8 @@ spec:
       prometheusSpec:
         retention: 24h # We have VictoriaMetrics for long-term storage
         retentionSize: 20GB
+        podMonitorSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
         scrapeInterval: 15s
         scrapeTimeout: 10s
         evaluationInterval: 30s
