@@ -21,6 +21,9 @@ resources:
   - envoy/gateway-grant.yaml
   - envoy/fallback-page.yaml
 
+  # flux-operator
+  - flux-operator/instance.yaml
+
   # openebs
   - openebs/disk-pools.yaml
   - openebs/storage-class.yaml
