@@ -5,6 +5,7 @@ metadata:
   namespace: default
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt"
+    external-dns.alpha.kubernetes.io/target: "h.tale.me"
 spec:
   gatewayClassName: envoy
   listeners:
