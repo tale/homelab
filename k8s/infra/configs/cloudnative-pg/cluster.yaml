@@ -14,3 +14,19 @@ spec:
     size: 50Gi
   monitoring:
     enablePodMonitor: true
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://tale-home/cnpg/
+      endpointURL: https://s3.wasabisys.com
+      s3Credentials:
+        accessKeyId:
+          name: cnpg-wasabi-credentials
+          key: ACCESS_KEY_ID
+        secretAccessKey:
+          name: cnpg-wasabi-credentials
+          key: ACCESS_SECRET_KEY
+      wal:
+        compression: gzip
+      data:
+        compression: gzip
+    retentionPolicy: "30d"

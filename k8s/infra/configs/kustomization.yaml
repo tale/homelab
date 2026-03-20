@@ -14,6 +14,8 @@ resources:
   # cloudnative-pg
   - cloudnative-pg/cluster.yaml
   - cloudnative-pg/blocky-database.yaml
+  - cloudnative-pg/wasabi-credentials.sops.yaml
+  - cloudnative-pg/scheduled-backup.yaml
 
   # metallb
   - metallb/omada-pool.yaml
