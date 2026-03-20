@@ -8,20 +8,20 @@ spec:
   chart:
     spec:
       chart: external-dns
-      version: 8.7.3
+      version: 1.20.0
       sourceRef:
         kind: HelmRepository
         name: external-dns
   values:
-    provider: cloudflare
-    cloudflare:
-      proxied: true
+    provider:
+      name: cloudflare
     domainFilters:
       - tale.me
     sources:
       - gateway-httproute
     extraArgs:
       - --default-targets=h.tale.me
+      - --cloudflare-proxied
     env:
       - name: CF_API_TOKEN
         valueFrom:
