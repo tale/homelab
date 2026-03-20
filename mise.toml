@@ -7,6 +7,12 @@
 "asdf:mise-plugins/mise-pipx" = "1.7.1"
 ansible = "latest"
 "npm:oxfmt" = "latest"
+flux2 = "latest"
+lefthook = "latest"
+"aqua:mikefarah/yq" = "latest"
+
+[hooks]
+postinstall = "lefthook install"
 
 [env]
 SOPS_AGE_KEY_FILE = "{{env.HOME}}/.config/sops/age/keys.txt"

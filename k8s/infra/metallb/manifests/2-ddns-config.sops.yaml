@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: config-cloudflare-ddns
+  namespace: metallb-system
+stringData:
+  config.json: ENC[AES256_GCM,data:G8MAxgwpU+doTzfCmrYIY5Rkvs8kEEBoIkOdpwX6JVm+uIXBSosI3HffLM8qHkZBdkB953pagbLVyU00f0HhV/e0Z65P5WiEdHFuds12zDSkiZ2B5LNaf1PwX4GhB63od0mnk2jpjjd3R6m2+wmd5Ls/XvGa43jlxFHqZ0jOSjimz2iysRDJYSrIzs2slS3V7988ytSWe0sH4Qv38NfUL9OQYtMvSUxGUt/vn4W7O/i310MN2MMSyxXuM9c4NgApxiLmV2b8b/qUuHlhCYai4QsbVPVj+bfh9yCN1QbW7rboQpTtd2RoUe73Esq39cxkmHKH/FA7aqIsTEocbkhgwu2MyNWXgULKlZ8rfwnuEjBywh0QbpYmCW5Hn78/FPRZyhBsjMNDLWcqrclFid82N+UR6jEEdCUS2qJapctvE74zEiWs7J4H9FMnl/aXrfiOMnlN2/ggrgFkv59vCYOxfapcqQHr6MGIPWYjpWHK0xrho7pAoBI8uZR4/039ug==,iv:7WBdx7NDYnKTYjJ9NjCq2rh8G+cR3Vai/tFMFjNLIuQ=,tag:QrWhT00EvnwtA5PKdSCXDQ==,type:str]
+sops:
+  age:
+    - recipient: age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBDMG42YWxrby9FV0xjakl1
+        VEpqK2FCOWRjZnphUlB3U0xkRmJIc25ORkNJCjAwTXg5ZXE0ODhxdXhWQklWdnNn
+        TmhOZ0phci9rZ0VGelhlR1I0WE9UVE0KLS0tIGh2cW52ZC9DMkNvZ01vQ1RLSGl0
+        NGxlMG1rb3g1K0R1d3dVVFJlamdqS2MKF6iZZIqT8aXafx1aHw5HyBz2PaAonGJq
+        ea20bOIzzO4XZWGx3WdAZVRvzfn7SHQjtftFZdAGlW+zbWBiqNS6GQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2025-12-19T15:53:12Z"
+  mac: ENC[AES256_GCM,data:J+6koeZ21x0kRJyMxIFhD4LD0epM9W+bpE8YNnPmOmxWoIW20TsZfnphNV5+jW+bIzNOZdW2X+otMOwMiexA7AV8zii5DDsFfFYFWOLK1ezhpAvd2mn6ynqeyV33pqKE/HkfIWUaFSiTGr6C4mtp3unoy2LKVyIxKLhCD4+3Rvc=,iv:1aokSQYKMwbpz/ljgtvMSL4aGsx7PqsG1TP3xieN29c=,tag:Skn+5ynLKYfHU/wSTKU5QA==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  version: 3.10.2

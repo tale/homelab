@@ -10,22 +10,53 @@ checked all of those boxes and includes tons of extra goodies for homelabbers.
 ## Deployments
 
 All deployments are managed by [Flux CD](https://fluxcd.io/) using a GitOps
-workflow. Pushing changes to the `k8s/apps/` directory automatically reconciles
+workflow. Pushing changes to the `k8s/` directory automatically reconciles
 the cluster state. SOPS-encrypted secrets are decrypted natively by Flux using
 [age](https://github.com/FiloSottile/age) encryption.
 
-- General
-  - [**cert-manager**](./k8s/apps/cert-manager/): TLS certificate issuer
-  - [**Cilium**](./k8s/cilium/): CNI plugin for the cluster
-  - [**Envoy Gateway**](./k8s/envoy/): Gateway for the cluster
-  - [**MetalLB**](./k8s/metallb/): Load balancer for the cluster
-  - [**OpenEBS**](./k8s/openebs/): Storage for the cluster
-  - [**Observability Stack**](./k8s/observability/): Monitoring
+- Infrastructure (`k8s/infra/`)
+  - [**OpenEBS**](./k8s/infra/openebs/): Replicated storage
+  - [**MetalLB**](./k8s/infra/metallb/): Load balancer
+  - [**cert-manager**](./k8s/infra/cert-manager/): TLS certificate issuer
+  - [**Envoy Gateway**](./k8s/infra/envoy/): Gateway
+  - [**Cilium**](./k8s/infra/cilium/): CNI and Hubble UI
 
-- Home
+- Apps (`k8s/`)
   - [**Blocky**](./k8s/blocky/): DNS server for ad-blocking
-  - [**Home Assistant**](./k8s/home-assistant/): Home automation
   - [**Forgejo**](./k8s/forgejo/): Self-hosted Git server
+  - [**Observability**](./k8s/observability/): Prometheus, VictoriaMetrics, Grafana
+  - [**Omada Controller**](./k8s/omada-controller/): TP-Link network management
+  - [**Home Assistant**](./k8s/home-assistant/): Home automation
+  - [**MC Bedrock**](./k8s/mc-bedrock/): Minecraft Bedrock server
+
+## Dependency Graph
+
+<!-- regenerate with: bash k8s/generate-diagram.sh -->
+```mermaid
+flowchart TD
+    cert_manager[cert-manager]
+    cilium[cilium]
+    cilium --> envoy
+    envoy[envoy]
+    envoy --> metallb
+    envoy --> cert_manager
+    metallb[metallb]
+    openebs[openebs]
+    blocky[blocky]
+    blocky --> metallb
+    forgejo[forgejo]
+    forgejo --> envoy
+    home_assistant[home-assistant]
+    home_assistant --> envoy
+    home_assistant --> metallb
+    mc_bedrock[mc-bedrock]
+    mc_bedrock --> metallb
+    observability[observability]
+    observability --> envoy
+    omada_controller[omada-controller]
+    omada_controller --> envoy
+    omada_controller --> metallb
+```
 
 ## Bootstrap
 

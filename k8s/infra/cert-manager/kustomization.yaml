@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - repository.yaml
   - helmrelease.yaml
   - manifests/1-cf-apikey.sops.yaml
   - manifests/2-test-issuer.yaml

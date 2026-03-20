@@ -7,4 +7,3 @@ metadata:
     pod-security.kubernetes.io/warn: privileged
   name: metallb-system
 ---
-
