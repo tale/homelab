@@ -18,6 +18,7 @@ resources:
   # metallb
   - metallb/omada-pool.yaml
   - metallb/blocky-pool.yaml
+  - metallb/samba-pool.yaml
 
   # envoy
   - envoy/metallb.yaml

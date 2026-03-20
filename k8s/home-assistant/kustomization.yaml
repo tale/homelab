@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - manifests/1-ns.yaml
+  - manifests/2-ha-pvc.yaml
+  - manifests/3-ha-deployment.yaml
+  - manifests/4-ha-http-route.yaml
+  - manifests/5-eufy-pvc.yaml
+  - manifests/6-eufy-config.sops.yaml
+  - manifests/7-eufy-deployment.yaml
+  - manifests/8-eufy-svc.yaml
+  - manifests/9-scrypted-pvc.yaml
+  - manifests/10-scrypted-deployment.yaml
+  - manifests/11-scrypted-svc.yaml

@@ -6,3 +6,4 @@ resources:
   - observability/flux.yaml
   - blocky/flux.yaml
   - omada-controller/flux.yaml
+  - samba/flux.yaml
