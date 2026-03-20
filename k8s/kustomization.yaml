@@ -2,10 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - flux-system
-
   # Infra
-  - infra/capacitor/flux.yaml
+  - infra/flux-operator/flux.yaml
   - infra/openebs/flux.yaml
   - infra/metallb/flux.yaml
   - infra/cert-manager/flux.yaml
