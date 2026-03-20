@@ -1,0 +1,9 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: external-dns
+  namespace: cert-manager
+spec:
+  type: oci
+  url: oci://registry-1.docker.io/bitnamicharts
+  interval: 1h

@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ocirepository.yaml
+  - kustomization-crd.yaml
+  - manifests/1-oidc-secret.sops.yaml
+  - manifests/2-http-route.yaml
+  - manifests/3-security-policy.yaml

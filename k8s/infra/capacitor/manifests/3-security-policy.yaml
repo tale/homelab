@@ -1,0 +1,18 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: capacitor-oidc
+  namespace: flux-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: capacitor
+  oidc:
+    provider:
+      issuer: https://idp.tale.me
+    clientID: c87cccfc-0696-4478-9f25-1a7076314160
+    clientSecret:
+      name: capacitor-oidc-secret
+    redirectURL: https://flux.tale.me/oauth2/callback
+    logoutPath: /logout

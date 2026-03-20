@@ -19,7 +19,9 @@ the cluster state. SOPS-encrypted secrets are decrypted natively by Flux using
   - [**MetalLB**](./k8s/infra/metallb/): Load balancer
   - [**cert-manager**](./k8s/infra/cert-manager/): TLS certificate issuer
   - [**Envoy Gateway**](./k8s/infra/envoy/): Gateway
+  - [**External DNS**](./k8s/infra/external-dns/): Automatic Cloudflare DNS
   - [**Cilium**](./k8s/infra/cilium/): CNI and Hubble UI
+  - [**Capacitor**](./k8s/infra/capacitor/): Flux UI dashboard
 
 - Apps (`k8s/`)
   - [**Blocky**](./k8s/blocky/): DNS server for ad-blocking
@@ -34,12 +36,16 @@ the cluster state. SOPS-encrypted secrets are decrypted natively by Flux using
 <!-- regenerate with: bash k8s/generate-diagram.sh -->
 ```mermaid
 flowchart TD
+    capacitor_setup[capacitor-setup]
+    capacitor_setup --> envoy
     cert_manager[cert-manager]
     cilium[cilium]
     cilium --> envoy
     envoy[envoy]
     envoy --> metallb
     envoy --> cert_manager
+    external_dns[external-dns]
+    external_dns --> cert_manager
     metallb[metallb]
     openebs[openebs]
     blocky[blocky]
