@@ -5,17 +5,27 @@ set -euo pipefail
 echo '```mermaid'
 echo "flowchart TD"
 
-for flux in k8s/infra/*/flux.yaml k8s/*/flux.yaml; do
+files=("k8s/infra/flux.yaml")
+for f in k8s/*/flux.yaml; do
+  [[ "$f" == k8s/infra/flux.yaml ]] && continue
+  files+=("$f")
+done
+
+for flux in "${files[@]}"; do
   [ -f "$flux" ] || continue
 
-  name=$(yq '.metadata.name' "$flux")
-  id=$(echo "$name" | tr '-' '_')
-  echo "    ${id}[${name}]"
+  count=$(yq 'document_index' "$flux" | wc -l)
 
-  deps=$(yq '.spec.dependsOn[].name // ""' "$flux" 2>/dev/null || true)
-  for dep in $deps; do
-    dep_id=$(echo "$dep" | tr '-' '_')
-    echo "    ${id} --> ${dep_id}"
+  for i in $(seq 0 $((count - 1))); do
+    name=$(yq "select(document_index == $i) | .metadata.name" "$flux")
+    id=$(echo "$name" | tr '-' '_')
+    echo "    ${id}[${name}]"
+
+    deps=$(yq "select(document_index == $i) | .spec.dependsOn[].name // \"\"" "$flux" 2>/dev/null || true)
+    for dep in $deps; do
+      dep_id=$(echo "$dep" | tr '-' '_')
+      echo "    ${id} --> ${dep_id}"
+    done
   done
 done
 

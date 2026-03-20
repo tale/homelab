@@ -1,11 +1,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: openebs
+  name: mc-bedrock
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: infra-configs
   interval: 1h
-  path: ./k8s/infra/openebs
+  path: ./k8s/mc-bedrock
   prune: true
   sourceRef:
     kind: GitRepository

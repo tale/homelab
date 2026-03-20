@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # cert-manager
+  - cert-manager/repository.yaml
+  - cert-manager/helmrelease.yaml
+  - cert-manager/cf-apikey.sops.yaml
+
+  # cloudnative-pg
+  - cloudnative-pg/namespace.yaml
+  - cloudnative-pg/repository.yaml
+  - cloudnative-pg/helmrelease.yaml
+
+  # envoy
+  - envoy/repository.yaml
+  - envoy/helmrelease.yaml
+
+  # external-dns
+  - external-dns/repository.yaml
+  - external-dns/helmrelease.yaml
+
+  # flux-operator
+  - flux-operator/repository.yaml
+  - flux-operator/helmrelease.yaml
+  - flux-operator/oidc.sops.yaml
+  - flux-operator/rbac.yaml
+
+  # metallb
+  - metallb/namespace.yaml
+  - metallb/repository.yaml
+  - metallb/helmrelease.yaml
+  - metallb/ddns-config.sops.yaml
+  - metallb/ddns-deployment.yaml
+
+  # openebs
+  - openebs/repository.yaml
+  - openebs/helmrelease.yaml

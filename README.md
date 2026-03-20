@@ -16,15 +16,16 @@ CRD. Pushing changes to the `k8s/` directory automatically reconciles
 the cluster state. SOPS-encrypted secrets are decrypted natively by Flux using
 [age](https://github.com/FiloSottile/age) encryption.
 
-- Infrastructure (`k8s/infra/`)
-  - [**Flux Operator**](./k8s/infra/flux-operator/): Flux lifecycle management and web UI
-  - [**OpenEBS**](./k8s/infra/openebs/): Replicated storage
-  - [**MetalLB**](./k8s/infra/metallb/): Load balancer
-  - [**cert-manager**](./k8s/infra/cert-manager/): TLS certificate issuer
-  - [**Envoy Gateway**](./k8s/infra/envoy/): Gateway
-  - [**External DNS**](./k8s/infra/external-dns/): Automatic Cloudflare DNS
-  - [**Cilium**](./k8s/infra/cilium/): CNI and Hubble UI
-  - [**CloudNativePG**](./k8s/infra/cloudnative-pg/): Centralized PostgreSQL
+- Infrastructure (`k8s/infra/`) — split into `controllers/` (operators and Helm
+  charts) and `configs/` (CRDs that depend on those operators)
+  - **Flux Operator**: Flux lifecycle management and web UI
+  - **OpenEBS**: Replicated storage
+  - **MetalLB**: Load balancer
+  - **cert-manager**: TLS certificate issuer
+  - **Envoy Gateway**: Gateway
+  - **External DNS**: Automatic Cloudflare DNS
+  - **Cilium**: CNI and Hubble UI (CNI deployed via Talos, Hubble config via Flux)
+  - **CloudNativePG**: Centralized PostgreSQL
 
 - Apps (`k8s/`)
   - [**Blocky**](./k8s/blocky/): DNS server for ad-blocking
@@ -39,33 +40,21 @@ the cluster state. SOPS-encrypted secrets are decrypted natively by Flux using
 <!-- regenerate with: bash k8s/generate-diagram.sh -->
 ```mermaid
 flowchart TD
-    cert_manager[cert-manager]
-    cilium[cilium]
-    cilium --> envoy
-    cloudnative_pg[cloudnative-pg]
-    cloudnative_pg --> openebs
-    envoy[envoy]
-    envoy --> metallb
-    envoy --> cert_manager
-    external_dns[external-dns]
-    external_dns --> cert_manager
-    flux_operator[flux-operator]
-    metallb[metallb]
-    openebs[openebs]
+    infra_controllers[infra-controllers]
+    infra_configs[infra-configs]
+    infra_configs --> infra_controllers
     blocky[blocky]
-    blocky --> metallb
+    blocky --> infra_configs
     forgejo[forgejo]
-    forgejo --> envoy
+    forgejo --> infra_configs
     home_assistant[home-assistant]
-    home_assistant --> envoy
-    home_assistant --> metallb
+    home_assistant --> infra_configs
     mc_bedrock[mc-bedrock]
-    mc_bedrock --> metallb
+    mc_bedrock --> infra_configs
     observability[observability]
-    observability --> envoy
+    observability --> infra_configs
     omada_controller[omada-controller]
-    omada_controller --> envoy
-    omada_controller --> metallb
+    omada_controller --> infra_configs
 ```
 
 ## Bootstrap
@@ -96,13 +85,10 @@ After step 3, the operator installs the Flux controllers, creates a
 Everything else is automatic — the `dependsOn` chain in each project's
 `flux.yaml` ensures correct ordering:
 
-1. **No deps:** flux-operator, openebs, metallb, cert-manager
-2. **After openebs:** cloudnative-pg
-3. **After metallb + cert-manager:** envoy
-4. **After cert-manager:** external-dns
-5. **After envoy:** cilium, forgejo, observability
-6. **After metallb:** blocky, mc-bedrock
-7. **After envoy + metallb:** home-assistant, omada-controller
+1. **infra-controllers:** all operators and Helm charts install in parallel
+2. **infra-configs:** all CRD-based resources (issuers, gateways, storage
+   classes, PG cluster, etc.) apply after controllers are ready
+3. **Apps:** all apps depend on infra-configs
 
 Once reconciled, the `flux-operator` HelmRelease takes over management of
 the operator itself — future upgrades happen via Git, not Helm CLI.
