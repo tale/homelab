@@ -1,0 +1,177 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: victoriametrics
+  namespace: observability-system
+spec:
+  type: oci
+  url: oci://ghcr.io/victoriametrics/helm-charts
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: prometheus-community
+  namespace: observability-system
+spec:
+  type: oci
+  url: oci://ghcr.io/prometheus-community/charts
+  interval: 1h
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: victoriametrics
+  namespace: observability-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: victoria-metrics-single
+      version: 0.24.2
+      sourceRef:
+        kind: HelmRepository
+        name: victoriametrics
+  install:
+    createNamespace: true
+  values:
+    server:
+      retentionPeriod: 180d
+      persistentVolume:
+        enabled: true
+        storageClassName: cluster-nvmf
+        size: 200Gi
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: prometheus
+  namespace: observability-system
+spec:
+  dependsOn:
+    - name: victoriametrics
+  interval: 1h
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      version: 76.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+  install:
+    createNamespace: true
+  values:
+    alertmanager:
+      enabled: false
+    grafana:
+      enabled: true
+      persistence:
+        enabled: true
+        type: pvc
+        storageClassName: "cluster-nvmf"
+        accessModes:
+          - ReadWriteOnce
+        size: 25Gi
+      additionalDataSources:
+        - name: VictoriaLogs
+          type: victoriametrics-logs-datasource
+          url: http://victorialogs-victoria-logs-single-server.observability-system.svc.cluster.local:9428
+          access: proxy
+          isDefault: false
+      plugins:
+        - victoriametrics-logs-datasource
+      grafana.ini:
+        server:
+          root_url: "https://grafana.tale.me"
+        auth.generic_oauth:
+          enabled: true
+          allow_sign_up: true
+          auto_login: false
+          name: Pocket ID
+          client_id: $__file{/etc/secrets/auth_generic_oauth/client_id}
+          client_secret: $__file{/etc/secrets/auth_generic_oauth/client_secret}
+          scopes: "openid email profile"
+          auth_url: https://idp.tale.me/authorize
+          token_url: https://idp.tale.me/api/oidc/token
+          email_attribute_path: email
+          login_attribute_path: preferred_username
+          skip_org_role_sync: true
+      extraSecretMounts:
+        - name: grafana-oidc
+          secretName: grafana-oidc
+          defaultMode: 0440
+          mountPath: /etc/secrets/auth_generic_oauth
+          readOnly: true
+    kubeProxy:
+      enabled: false
+    prometheus:
+      enabled: true
+      prometheusSpec:
+        retention: 24h # We have VictoriaMetrics for long-term storage
+        retentionSize: 20GB
+        scrapeInterval: 15s
+        scrapeTimeout: 10s
+        evaluationInterval: 30s
+        remoteWrite:
+          - url: http://victoriametrics-victoria-metrics-single-server.observability-system.svc.cluster.local:8428/api/v1/write
+            name: victoriametrics
+            remoteTimeout: 30s
+            sendExemplars: true
+            queueConfig:
+              capacity: 20000
+              maxShards: 8
+              minShards: 1
+              maxSamplesPerSend: 2000
+              batchSendDeadline: 5s
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: "cluster-nvmf"
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 25Gi
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: victorialogs
+  namespace: observability-system
+spec:
+  dependsOn:
+    - name: victoriametrics
+  interval: 1h
+  chart:
+    spec:
+      chart: victoria-logs-single
+      version: 0.11.28
+      sourceRef:
+        kind: HelmRepository
+        name: victoriametrics
+  values:
+    server:
+      retentionPeriod: 90d
+      persistentVolume:
+        enabled: true
+        storageClassName: cluster-nvmf
+        size: 50Gi
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: logs-collector
+  namespace: observability-system
+spec:
+  dependsOn:
+    - name: victorialogs
+  interval: 1h
+  chart:
+    spec:
+      chart: victoria-logs-collector
+      version: 0.14.2
+      sourceRef:
+        kind: HelmRepository
+        name: victoriametrics
+  values:
+    remoteWrite:
+      - url: http://victorialogs-victoria-logs-single-server.observability-system.svc.cluster.local:9428
