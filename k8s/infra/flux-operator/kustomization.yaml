@@ -6,5 +6,4 @@ resources:
   - helmrelease.yaml
   - instance.yaml
   - manifests/1-oidc.sops.yaml
-  - manifests/2-security-policy.yaml
-  - manifests/3-reference-grant.yaml
+  - manifests/2-rbac.yaml

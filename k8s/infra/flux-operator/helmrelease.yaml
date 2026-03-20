@@ -12,9 +12,22 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: flux-operator
+  valuesFrom:
+    - kind: Secret
+      name: flux-ui-oidc-secret
+      valuesKey: client-secret
+      targetPath: web.config.authentication.oauth2.clientSecret
   values:
     web:
       enabled: true
+      config:
+        baseURL: https://flux.tale.me
+        authentication:
+          type: OAuth2
+          oauth2:
+            provider: OIDC
+            clientID: c87cccfc-0696-4478-9f25-1a7076314160
+            issuerURL: https://idp.tale.me
       httpRoute:
         enabled: true
         parentRefs:
