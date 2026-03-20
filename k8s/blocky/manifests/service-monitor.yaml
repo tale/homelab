@@ -13,3 +13,6 @@ spec:
     - port: http
       path: /metrics
       interval: 30s
+      relabelings:
+        - targetLabel: job
+          replacement: blocky
