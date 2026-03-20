@@ -29,6 +29,8 @@ kind: Service
 metadata:
   name: blocky-http
   namespace: default
+  labels:
+    app: me.tale.blocky
 spec:
   type: ClusterIP
   selector:

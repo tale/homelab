@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: blocky
+  namespace: default
+  labels:
+    app: me.tale.blocky
+spec:
+  selector:
+    matchLabels:
+      app: me.tale.blocky
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s

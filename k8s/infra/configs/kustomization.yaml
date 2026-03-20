@@ -13,9 +13,11 @@ resources:
 
   # cloudnative-pg
   - cloudnative-pg/cluster.yaml
+  - cloudnative-pg/blocky-database.yaml
 
   # metallb
   - metallb/omada-pool.yaml
+  - metallb/blocky-pool.yaml
 
   # envoy
   - envoy/metallb.yaml

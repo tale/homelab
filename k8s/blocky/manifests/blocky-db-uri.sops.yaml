@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: blocky-db-uri
+  namespace: default
+stringData:
+  uri: ENC[AES256_GCM,data:ZSa2/LBIdJeymN9lo4CzFWGoY9Pcv5ixLOfgMtBOSl+ow+ULr4h3h0sJmDh3WufuHwg9mVMpjXRReFkhjBQn+OEARd+CweS9GGzFTExsYD25IXOZL5loJqYo+S0AJ6B+d7EcZ52zl1IOOg5PiiphC1swc2XT83HPlNpejyHx0OZX7gVMrlf5xjFuHfTY7zviKM431FdyZ45TBAwCxw==,iv:lLTYSiqrmPE+Ec5Tcj1qF9XnRAOMAWMK+0xJhE7fYcA=,tag:kSUFgNLkqyV8O/VVEeOFPQ==,type:str]
+sops:
+  age:
+    - recipient: age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBEMVYwMVBjbnhDWEVwblUw
+        UjdYSmNLNkpFbHg3ZlZ4TXNqVkNPZkxqNUhRCjZWcDYrN1BFQkhBWlRvaXU1WEdO
+        SzFjRXpON2wxMlZLaXlwYjViNjRGTHMKLS0tIGk2YTdGMFdjbjJDS0s3YU55em9R
+        RUF1VlNzeTZYdHBCYnhYNDVQZjV4QVUK6jSiHyk/am9nvMarzHJ4VBRJW3dpSO+3
+        gA02uEJUxV3JpGivf3g+jSmiYUu8kKvJLEX1+154ss3dGmPYa8Dj5w==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-20T19:22:29Z"
+  mac: ENC[AES256_GCM,data:AMOd99a09+irV3pED1K7p0ICIAuwo/g8ihoXWbEck/w0UjUhgvTVx5EXMcbtQk5aNfsbT0neh9bZI+shQrxn1tgVUAMeK8CyiKupF6rBI7+PppP0eXBf2WzznL/zKf0M6Zkd4pWfwiiNLjB8e+AfevMaDvzmdzUtXI2H/4GJulE=,iv:1TpuwkSWKnrDey/D82jh7JgIlEUyzwhJnejvrNhGxMo=,tag:IXiACxD30ETFz+xky7WHaA==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  version: 3.10.2

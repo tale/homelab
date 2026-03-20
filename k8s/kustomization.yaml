@@ -4,4 +4,5 @@ kind: Kustomization
 resources:
   - infra/flux.yaml
   - observability/flux.yaml
+  - blocky/flux.yaml
   - omada-controller/flux.yaml

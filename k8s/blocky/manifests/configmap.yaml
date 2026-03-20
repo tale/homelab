@@ -4,7 +4,6 @@ metadata:
   name: blocky-config
   namespace: default
 data:
-  # TODO: Prometheus + Query Logging on PostgreSQL
   config.yml: |
     ports:
       dns: 53
@@ -38,3 +37,10 @@ data:
         default:
           - ads
           - fake-news
+    prometheus:
+      enable: true
+    queryLog:
+      type: postgresql
+      target: __DB_URI__
+      logRetentionDays: 90
+      flushInterval: 30s
