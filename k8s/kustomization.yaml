@@ -9,4 +9,5 @@ resources:
   - infra/cert-manager/flux.yaml
   - infra/envoy/flux.yaml
   - infra/external-dns/flux.yaml
+  - infra/cloudnative-pg/flux.yaml
   - infra/cilium/flux.yaml

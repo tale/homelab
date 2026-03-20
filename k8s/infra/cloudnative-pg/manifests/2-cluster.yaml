@@ -1,0 +1,16 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: central-postgres
+  namespace: cnpg-system
+spec:
+  instances: 2
+  postgresql:
+    parameters:
+      shared_buffers: "256MB"
+      effective_cache_size: "512MB"
+  storage:
+    storageClass: cluster-nvmf
+    size: 50Gi
+  monitoring:
+    enablePodMonitor: true
