@@ -1,0 +1,51 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: mbentley
+  namespace: omada-controller
+spec:
+  type: oci
+  url: oci://registry-1.docker.io/mbentley
+  interval: 1h
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: omada-controller
+  namespace: omada-controller
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: omada-controller-helm
+      version: 1.1.5
+      sourceRef:
+        kind: HelmRepository
+        name: mbentley
+  install:
+    createNamespace: true
+  values:
+    config:
+      timezone: America/New_York
+      externalMongoDBUrlSecret:
+        name: omada-mongodb-uri
+        key: uri
+    service:
+      type: LoadBalancer
+      annotations:
+        metallb.io/address-pool: omada-pool
+    persistence:
+      data:
+        storageClassName: cluster-nvmf
+        size: 10Gi
+      logs:
+        # Seems like a bug, they named it wrong?
+        storageClass: cluster-nvmf
+        size: 1Gi
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: "2"
+        memory: 2Gi
