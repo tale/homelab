@@ -3,9 +3,8 @@ kind: Kustomization
 
 resources:
   - helmrelease.yaml
-  - manifests/1-metallb.yaml
-  - manifests/2-http-route.yaml
-  - manifests/3-mongodb-secret.sops.yaml
-  - manifests/4-omada-mongodb-uri.sops.yaml
-  - manifests/5-mongodb.yaml
-  - manifests/6-mongodb-init.yaml
+  - manifests/http-route.yaml
+  - manifests/mongodb-secret.sops.yaml
+  - manifests/omada-mongodb-uri.sops.yaml
+  - manifests/mongodb.yaml
+  - manifests/mongodb-init.yaml

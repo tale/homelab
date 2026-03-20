@@ -14,6 +14,9 @@ resources:
   # cloudnative-pg
   - cloudnative-pg/cluster.yaml
 
+  # metallb
+  - metallb/omada-pool.yaml
+
   # envoy
   - envoy/metallb.yaml
   - envoy/gateway-class.yaml

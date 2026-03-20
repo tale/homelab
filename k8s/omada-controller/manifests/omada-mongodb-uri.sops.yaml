@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: omada-mongodb-uri
+  namespace: default
+type: Opaque
+stringData:
+  uri: ENC[AES256_GCM,data:mo4P87XZce4J23np+wB5FIEmaKQgWxCgh9ffRFpnvkudh09QO6W3Ud9IKgdWjKD12pRMFaC0wWZ5th5X2PznQe8itwWEnIGQ/Jv61q49mQcx64whU0E8+qQwvA==,iv:shWYhFlMfM6vYjnM0lmenZ4gRpW18uYkXCEgS20FjhY=,tag:j7IBsKEzvsFrg9pT1l2Uxw==,type:str]
+sops:
+  age:
+    - recipient: age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZK0hDZS9oY0s1NVlsb20z
+        by9USHNOZU9ZZmVQOXZlN3ltbjR2SkZXODJRCmZRVGZSYlhxZ2pkZHliUUU2V3dZ
+        U0Z3K29XWjB4SkFoVUprNmEyVFNXWlEKLS0tIEdLb1FLWUtIMW1OWWN2U0pSUGJz
+        TEg5OEVBckZCc0UydzhEa2Y4ZzhMakEKDeHq+RqgbFjT62TwmmTdawtkBUs6pCxw
+        CXcvVEFx3IlbjBJ7KiKsFkyExykjGRIsB7q7sVv/QcW4dTBHnxSh9Q==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-15T19:56:13Z"
+  mac: ENC[AES256_GCM,data:0/KqVJS4loACOYvae1oIS0GR8q0tb5Fkrl537NjXnJRTYGUIHxPaABP3t/dH2mCLKpFtn9r2akbu+x8gvBlFaKnT6F8aNR8CRSm3K1As877HnqaYol69oZQS4bjuf5EuHdUMvKDkpNGOnTFEpG8QT/CcIdqsOOhzPN0GgLxTUoo=,iv:5sE9+6VPHvpOPAHqru6vjnKluDXJOGx9GBZs2EVYS70=,tag:m4vPGgIrpvS7/zI7k4+sEQ==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  version: 3.10.2
