@@ -16,6 +16,6 @@ spec:
     createNamespace: true
   values:
     monitoring:
-      podMonitorEnabled: true
+      podMonitorEnabled: false
       grafanaDashboard:
         create: false

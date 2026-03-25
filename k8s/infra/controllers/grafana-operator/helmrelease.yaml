@@ -16,4 +16,4 @@ spec:
     createNamespace: true
   values:
     serviceMonitor:
-      enabled: true
+      enabled: false

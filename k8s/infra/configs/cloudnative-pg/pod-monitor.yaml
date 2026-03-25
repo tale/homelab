@@ -1,0 +1,27 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: central-postgres
+  namespace: cnpg-system
+spec:
+  selector:
+    matchLabels:
+      cnpg.io/cluster: central-postgres
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: cloudnative-pg-operator
+  namespace: cnpg-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloudnative-pg
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s

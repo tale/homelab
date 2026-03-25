@@ -81,7 +81,7 @@ spec:
         enabled: false
         plain: false
       operator:
-        disable_prometheus_converter: false
+        disable_prometheus_converter: true
     prometheus-node-exporter:
       enabled: true
     kube-state-metrics:
@@ -113,7 +113,7 @@ spec:
   chart:
     spec:
       chart: victoria-logs-collector
-      version: 0.2.13
+      version: 0.2.14
       sourceRef:
         kind: HelmRepository
         name: victoriametrics

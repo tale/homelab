@@ -29,7 +29,7 @@ spec:
   allowCrossNamespaceImport: true
   plugins:
     - name: victoriametrics-logs-datasource
-      version: 0.14.1
+      version: 0.26.3
   datasource:
     name: VictoriaLogs
     type: victoriametrics-logs-datasource

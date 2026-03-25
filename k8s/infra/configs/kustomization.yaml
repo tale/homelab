@@ -10,6 +10,8 @@ resources:
   - cilium/hubble-oidc.sops.yaml
   - cilium/hubble-route.yaml
   - cilium/hubble-security-policy.yaml
+  - cilium/service-monitor.yaml
+  - cilium/grafana-dashboard.yaml
 
   # cloudnative-pg
   - cloudnative-pg/cluster.yaml
@@ -17,6 +19,7 @@ resources:
   - cloudnative-pg/grafana-database.yaml
   - cloudnative-pg/wasabi-credentials.sops.yaml
   - cloudnative-pg/scheduled-backup.yaml
+  - cloudnative-pg/pod-monitor.yaml
 
   # metallb
   - metallb/omada-pool.yaml
@@ -29,6 +32,8 @@ resources:
   - envoy/gateway.yaml
   - envoy/gateway-grant.yaml
   - envoy/fallback-page.yaml
+  - envoy/service-monitor.yaml
+  - envoy/grafana-dashboard.yaml
 
   # flux-operator
   - flux-operator/instance.yaml
@@ -36,3 +41,4 @@ resources:
   # openebs
   - openebs/disk-pools.yaml
   - openebs/storage-class.yaml
+  - openebs/service-monitor.yaml

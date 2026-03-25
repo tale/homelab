@@ -1,0 +1,33 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: hubble
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      k8s-app: hubble
+  namespaceSelector:
+    matchNames:
+      - kube-system
+  endpoints:
+    - port: hubble-metrics
+      path: /metrics
+      interval: 30s
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: cilium-envoy
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      k8s-app: cilium-envoy
+  namespaceSelector:
+    matchNames:
+      - kube-system
+  endpoints:
+    - port: envoy-metrics
+      path: /metrics
+      interval: 30s

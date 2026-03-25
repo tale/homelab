@@ -1,5 +1,5 @@
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
 metadata:
   name: blocky
   namespace: default
@@ -13,6 +13,6 @@ spec:
     - port: http
       path: /metrics
       interval: 30s
-      relabelings:
+      relabelConfigs:
         - targetLabel: job
           replacement: blocky
