@@ -23,18 +23,6 @@ spec:
       enabled: true
       spec:
         retentionPeriod: "180d"
-        vmBackup:
-          destination: s3://tale-home/vmbackup/
-          customS3Endpoint: https://s3.wasabisys.com
-          credentialsSecret:
-            name: vmbackup-wasabi-credentials
-            key: ""
-          extraArgs:
-            runOnStart: "true"
-            disableDaily: "false"
-            disableHourly: "true"
-            disableMonthly: "true"
-            keepLastDaily: "7"
         storage:
           storageClassName: cluster-nvmf
           accessModes:
