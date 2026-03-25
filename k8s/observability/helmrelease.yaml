@@ -34,7 +34,7 @@ spec:
             disableDaily: "false"
             disableHourly: "true"
             disableMonthly: "true"
-            keepLastDaily: 7
+            keepLastDaily: "7"
         storage:
           storageClassName: cluster-nvmf
           accessModes:
