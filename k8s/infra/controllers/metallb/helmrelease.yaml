@@ -14,5 +14,6 @@ spec:
         name: metallb
   values:
     prometheus:
+      rbacPrometheus: false
       serviceMonitor:
         enabled: true

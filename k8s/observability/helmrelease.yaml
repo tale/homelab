@@ -8,16 +8,6 @@ spec:
   url: oci://ghcr.io/victoriametrics/helm-charts
   interval: 1h
 ---
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: grafana-operator
-  namespace: observability-system
-spec:
-  type: oci
-  url: oci://ghcr.io/grafana/helm-charts
-  interval: 1h
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -132,26 +122,6 @@ spec:
     kubelet:
       enabled: true
     coreDns:
-      enabled: true
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: grafana-operator
-  namespace: observability-system
-spec:
-  interval: 1h
-  chart:
-    spec:
-      chart: grafana-operator
-      version: v5.22.2
-      sourceRef:
-        kind: HelmRepository
-        name: grafana-operator
-  install:
-    createNamespace: true
-  values:
-    serviceMonitor:
       enabled: true
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2

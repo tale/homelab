@@ -20,6 +20,10 @@ resources:
   - external-dns/repository.yaml
   - external-dns/helmrelease.yaml
 
+  # grafana-operator
+  - grafana-operator/repository.yaml
+  - grafana-operator/helmrelease.yaml
+
   # flux-operator
   - flux-operator/repository.yaml
   - flux-operator/helmrelease.yaml
