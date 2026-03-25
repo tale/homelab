@@ -1,0 +1,10 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: central-postgres-grafana
+  namespace: cnpg-system
+spec:
+  name: grafana
+  owner: app
+  cluster:
+    name: central-postgres

@@ -1,0 +1,103 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: victoriametrics-single
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: VictoriaMetrics
+  grafanaCom:
+    id: 10229
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: victoriametrics-vmagent
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: VictoriaMetrics
+  grafanaCom:
+    id: 12683
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: victoriametrics-vmalert
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: VictoriaMetrics
+  grafanaCom:
+    id: 14950
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: victorialogs-single
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: VictoriaMetrics
+  grafanaCom:
+    id: 21599
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: node-exporter-full
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: Infrastructure
+  grafanaCom:
+    id: 1860
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: kubernetes-views-global
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: Kubernetes
+  grafanaCom:
+    id: 15757
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: kubernetes-views-pods
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: Kubernetes
+  grafanaCom:
+    id: 15760
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: alertmanager-overview
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: VictoriaMetrics
+  grafanaCom:
+    id: 9578

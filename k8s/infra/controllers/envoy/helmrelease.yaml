@@ -19,5 +19,9 @@ spec:
       envoyGateway:
         extensionApis:
           enableBackend: true
+        telemetry:
+          metrics:
+            prometheus:
+              disable: false
     deployment:
       replicas: 2

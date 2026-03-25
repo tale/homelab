@@ -11,152 +11,148 @@ spec:
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: prometheus-community
+  name: grafana-operator
   namespace: observability-system
 spec:
   type: oci
-  url: oci://ghcr.io/prometheus-community/charts
+  url: oci://ghcr.io/grafana/helm-charts
   interval: 1h
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: victoriametrics
+  name: victoria-metrics-k8s-stack
   namespace: observability-system
 spec:
   interval: 1h
   chart:
     spec:
-      chart: victoria-metrics-single
-      version: 0.24.2
+      chart: victoria-metrics-k8s-stack
+      version: 0.35.0
       sourceRef:
         kind: HelmRepository
         name: victoriametrics
   install:
     createNamespace: true
   values:
-    server:
-      retentionPeriod: 180d
-      persistentVolume:
-        enabled: true
-        storageClassName: cluster-nvmf
-        size: 150Gi
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: prometheus
-  namespace: observability-system
-spec:
-  dependsOn:
-    - name: victoriametrics
-  interval: 1h
-  chart:
-    spec:
-      chart: kube-prometheus-stack
-      version: 76.2.0
-      sourceRef:
-        kind: HelmRepository
-        name: prometheus-community
-  install:
-    createNamespace: true
-  values:
-    alertmanager:
-      enabled: false
     grafana:
-      enabled: true
-      persistence:
-        enabled: true
-        type: pvc
-        storageClassName: "cluster-nvmf"
-        accessModes:
-          - ReadWriteOnce
-        size: 25Gi
-      additionalDataSources:
-        - name: VictoriaLogs
-          type: victoriametrics-logs-datasource
-          url: http://victorialogs-victoria-logs-single-server.observability-system.svc.cluster.local:9428
-          access: proxy
-          isDefault: false
-      plugins:
-        - victoriametrics-logs-datasource
-      grafana.ini:
-        server:
-          root_url: "https://grafana.tale.me"
-        auth.generic_oauth:
-          enabled: true
-          allow_sign_up: true
-          auto_login: false
-          name: Pocket ID
-          client_id: $__file{/etc/secrets/auth_generic_oauth/client_id}
-          client_secret: $__file{/etc/secrets/auth_generic_oauth/client_secret}
-          scopes: "openid email profile"
-          auth_url: https://idp.tale.me/authorize
-          token_url: https://idp.tale.me/api/oidc/token
-          email_attribute_path: email
-          login_attribute_path: preferred_username
-          skip_org_role_sync: true
-      extraSecretMounts:
-        - name: grafana-oidc
-          secretName: grafana-oidc
-          defaultMode: 0440
-          mountPath: /etc/secrets/auth_generic_oauth
-          readOnly: true
-    kubeProxy:
       enabled: false
-    prometheus:
+    defaultDashboards:
+      enabled: false
+    vmsingle:
       enabled: true
-      prometheusSpec:
-        retention: 24h # We have VictoriaMetrics for long-term storage
-        retentionSize: 20GB
-        podMonitorSelectorNilUsesHelmValues: false
-        serviceMonitorSelectorNilUsesHelmValues: false
+      spec:
+        retentionPeriod: "180d"
+        vmBackup:
+          destination: s3://tale-home/vmbackup/
+          customS3Endpoint: https://s3.wasabisys.com
+          credentialsSecret:
+            name: vmbackup-wasabi-credentials
+            key: ""
+          extraArgs:
+            runOnStart: "true"
+            disableDaily: "false"
+            disableHourly: "true"
+            disableMonthly: "true"
+            keepLastDaily: 7
+        storage:
+          storageClassName: cluster-nvmf
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 150Gi
+    vmagent:
+      enabled: true
+      spec:
         scrapeInterval: 15s
-        scrapeTimeout: 10s
+        selectAllByDefault: true
+        extraArgs:
+          promscrape.streamParse: "true"
+    vmalert:
+      enabled: true
+      spec:
         evaluationInterval: 30s
-        remoteWrite:
-          - url: http://victoriametrics-victoria-metrics-single-server.observability-system.svc.cluster.local:8428/api/v1/write
-            name: victoriametrics
-            remoteTimeout: 30s
-            sendExemplars: true
-            queueConfig:
-              capacity: 20000
-              maxShards: 8
-              minShards: 1
-              maxSamplesPerSend: 2000
-              batchSendDeadline: 5s
-        storageSpec:
+        selectAllByDefault: true
+    alertmanager:
+      enabled: true
+      spec:
+        configSecret: ""
+        storage:
           volumeClaimTemplate:
             spec:
-              storageClassName: "cluster-nvmf"
-              accessModes: ["ReadWriteOnce"]
+              storageClassName: cluster-nvmf
+              accessModes:
+                - ReadWriteOnce
               resources:
                 requests:
-                  storage: 25Gi
+                  storage: 1Gi
+      config:
+        route:
+          receiver: pushover
+          group_by: ["alertname", "namespace"]
+          group_wait: 30s
+          group_interval: 5m
+          repeat_interval: 4h
+          routes:
+            - receiver: pushover
+              matchers:
+                - severity =~ "critical|warning"
+        receivers:
+          - name: pushover
+            pushover_configs:
+              - user_key_file: /etc/alertmanager/secrets/pushover-credentials/user_key
+                token_file: /etc/alertmanager/secrets/pushover-credentials/api_token
+                priority: '{{ if eq .CommonLabels.severity "critical" }}1{{ else }}0{{ end }}'
+                title: "{{ .CommonLabels.alertname }}"
+                message: '{{ range .Alerts }}{{ .Annotations.summary }}{{ "\n" }}{{ end }}'
+      secrets:
+        - pushover-credentials
+    victoria-metrics-operator:
+      crds:
+        enabled: true
+      operator:
+        disable_prometheus_converter: false
+    prometheus-operator-crds:
+      enabled: false
+    prometheus-node-exporter:
+      enabled: true
+    kube-state-metrics:
+      enabled: true
+    kubeProxy:
+      enabled: false
+    kubeControllerManager:
+      enabled: false
+    kubeScheduler:
+      enabled: false
+    kubeEtcd:
+      enabled: false
+    kubeApiServer:
+      enabled: true
+    kubelet:
+      enabled: true
+    coreDns:
+      enabled: true
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: victorialogs
+  name: grafana-operator
   namespace: observability-system
 spec:
-  dependsOn:
-    - name: victoriametrics
   interval: 1h
   chart:
     spec:
-      chart: victoria-logs-single
-      version: 0.11.28
+      chart: grafana-operator
+      version: v5.22.2
       sourceRef:
         kind: HelmRepository
-        name: victoriametrics
+        name: grafana-operator
+  install:
+    createNamespace: true
   values:
-    server:
-      retentionPeriod: 90d
-      persistentVolume:
-        enabled: true
-        storageClassName: cluster-nvmf
-        size: 50Gi
+    serviceMonitor:
+      enabled: true
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -165,7 +161,7 @@ metadata:
   namespace: observability-system
 spec:
   dependsOn:
-    - name: victorialogs
+    - name: victoria-metrics-k8s-stack
   interval: 1h
   chart:
     spec:
@@ -176,4 +172,4 @@ spec:
         name: victoriametrics
   values:
     remoteWrite:
-      - url: http://victorialogs-victoria-logs-single-server.observability-system.svc.cluster.local:9428
+      - url: http://vlogs-victorialogs-server.observability-system.svc.cluster.local:9428

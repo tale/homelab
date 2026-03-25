@@ -7,3 +7,4 @@ resources:
   - manifests/services.yaml
   - manifests/service-monitor.yaml
   - manifests/blocky-db-uri.sops.yaml
+  - manifests/grafana-dashboard.yaml

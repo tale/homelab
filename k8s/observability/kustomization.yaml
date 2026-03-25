@@ -3,6 +3,14 @@ kind: Kustomization
 
 resources:
   - helmrelease.yaml
-  - manifests/1-namespace.yaml
-  - manifests/2-grafana-oidc.sops.yaml
-  - manifests/3-grafana-http-route.yaml
+  - manifests/namespace.yaml
+  - manifests/grafana-oidc.sops.yaml
+  - manifests/grafana-http-route.yaml
+  - manifests/pushover-secret.sops.yaml
+  - manifests/grafana-db-credentials.sops.yaml
+  - manifests/vmbackup-credentials.sops.yaml
+  - manifests/vlogs.yaml
+  - manifests/grafana.yaml
+  - manifests/grafana-datasources.yaml
+  - manifests/grafana-dashboards.yaml
+  - manifests/vmrules.yaml

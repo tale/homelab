@@ -1,0 +1,33 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: victoriametrics
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  datasource:
+    name: VictoriaMetrics
+    type: prometheus
+    access: proxy
+    url: http://vmsingle-victoria-metrics-k8s-stack.observability-system.svc.cluster.local:8428
+    isDefault: true
+    jsonData:
+      timeInterval: "15s"
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: victorialogs
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  datasource:
+    name: VictoriaLogs
+    type: victoriametrics-logs-datasource
+    access: proxy
+    url: http://vlogs-victorialogs-server.observability-system.svc.cluster.local:9428
+    isDefault: false

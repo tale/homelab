@@ -1,0 +1,14 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VLogs
+metadata:
+  name: vlogs
+  namespace: observability-system
+spec:
+  retentionPeriod: "90d"
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: cluster-nvmf
+    resources:
+      requests:
+        storage: 50Gi

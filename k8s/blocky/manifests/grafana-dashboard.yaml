@@ -1,0 +1,12 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: blocky
+  namespace: default
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: Applications
+  grafanaCom:
+    id: 18166

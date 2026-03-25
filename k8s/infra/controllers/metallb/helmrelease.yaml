@@ -12,3 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: metallb
+  values:
+    prometheus:
+      serviceMonitor:
+        enabled: true

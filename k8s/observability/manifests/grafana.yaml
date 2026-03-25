@@ -1,0 +1,62 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  name: grafana
+  namespace: observability-system
+  labels:
+    dashboards: "homelab"
+spec:
+  config:
+    server:
+      root_url: "https://grafana.tale.me"
+    database:
+      type: postgres
+      host: central-postgres-rw.cnpg-system.svc.cluster.local:5432
+      name: grafana
+      user: app
+      password: "${GF_DATABASE_PASSWORD}"
+      ssl_mode: require
+    auth.generic_oauth:
+      enabled: "true"
+      allow_sign_up: "true"
+      auto_login: "false"
+      name: Pocket ID
+      client_id: "$__file{/etc/secrets/auth_generic_oauth/client_id}"
+      client_secret: "$__file{/etc/secrets/auth_generic_oauth/client_secret}"
+      scopes: "openid email profile"
+      auth_url: https://idp.tale.me/authorize
+      token_url: https://idp.tale.me/api/oidc/token
+      email_attribute_path: email
+      login_attribute_path: preferred_username
+      skip_org_role_sync: "true"
+  deployment:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: grafana-oidc
+              secret:
+                secretName: grafana-oidc
+                defaultMode: 0440
+          containers:
+            - name: grafana
+              env:
+                - name: GF_DATABASE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-db-credentials
+                      key: password
+              volumeMounts:
+                - name: grafana-oidc
+                  mountPath: /etc/secrets/auth_generic_oauth
+                  readOnly: true
+  plugins:
+    - name: victoriametrics-logs-datasource
+  persistentVolumeClaim:
+    spec:
+      storageClassName: cluster-nvmf
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 25Gi

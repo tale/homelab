@@ -24,6 +24,8 @@ spec:
       replicated:
         mayastor:
           enabled: true
+    monitoring:
+      enabled: true
     mayastor:
       io_engine:
         envcontext: "iova-mode=pa"
