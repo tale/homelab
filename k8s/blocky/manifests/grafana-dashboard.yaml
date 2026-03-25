@@ -7,6 +7,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "homelab"
+  allowCrossNamespaceImport: true
   folder: Applications
   grafanaCom:
     id: 18166

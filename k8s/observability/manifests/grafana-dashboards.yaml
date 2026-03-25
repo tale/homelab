@@ -101,3 +101,29 @@ spec:
   folder: VictoriaMetrics
   grafanaCom:
     id: 9578
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: cert-manager
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: Infrastructure
+  grafanaCom:
+    id: 20842
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: cloudnative-pg
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: Infrastructure
+  grafanaCom:
+    id: 20417

@@ -5,7 +5,6 @@ resources:
   # cert-manager
   - cert-manager/test-issuer.yaml
   - cert-manager/prod-issuer.yaml
-  - cert-manager/grafana-dashboard.yaml
 
   # cilium (hubble UI)
   - cilium/hubble-oidc.sops.yaml
@@ -18,7 +17,6 @@ resources:
   - cloudnative-pg/grafana-database.yaml
   - cloudnative-pg/wasabi-credentials.sops.yaml
   - cloudnative-pg/scheduled-backup.yaml
-  - cloudnative-pg/grafana-dashboard.yaml
 
   # metallb
   - metallb/omada-pool.yaml

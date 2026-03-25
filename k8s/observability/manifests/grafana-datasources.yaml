@@ -7,6 +7,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "homelab"
+  allowCrossNamespaceImport: true
   datasource:
     name: VictoriaMetrics
     type: prometheus
@@ -25,6 +26,10 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "homelab"
+  allowCrossNamespaceImport: true
+  plugins:
+    - name: victoriametrics-logs-datasource
+      version: 0.14.1
   datasource:
     name: VictoriaLogs
     type: victoriametrics-logs-datasource

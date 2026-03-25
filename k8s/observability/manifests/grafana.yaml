@@ -50,8 +50,6 @@ spec:
                 - name: grafana-oidc
                   mountPath: /etc/secrets/auth_generic_oauth
                   readOnly: true
-  plugins:
-    - name: victoriametrics-logs-datasource
   persistentVolumeClaim:
     spec:
       storageClassName: cluster-nvmf
