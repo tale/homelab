@@ -46,6 +46,8 @@ spec:
       enabled: true
       spec:
         configSecret: ""
+        secrets:
+          - pushover-credentials
         storage:
           volumeClaimTemplate:
             spec:
@@ -74,8 +76,6 @@ spec:
                 priority: '{{ if eq .CommonLabels.severity "critical" }}1{{ else }}0{{ end }}'
                 title: "{{ .CommonLabels.alertname }}"
                 message: '{{ range .Alerts }}{{ .Annotations.summary }}{{ "\n" }}{{ end }}'
-      secrets:
-        - pushover-credentials
     victoria-metrics-operator:
       crds:
         enabled: false
