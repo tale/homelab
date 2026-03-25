@@ -34,5 +34,5 @@ spec:
     name: VictoriaLogs
     type: victoriametrics-logs-datasource
     access: proxy
-    url: http://vlogs-victorialogs-server.observability-system.svc.cluster.local:9428
+    url: http://vlsingle-vlogs.observability-system.svc.cluster.local:9428
     isDefault: false

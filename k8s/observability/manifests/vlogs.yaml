@@ -1,5 +1,5 @@
-apiVersion: operator.victoriametrics.com/v1beta1
-kind: VLogs
+apiVersion: operator.victoriametrics.com/v1
+kind: VLSingle
 metadata:
   name: vlogs
   namespace: observability-system

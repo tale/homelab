@@ -18,7 +18,7 @@ spec:
   chart:
     spec:
       chart: victoria-metrics-k8s-stack
-      version: 0.35.0
+      version: 0.72.5
       sourceRef:
         kind: HelmRepository
         name: victoriametrics
@@ -101,10 +101,9 @@ spec:
     victoria-metrics-operator:
       crds:
         enabled: true
+        plain: true
       operator:
         disable_prometheus_converter: false
-    prometheus-operator-crds:
-      enabled: false
     prometheus-node-exporter:
       enabled: true
     kube-state-metrics:
@@ -123,6 +122,21 @@ spec:
       enabled: true
     coreDns:
       enabled: true
+    extraObjects:
+      - apiVersion: operator.victoriametrics.com/v1
+        kind: VLSingle
+        metadata:
+          name: vlogs
+          namespace: observability-system
+        spec:
+          retentionPeriod: "90d"
+          storage:
+            accessModes:
+              - ReadWriteOnce
+            storageClassName: cluster-nvmf
+            resources:
+              requests:
+                storage: 50Gi
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -142,4 +156,4 @@ spec:
         name: victoriametrics
   values:
     remoteWrite:
-      - url: http://vlogs-victorialogs-server.observability-system.svc.cluster.local:9428
+      - url: http://vlsingle-vlogs.observability-system.svc.cluster.local:9428
