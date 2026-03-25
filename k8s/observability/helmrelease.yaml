@@ -42,9 +42,11 @@ spec:
       spec:
         evaluationInterval: 30s
         selectAllByDefault: true
+        externalURL: https://grafana.tale.me
     alertmanager:
       enabled: true
       spec:
+        externalURL: https://grafana.tale.me
         configSecret: ""
         secrets:
           - pushover-credentials
