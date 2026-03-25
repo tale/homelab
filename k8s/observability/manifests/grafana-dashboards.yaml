@@ -55,12 +55,12 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "homelab"
-  folder: Logging
+  folder: Infrastructure
   grafanaCom:
-    id: 21599
+    id: 22084
   datasources:
-    - inputName: "DS_VICTORIALOGS"
-      datasourceName: "VictoriaLogs"
+    - inputName: "DS_VICTORIAMETRICS"
+      datasourceName: "VictoriaMetrics"
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard

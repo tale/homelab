@@ -8,7 +8,7 @@ spec:
     matchLabels:
       dashboards: "homelab"
   allowCrossNamespaceImport: true
-  folder: Network
+  folder: Infrastructure
   grafanaCom:
     id: 22539
   datasources:

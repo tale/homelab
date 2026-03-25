@@ -8,9 +8,9 @@ spec:
     matchLabels:
       dashboards: "homelab"
   allowCrossNamespaceImport: true
-  folder: Network
+  folder: Infrastructure
   grafanaCom:
-    id: 16611
+    id: 13542
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "VictoriaMetrics"

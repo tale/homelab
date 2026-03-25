@@ -26,10 +26,6 @@ resources:
   - grafana-operator/helmrelease.yaml
   - grafana-operator/service-monitor.yaml
 
-  # prometheus-operator (CRDs only, required until helm charts drop ServiceMonitors)
-  - prometheus-operator-crds/repository.yaml
-  - prometheus-operator-crds/helmrelease.yaml
-
   # victoria-metrics-operator (CRDs only)
   - victoria-metrics-operator/repository.yaml
   - victoria-metrics-operator/helmrelease.yaml
