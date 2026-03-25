@@ -71,8 +71,8 @@ spec:
         receivers:
           - name: pushover
             pushover_configs:
-              - user_key_file: /etc/alertmanager/secrets/pushover-credentials/user_key
-                token_file: /etc/alertmanager/secrets/pushover-credentials/api_token
+              - user_key_file: /etc/vm/secrets/pushover-credentials/user_key
+                token_file: /etc/vm/secrets/pushover-credentials/api_token
                 priority: '{{ if eq .CommonLabels.severity "critical" }}1{{ else }}0{{ end }}'
                 title: "{{ .CommonLabels.alertname }}"
                 message: '{{ range .Alerts }}{{ .Annotations.summary }}{{ "\n" }}{{ end }}'
