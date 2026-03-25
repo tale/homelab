@@ -1,0 +1,28 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: blocky-postgres
+  namespace: default
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  allowCrossNamespaceImport: true
+  datasource:
+    name: Blocky Postgres
+    type: postgres
+    access: proxy
+    url: central-postgres-rw.cnpg-system.svc.cluster.local:5432
+    database: blocky
+    user: app
+    isDefault: false
+    jsonData:
+      sslmode: require
+    secureJsonData:
+      password: "${BLOCKY_DB_PASSWORD}"
+  valuesFrom:
+    - targetPath: "datasource.secureJsonData.password"
+      valueFrom:
+        secretKeyRef:
+          name: blocky-db-credentials
+          key: password
