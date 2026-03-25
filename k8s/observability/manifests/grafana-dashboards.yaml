@@ -10,6 +10,9 @@ spec:
   folder: VictoriaMetrics
   grafanaCom:
     id: 10229
+  datasources:
+    - inputName: "DS_VICTORIAMETRICS"
+      datasourceName: "VictoriaMetrics"
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -23,6 +26,9 @@ spec:
   folder: VictoriaMetrics
   grafanaCom:
     id: 12683
+  datasources:
+    - inputName: "DS_VICTORIAMETRICS"
+      datasourceName: "VictoriaMetrics"
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -36,6 +42,9 @@ spec:
   folder: VictoriaMetrics
   grafanaCom:
     id: 14950
+  datasources:
+    - inputName: "DS_VICTORIAMETRICS"
+      datasourceName: "VictoriaMetrics"
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -49,6 +58,9 @@ spec:
   folder: VictoriaMetrics
   grafanaCom:
     id: 21599
+  datasources:
+    - inputName: "DS_VICTORIALOGS"
+      datasourceName: "VictoriaLogs"
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -62,6 +74,9 @@ spec:
   folder: Infrastructure
   grafanaCom:
     id: 1860
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "VictoriaMetrics"
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -75,6 +90,9 @@ spec:
   folder: Kubernetes
   grafanaCom:
     id: 15757
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "VictoriaMetrics"
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -88,6 +106,9 @@ spec:
   folder: Kubernetes
   grafanaCom:
     id: 15760
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "VictoriaMetrics"
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -101,6 +122,9 @@ spec:
   folder: VictoriaMetrics
   grafanaCom:
     id: 9578
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "VictoriaMetrics"
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -114,6 +138,9 @@ spec:
   folder: Infrastructure
   grafanaCom:
     id: 20842
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "VictoriaMetrics"
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -127,3 +154,6 @@ spec:
   folder: Infrastructure
   grafanaCom:
     id: 20417
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "VictoriaMetrics"
