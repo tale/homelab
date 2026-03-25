@@ -9,6 +9,7 @@ resources:
   - manifests/pushover-secret.sops.yaml
   - manifests/grafana-db-credentials.sops.yaml
   - manifests/vmbackup-credentials.sops.yaml
+  - manifests/vlogs.yaml
   - manifests/grafana.yaml
   - manifests/grafana-datasources.yaml
   - manifests/grafana-dashboards.yaml

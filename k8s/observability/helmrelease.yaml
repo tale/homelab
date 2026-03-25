@@ -1,13 +1,3 @@
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: victoriametrics
-  namespace: observability-system
-spec:
-  type: oci
-  url: oci://ghcr.io/victoriametrics/helm-charts
-  interval: 1h
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -100,8 +90,7 @@ spec:
         - pushover-credentials
     victoria-metrics-operator:
       crds:
-        enabled: true
-        plain: true
+        enabled: false
       operator:
         disable_prometheus_converter: false
     prometheus-node-exporter:
@@ -122,21 +111,6 @@ spec:
       enabled: true
     coreDns:
       enabled: true
-    extraObjects:
-      - apiVersion: operator.victoriametrics.com/v1
-        kind: VLSingle
-        metadata:
-          name: vlogs
-          namespace: observability-system
-        spec:
-          retentionPeriod: "90d"
-          storage:
-            accessModes:
-              - ReadWriteOnce
-            storageClassName: cluster-nvmf
-            resources:
-              requests:
-                storage: 50Gi
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

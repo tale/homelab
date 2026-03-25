@@ -24,6 +24,10 @@ resources:
   - grafana-operator/repository.yaml
   - grafana-operator/helmrelease.yaml
 
+  # victoria-metrics-operator (CRDs only)
+  - victoria-metrics-operator/repository.yaml
+  - victoria-metrics-operator/helmrelease.yaml
+
   # flux-operator
   - flux-operator/repository.yaml
   - flux-operator/helmrelease.yaml
