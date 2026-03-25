@@ -91,6 +91,7 @@ spec:
     victoria-metrics-operator:
       crds:
         enabled: false
+        plain: false
       operator:
         disable_prometheus_converter: false
     prometheus-node-exporter:
