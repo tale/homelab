@@ -1,161 +1,74 @@
-# Tale Homelab (Talos Mini-cluster)
+# Tale Homelab
 
-This repository contains all of the necessary configuration files for my own
-homelab mini-cluster built on top of [Talos Linux](https://www.talos.dev/). For
-the hardware specifics see the [Hardware](#hardware) section below. With the
-actual cluster software, I was aiming to have a very simple setup that is
-secure by default, easy to manage, and optionally immutable. Talos Linux
-checked all of those boxes and includes tons of extra goodies for homelabbers.
+Configuration for my homelab mini-cluster running on
+[Talos Linux](https://www.talos.dev/) along with a variety of applications that
+run in the Oracle Cloud. All Kubernetes deployments are managed with
+[Flux](https://fluxcd.io/), using SOPS for secrets and Kustomize for templating.
 
-## Deployments
+## What's Running
 
-All deployments are managed by [Flux CD](https://fluxcd.io/) using a GitOps
-workflow. The [Flux Operator](https://fluxoperator.dev) handles Flux lifecycle
-management (install, upgrade, configuration) declaratively via a `FluxInstance`
-CRD. Pushing changes to the `k8s/` directory automatically reconciles
-the cluster state. SOPS-encrypted secrets are decrypted natively by Flux using
-[age](https://github.com/FiloSottile/age) encryption.
+**Infrastructure** (`k8s/infra/`)
+- [Cilium](https://cilium.io/) — Cluster Networking
+- [OpenEBS](https://openebs.io/) — Replicated NVMe storage
+- [MetalLB](https://metallb.universe.tf/) — Bare-metal load balancer
+- [Envoy Gateway](https://gateway.envoyproxy.io/) — Gateway API
+- [cert-manager](https://cert-manager.io/) — TLS certificates
+- [CloudNativePG](https://cloudnative-pg.io/) — Centralized PostgreSQL cluster
+- [Flux Operator](https://fluxoperator.dev/) — Flux lifecycle management
 
-- Infrastructure (`k8s/infra/`) — split into `controllers/` (operators and Helm
-  charts) and `configs/` (CRDs that depend on those operators)
-  - **Flux Operator**: Flux lifecycle management and web UI
-  - **OpenEBS**: Replicated storage
-  - **MetalLB**: Load balancer
-  - **cert-manager**: TLS certificate issuer
-  - **Envoy Gateway**: Gateway
-  - **External DNS**: Automatic Cloudflare DNS
-  - **Cilium**: CNI and Hubble UI (CNI deployed via Talos, Hubble config via Flux)
-  - **CloudNativePG**: Centralized PostgreSQL
-
-- Apps (`k8s/`)
-  - [**Blocky**](./k8s/blocky/): DNS server for ad-blocking
-  - [**Forgejo**](./k8s/forgejo/): Self-hosted Git server
-  - [**Observability**](./k8s/observability/): Prometheus, VictoriaMetrics, Grafana
-  - [**Omada Controller**](./k8s/omada-controller/): TP-Link network management
-  - [**Home Assistant**](./k8s/home-assistant/): Home automation
-  - [**MC Bedrock**](./k8s/mc-bedrock/): Minecraft Bedrock server
+**Apps** (`k8s/`)
+- [Blocky](./k8s/blocky/) — DNS proxy and ad-blocker
+- [Forgejo](./k8s/forgejo/) — Git server with GitHub mirroring via Gickup
+- [Observability](./k8s/observability/) — VictoriaMetrics, Grafana, alerting
+- [Omada Controller](./k8s/omada-controller/) — TP-Link network management
+- [Samba](./k8s/samba/) — Network file shares
 
 ## Dependency Graph
 
-<!-- regenerate with: bash k8s/generate-diagram.sh -->
 ```mermaid
 flowchart TD
     infra_controllers[infra-controllers]
     infra_configs[infra-configs]
     infra_configs --> infra_controllers
-    blocky[blocky]
     blocky --> infra_configs
-    forgejo[forgejo]
     forgejo --> infra_configs
-    home_assistant[home-assistant]
-    home_assistant --> infra_configs
-    mc_bedrock[mc-bedrock]
-    mc_bedrock --> infra_configs
-    observability[observability]
     observability --> infra_configs
-    omada_controller[omada-controller]
-    omada_controller --> infra_configs
+    omada_controller[omada-controller] --> infra_configs
+    samba --> infra_configs
 ```
 
 ## Bootstrap
 
-The cluster is bootstrapped from scratch in three steps. The Flux Operator
-replaces the old `flux bootstrap` CLI workflow with a declarative
-`FluxInstance` CRD that manages Flux controller installation, upgrades,
-and Git synchronization.
-
 ```bash
-# 1. Install the Flux Operator via Helm (one-time)
+# 1. Install the Flux Operator (one-time)
 helm install flux-operator \
   oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
-  --namespace flux-system \
-  --create-namespace
+  --namespace flux-system --create-namespace
 
-# 2. Create the SOPS age secret (so Flux can decrypt encrypted manifests)
+# 2. Create the SOPS age secret
 kubectl create secret generic sops-age \
   --namespace=flux-system \
   --from-file=age.agekey=$HOME/.config/sops/age/keys.txt
 
-# 3. Apply the FluxInstance (starts Flux controllers and syncs this repo)
+# 3. Apply the FluxInstance — everything else is automatic
 kubectl apply -f k8s/infra/flux-operator/instance.yaml
 ```
 
-After step 3, the operator installs the Flux controllers, creates a
-`GitRepository` pointing at this repo, and begins reconciling `k8s/`.
-Everything else is automatic — the `dependsOn` chain in each project's
-`flux.yaml` ensures correct ordering:
+The `dependsOn` chain handles ordering: controllers → configs → apps.
 
-1. **infra-controllers:** all operators and Helm charts install in parallel
-2. **infra-configs:** all CRD-based resources (issuers, gateways, storage
-   classes, PG cluster, etc.) apply after controllers are ready
-3. **Apps:** all apps depend on infra-configs
+## Adding a New App
 
-Once reconciled, the `flux-operator` HelmRelease takes over management of
-the operator itself — future upgrades happen via Git, not Helm CLI.
+1. Create `k8s/<name>/` with `kustomization.yaml`, `flux.yaml`, and `manifests/`
+2. Add `<name>/flux.yaml` to `k8s/kustomization.yaml`
+3. Push
 
-The Flux Operator web UI is available at `https://flux.tale.me` (protected
-by OIDC via Envoy Gateway and Pocket ID).
-
-### Migrating from `flux bootstrap`
-
-If the cluster is already running Flux via the old `flux bootstrap` workflow,
-the operator can take over in-place without tearing anything down:
-
-```bash
-# 1. Install the operator alongside the running Flux controllers
-helm install flux-operator \
-  oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
-  --namespace flux-system
-
-# 2. Apply the FluxInstance — operator takes over Flux management
-kubectl apply -f k8s/infra/flux-operator/instance.yaml
-
-# 3. Wait for the operator to confirm it owns Flux
-kubectl -n flux-system wait fluxinstance/flux \
-  --for=condition=Ready --timeout=5m
-
-# 4. Commit and push (the repo no longer contains k8s/flux-system/)
-#    Pruning the old bootstrap manifests is safe because the operator
-#    now manages the controllers independently.
-```
-
-### Adding a new deployment
-
-1. Create a directory under `k8s/<name>/`
-2. Add a `kustomization.yaml` listing its resources
-3. Add a `flux.yaml` with a Flux Kustomization CRD (set `dependsOn` as needed)
-4. Add `<name>/flux.yaml` to `k8s/kustomization.yaml`
-5. Push to git
-
-### Tools
-
-All tools are installed using [Mise](https://mise.jdx.dev/):
-
-- [**helm**](https://helm.sh/): Helm chart management (bootstrap only)
-- [**talosctl**](https://www.talos.dev/v1.10/reference/cli/): Talos control
-- [**sops**](https://github.com/getsops/sops): Secrets management
-- [**age**](https://github.com/FiloSottile/age): File encryption
-
-### Hardware
-
-My goals for a homelab are to have a small, quiet, and power-efficient cluster
-that is still capable of running a variety of workloads. I just created this
-cluster, but eventually it'll be all rackmounted and fancy. The hardware I chose
-is as follows:
+## Hardware
 
 - **3x Dell OptiPlex Micro 7050**
-  - Intel Core i7-7700T
-  - 32GB DDR4 RAM @ 2400MHz
-  - 240GB SATA SSD (for Talos)
-  - 2TB NVMe SSD (replicated storage)
-  - 1x 1GbE built-in NIC (LAN and WAN access)
-  - 1x 2.5GbE M.2 A-Key NIC (intra-cluster communication)
-- **1x UGREEN 2.5GbE Switch**
-  - 5x 2.5GbE RJ45 ports
-  - 1x 10GbE SFP+ port
-- **Planned but not yet purchased:**
-  - 1x Generic UPS with `usbhid-ups` support
-  - 1x Raspberry Pi 4B
-    - Runs a NUT server to monitor the UPS and signal the cluster
-    - Runs a tunnelable Tailscale node for LAN recovery access
-    - Possibly PiKVM for remote KVM access (if needed)
+  - Intel Core i7-7700T, 32GB DDR4
+  - 240GB SATA SSD (Talos OS), 2TB NVMe SSD (replicated storage)
+  - 1GbE built-in NIC + 2.5GbE M.2 NIC (intra-cluster)
+- **UGREEN 2.5GbE Switch** (5x 2.5GbE + 1x 10GbE SFP+)
+- **TP-Link Omada ER605 Router** (WAN + 1GbE management)
+- **TP-Link Omada SG2008 Switch** (8x 1GbE for management and IoT)
+- **2x TP-Link Omada EAP773 Access Point** (Wi-Fi 7 AP)

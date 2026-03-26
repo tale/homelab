@@ -17,4 +17,5 @@ each repository.
 ### Setup
 
 - Forgejo is running through their Helm chart, configured with OIDC
-- Gickup runs as a `CronJob`, only discovering new repositories every 3 hours
+- PostgreSQL is backed by the centralized CloudNativePG cluster
+- Gickup runs as a `CronJob`, discovering new repositories every 3 hours
