@@ -7,3 +7,4 @@ resources:
   - blocky/flux.yaml
   - omada-controller/flux.yaml
   - samba/flux.yaml
+  - forgejo/flux.yaml

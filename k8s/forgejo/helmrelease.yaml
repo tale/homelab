@@ -1,0 +1,76 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: forgejo
+  namespace: forgejo
+spec:
+  type: oci
+  url: oci://code.forgejo.org/forgejo-helm
+  interval: 1h
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+  namespace: forgejo
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: forgejo
+      version: 16.2.1
+      sourceRef:
+        kind: HelmRepository
+        name: forgejo
+  install:
+    createNamespace: true
+  values:
+    global:
+      storageClass: cluster-nvmf
+    valkey-cluster:
+      enabled: false
+    valkey:
+      enabled: true
+    postgresql:
+      enabled: false
+    postgresql-ha:
+      enabled: false
+    persistence:
+      enabled: true
+      size: 25Gi
+    gitea:
+      config:
+        APP_NAME: Tale Git
+        server:
+          ROOT_URL: "https://git.tale.me"
+          LANDING_PAGE: login
+        service:
+          DISABLE_REGISTRATION: true
+          ALLOW_ONLY_EXTERNAL_REGISTRATION: true
+          REQUIRE_SIGNIN_VIEW: true
+        database:
+          DB_TYPE: postgres
+          HOST: central-postgres-rw.cnpg-system.svc.cluster.local:5432
+          NAME: forgejo
+          USER: app
+          SSL_MODE: require
+        indexer:
+          ISSUE_INDEXER_TYPE: bleve
+          REPO_INDEXER_ENABLED: true
+        metrics:
+          ENABLED: true
+          ENABLED_ISSUE_BY_REPOSITORY: true
+          ENABLED_ISSUE_BY_LABEL: true
+      additionalConfigFromEnvs:
+        - name: ENV_TO_INI__DATABASE__PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: forgejo-db-credentials
+              key: password
+      oauth:
+        - name: pocket-id
+          provider: openidConnect
+          autoDiscoverUrl: "https://idp.tale.me/.well-known/openid-configuration"
+          existingSecret: forgejo-oidc
+          scopes: "openid profile email"
+          skipLocal2fa: true

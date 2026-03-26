@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - helmrelease.yaml
+  - manifests/forgejo-oidc.sops.yaml
+  - manifests/forgejo-http-route.yaml
+  - manifests/forgejo-db-credentials.sops.yaml
+  - manifests/gickup-config.sops.yaml
+  - manifests/gickup-cronjob.yaml
+  - manifests/service-monitor.yaml
+  - manifests/grafana-dashboard.yaml

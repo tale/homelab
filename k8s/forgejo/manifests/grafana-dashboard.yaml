@@ -1,0 +1,16 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: forgejo
+  namespace: forgejo
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  allowCrossNamespaceImport: true
+  folder: Applications
+  grafanaCom:
+    id: 22363
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "VictoriaMetrics"
