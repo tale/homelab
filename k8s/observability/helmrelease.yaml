@@ -42,7 +42,6 @@ spec:
       spec:
         evaluationInterval: 30s
         selectAllByDefault: true
-        externalURL: https://grafana.tale.me
     alertmanager:
       enabled: true
       spec:
@@ -78,6 +77,8 @@ spec:
                 priority: '{{ if eq .CommonLabels.severity "critical" }}1{{ else }}0{{ end }}'
                 title: "{{ .CommonLabels.alertname }}"
                 message: '{{ range .Alerts }}{{ .Annotations.summary }}{{ "\n" }}{{ end }}'
+    defaultRules:
+      enabled: false
     victoria-metrics-operator:
       crds:
         enabled: false
