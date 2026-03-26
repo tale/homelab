@@ -66,10 +66,14 @@ spec:
           group_interval: 5m
           repeat_interval: 4h
           routes:
+            - receiver: blackhole
+              matchers:
+                - alertname =~ "InfoInhibitor|Watchdog"
             - receiver: pushover
               matchers:
                 - severity =~ "critical|warning"
         receivers:
+          - name: blackhole
           - name: pushover
             pushover_configs:
               - user_key_file: /etc/vm/secrets/pushover-credentials/user_key
@@ -78,7 +82,19 @@ spec:
                 title: "{{ .CommonLabels.alertname }}"
                 message: '{{ range .Alerts }}{{ .Annotations.summary }}{{ "\n" }}{{ end }}'
     defaultRules:
-      enabled: false
+      enabled: true
+      groups:
+        general:
+          create: false
+      rules:
+        CPUThrottlingHigh:
+          spec:
+            expr: >-
+              sum(increase(container_cpu_cfs_throttled_periods_total{container!="",
+              }[5m])) by (cluster, container, pod, namespace) /
+              sum(increase(container_cpu_cfs_periods_total{}[5m])) by (cluster,
+              container, pod, namespace) > ( 50 / 100 )
+            for: 30m
     victoria-metrics-operator:
       crds:
         enabled: false
