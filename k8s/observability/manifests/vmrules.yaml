@@ -42,3 +42,11 @@ spec:
             severity: critical
           annotations:
             summary: "CNPG cluster {{ $labels.cluster }} has degraded instances"
+        - alert: KubeJobFailed
+          expr: kube_job_status_failed{job="kube-state-metrics"} > 0
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Job {{ $labels.namespace }}/{{ $labels.job_name }} failed"
+            description: "Job {{ $labels.job_name }} in namespace {{ $labels.namespace }} has failed {{ $value }} time(s)"
