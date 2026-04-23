@@ -38,7 +38,7 @@ data:
           user_fields:
             - email
             - username
-          webauthn_allowed_device_types_pw: !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, tale-passkey-validation]]
+          webauthn_stage: !KeyOf passkey-validation
 
       # Login stage
       - model: authentik_stages_user_login.userloginstage
