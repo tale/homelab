@@ -1,0 +1,135 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprints
+  namespace: authentik
+data:
+  passkey-authentication-flow.yaml: |
+    version: 1
+    metadata:
+      name: Tale - Passkey Authentication Flow
+    entries:
+      # Passkey validation stage (WebAuthn only)
+      - model: authentik_stages_authenticator_validate.authenticatorvalidatestage
+        id: passkey-validation
+        identifiers:
+          name: tale-passkey-validation
+        attrs:
+          device_classes:
+            - webauthn
+          not_configured_action: deny
+
+      # Password stage (fallback)
+      - model: authentik_stages_password.passwordstage
+        id: password-stage
+        identifiers:
+          name: tale-authentication-password
+        attrs:
+          backends:
+            - authentik.core.auth.InbuiltBackend
+            - authentik.core.auth.TokenBackend
+
+      # Identification stage with passkey autofill
+      - model: authentik_stages_identification.identificationstage
+        id: identification
+        identifiers:
+          name: tale-authentication-identification
+        attrs:
+          user_fields:
+            - email
+            - username
+          webauthn_allowed_device_types_pw: !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, tale-passkey-validation]]
+
+      # Login stage
+      - model: authentik_stages_user_login.userloginstage
+        id: login
+        identifiers:
+          name: tale-authentication-login
+
+      # Flow
+      - model: authentik_flows.flow
+        id: flow
+        identifiers:
+          slug: tale-passkey-authentication
+        attrs:
+          name: Tale Passkey Login
+          title: Welcome!
+          designation: authentication
+          authentication: none
+
+      # Stage bindings
+      # 1. Identification (with passkey autofill)
+      - model: authentik_flows.flowstagebinding
+        id: binding-identification
+        identifiers:
+          order: 10
+          stage: !KeyOf identification
+          target: !KeyOf flow
+
+      # 2. Password (conditional — skipped if passkey was used)
+      - model: authentik_flows.flowstagebinding
+        id: binding-password
+        identifiers:
+          order: 20
+          stage: !KeyOf password-stage
+          target: !KeyOf flow
+        attrs:
+          re_evaluate_policies: true
+
+      # 3. MFA validation (conditional — skipped if passkey was used)
+      - model: authentik_flows.flowstagebinding
+        id: binding-mfa
+        identifiers:
+          order: 30
+          stage: !KeyOf passkey-validation
+          target: !KeyOf flow
+        attrs:
+          re_evaluate_policies: true
+
+      # 4. Login
+      - model: authentik_flows.flowstagebinding
+        identifiers:
+          order: 100
+          stage: !KeyOf login
+          target: !KeyOf flow
+
+      # Policy: skip password when passkey was used
+      - model: authentik_policies_expression.expressionpolicy
+        id: policy-skip-password
+        identifiers:
+          name: tale-skip-password-if-passkey
+        attrs:
+          expression: |
+            flow_plan = request.context.get("flow_plan")
+            if not flow_plan:
+                return True
+            return not hasattr(flow_plan.context.get("pending_user"), "backend")
+
+      # Policy: skip MFA when passkey was used
+      - model: authentik_policies_expression.expressionpolicy
+        id: policy-skip-mfa
+        identifiers:
+          name: tale-skip-mfa-if-passkey
+        attrs:
+          expression: |
+            flow_plan = request.context.get("flow_plan")
+            if not flow_plan:
+                return True
+            return not (flow_plan.context.get("auth_method") == "auth_webauthn_pwl")
+
+      # Bind policies to stages
+      - model: authentik_policies.policybinding
+        identifiers:
+          order: 10
+          target: !KeyOf binding-password
+          policy: !KeyOf policy-skip-password
+        attrs:
+          failure_result: true
+
+      - model: authentik_policies.policybinding
+        identifiers:
+          order: 10
+          target: !KeyOf binding-mfa
+          policy: !KeyOf policy-skip-mfa
+        attrs:
+          failure_result: true
