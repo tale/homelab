@@ -52,6 +52,8 @@ spec:
           value: https://s3.us-east-1.wasabisys.com
         - name: AUTHENTIK_STORAGE__S3__BUCKET_NAME
           value: tale-home
+        - name: AUTHENTIK_STORAGE__S3__LOCATION
+          value: authentik
         - name: AUTHENTIK_STORAGE__S3__CUSTOM_DOMAIN
           value: s3.us-east-1.wasabisys.com/tale-home
         - name: AUTHENTIK_STORAGE__S3__ACCESS_KEY
