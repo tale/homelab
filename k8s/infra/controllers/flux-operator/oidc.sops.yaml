@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 type: Opaque
 stringData:
-  client-secret: ENC[AES256_GCM,data:cjVQJe8s4H26AoRzK3b7LH8zAh4P96fcbIzGrGXfNVI=,iv:N9fbGI90hWDElQjCf232XIY8Qce0EkLUbOPRMTZeExo=,tag:omEFqvRl0okzkuvYQhdd0w==,type:str]
+  client-secret: ENC[AES256_GCM,data:dY58p1mV6+QkPzKeZVnAsi/Seas6GHwVV2k+Rc0rXb+eXHiTk6J7LoZamdnD5t+3VFOawDQa4UkE2SSycpy5pwQrqrW4AopkYvl1IIjksIdKgPnW7KWgWi4/r9Z2PXdDly+4s3bSVOTvTnbnC8RHTiz3sOuhVzZ3xJB+eKjbVns=,iv:rEXlM9qzADsTUZN2v4Zqx7CcmI5zaZ5u1ST927P0HfM=,tag:LE5Au6wNVbg7+GO3FDRCFQ==,type:str]
 sops:
   age:
     - recipient: age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
@@ -17,7 +17,7 @@ sops:
         cTd2T3owL0ZXa213TW5sR2x3Y0dJbm8KukUspBUwksKkalpSAw7pIwflQVszsVhe
         GBy1830KILdCGxq2PCwgkynWt8J2HhP3rz5EiFQY4I0FdjfeYiK0Ng==
         -----END AGE ENCRYPTED FILE-----
-  lastmodified: "2026-03-20T14:17:13Z"
-  mac: ENC[AES256_GCM,data:NQwqb5PWMv1mQEkE0xw1ahcziQVqxMG0ijU/4rs00jDIji52ocmErTP+BAwmqRQGxPpxY91CEYAl17zK11smC3IhdZqIwm5blca0tFloGkLM45pYDtWqHFZJ8SCAYBortz6jQHHRE3x7J1q+LUYW7XpZhGtXQ87/2Cuqc2qsBiY=,iv:jVmhfOvFmiQyc35S80rauDNcofNkSprmpk/alizuIYE=,tag:0LhqghYFBSwdlOsndZiMMQ==,type:str]
+  lastmodified: "2026-04-23T17:39:12Z"
+  mac: ENC[AES256_GCM,data:0jCley7sWRFpkBhfNGIR2gfwvf+1g8XfKHJ6DygOVLJeRC2juPgL+G2OsUz6yUYPQ+ZhHDI8RjAW4tESw35Zv6SiTrgxHQMAxvFVzrWOAC2OP7IRP8KP5MTzIbJucwO3rDj9B6b/zzPK3yK3jf5i297R3SnYOO9zfS9Dj/mO5C0=,iv:A2fyS3zb1KoaZvYL88opb8BdQREYfPrtzOaMu5qHRl4=,tag:hI6WQo56Qqi/ThyDhm0ZwA==,type:str]
   encrypted_regex: ^(data|stringData)$
   version: 3.10.2

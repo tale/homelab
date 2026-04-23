@@ -26,8 +26,8 @@ spec:
           type: OAuth2
           oauth2:
             provider: OIDC
-            clientID: c87cccfc-0696-4478-9f25-1a7076314160
-            issuerURL: https://idp.tale.me
+            clientID: 6VoYqXzcFTThzCT4QlxQAii4be1Z0vAck8yarWAq
+            issuerURL: https://auth.tale.me/application/o/flux/
       httpRoute:
         enabled: true
         parentRefs:
