@@ -47,6 +47,7 @@ spec:
               name: authentik-secrets
               key: ses-password
     authentik:
+      avatars: "https://secure.gravatar.com/avatar/%(mail_hash)s?s=158&d=identicon,initials"
       log_level: info
       error_reporting:
         enabled: false
