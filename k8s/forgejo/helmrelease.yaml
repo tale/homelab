@@ -68,8 +68,9 @@ spec:
               name: forgejo-db-credentials
               key: password
       oauth:
-        - name: pocket-id
+        - name: Authentik
           provider: openidConnect
-          autoDiscoverUrl: "https://idp.tale.me/.well-known/openid-configuration"
+          autoDiscoverUrl: "https://auth.tale.me/application/o/forgejo/"
           existingSecret: forgejo-oidc
+          iconUrl: "https://auth.tale.me/static/dist/assets/icons/icon.png"
           scopes: "openid profile email"
