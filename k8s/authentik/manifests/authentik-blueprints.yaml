@@ -17,7 +17,7 @@ data:
         attrs:
           device_classes:
             - webauthn
-          not_configured_action: deny
+          not_configured_action: skip
 
       # Password stage (fallback)
       - model: authentik_stages_password.passwordstage
