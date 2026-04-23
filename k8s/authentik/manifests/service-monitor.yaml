@@ -1,0 +1,14 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: authentik
+  namespace: authentik
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: authentik-server
+      app.kubernetes.io/instance: authentik
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s

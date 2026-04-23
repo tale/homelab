@@ -7,3 +7,4 @@ resources:
   - manifests/authentik-secrets.sops.yaml
   - manifests/authentik-http-route.yaml
   - manifests/authentik-custom-css.yaml
+  - manifests/service-monitor.yaml
