@@ -8,4 +8,5 @@ resources:
   - manifests/authentik-http-route.yaml
   - manifests/authentik-blueprints.yaml
   - manifests/apply-blueprints-job.yaml
+  - manifests/authentik-data-pvc.yaml
   - manifests/service-monitor.yaml
