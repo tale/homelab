@@ -92,9 +92,8 @@ spec:
           create: false
       rules:
         KubeJobFailed:
-          enabled: false
-        LogErrors:
-          enabled: false
+          create: false
+        LogErrors: {}
         CPUThrottlingHigh:
           spec:
             expr: >-
@@ -109,6 +108,9 @@ spec:
         plain: false
       operator:
         disable_prometheus_converter: true
+      env:
+        - name: VM_ENABLEDPROMETHEUSCONVERTER_SCRAPECONFIG
+          value: "false"
     prometheus-node-exporter:
       enabled: true
     kube-state-metrics:
