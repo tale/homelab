@@ -1,0 +1,63 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: bluesky-pds
+  namespace: bluesky-pds
+spec:
+  url: https://charts.bear.fyi
+  interval: 1h
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: bluesky-pds
+  namespace: bluesky-pds
+spec:
+  interval: 1h
+  releaseName: bluesky-pds
+  chart:
+    spec:
+      chart: bluesky-pds
+      version: 0.4.208
+      sourceRef:
+        kind: HelmRepository
+        name: bluesky-pds
+  install:
+    createNamespace: false
+  values:
+    image:
+      tag: "0.4.219"
+    pds:
+      config:
+        hostname: pds.tale.me
+        emailFromAddress: noreply@tale.me
+        secrets:
+          existingSecret: pds-secrets
+        # Hide noisy startup banner; PDS already logs JSON to stdout.
+        logEnabled: "true"
+      dataStorage:
+        size: 25Gi
+        storageClass: cluster-nvmf
+    service:
+      port: 3000
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
+  # The chart hard-codes its env block and doesn't expose
+  # PDS_SERVICE_HANDLE_DOMAINS — patch it in so we can register `*.tale.me`
+  # handles directly through the PDS instead of only via DNS verification.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: bluesky-pds
+            patch: |
+              - op: add
+                path: /spec/template/spec/containers/0/env/-
+                value:
+                  name: PDS_SERVICE_HANDLE_DOMAINS
+                  value: .tale.me

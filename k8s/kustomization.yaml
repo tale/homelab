@@ -9,3 +9,4 @@ resources:
   - samba/flux.yaml
   - forgejo/flux.yaml
   - authentik/flux.yaml
+  - bluesky-pds/flux.yaml
