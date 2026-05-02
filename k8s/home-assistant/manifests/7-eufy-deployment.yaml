@@ -21,11 +21,14 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: eufy-security-ws
-          image: bropat/eufy-security-ws:latest
+          image: bropat/eufy-security-ws:2.1.0
           imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:
                 name: eufy-ws-secrets
+          # env:
+          #   - name: DEBUG
+          #     value: "true"
           volumeMounts:
             - name: data
               mountPath: /data
