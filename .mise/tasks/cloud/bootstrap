@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Bootstrap the Oracle Cloud VM (install podman + enable socket)"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT/cloud"
+ansible-playbook -i inventory.yaml bootstrap.yaml

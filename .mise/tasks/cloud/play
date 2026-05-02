@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Run an Ansible playbook for a service (e.g. mise run cloud:play traefik)"
+#USAGE arg "<service>" help="Subdirectory under cloud/ containing playbook.yaml"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT/cloud"
+ansible-playbook -i inventory.yaml "${usage_service}/playbook.yaml"

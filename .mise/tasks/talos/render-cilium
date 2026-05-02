@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#MISE description="Render the Cilium Helm chart into talos/cilium/manifest.gen.yaml"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT/talos"
+
+cilium_version="$(yq '.CILIUM_VERSION' talenv.yaml)"
+chart_url="https://helm.cilium.io/cilium-${cilium_version}.tgz"
+
+cp cilium/patch.yaml cilium/manifest.gen.yaml
+helm template cilium "$chart_url" \
+	--namespace kube-system --create-namespace \
+	-f cilium/values.yaml \
+	| sed -e 's/\$/$$/g' -e 's/^/        /' \
+	>> cilium/manifest.gen.yaml

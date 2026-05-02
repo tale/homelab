@@ -11,21 +11,7 @@ machine:
       - 8.8.4.4
 
   install:
-    # This image includes the siderolabs/tailscale extension
-    # image: factory.talos.dev/metal-installer-secureboot/4a0d65c669d46663f377e7161e50cfd570c401f26fd9e7bda34a0216b6f1922b:v1.10.6
-    # image: factory.talos.dev/metal-installer-secureboot/4a0d65c669d46663f377e7161e50cfd570c401f26fd9e7bda34a0216b6f1922b:v1.10.8
-    # image: factory.talos.dev/metal-installer-secureboot/4a0d65c669d46663f377e7161e50cfd570c401f26fd9e7bda34a0216b6f1922b:v1.11.6
-    image: factory.talos.dev/metal-installer-secureboot/4a0d65c669d46663f377e7161e50cfd570c401f26fd9e7bda34a0216b6f1922b:v1.12.4
-
     wipe: false
-
-    disk:
-      $patch: delete
-    diskSelector:
-      model: CT240BX500SSD1
-
-  nodeLabels:
-    $patch: delete
 
   time:
     disabled: false
@@ -40,10 +26,11 @@ machine:
 
   sysctls:
     kernel.domainname: talos.dev
+    net.ipv4.ip_forward: "1"
+    net.ipv6.conf.all.forwarding: "1"
 
 cluster:
-  allowSchedulingOnControlPlanes: true
-  # We want the kubelet to support a proper metrics-server for kubectl top
+  # Make `kubectl top` work out of the box.
   extraManifests:
     - https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml
     - https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml

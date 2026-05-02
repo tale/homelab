@@ -6,12 +6,12 @@ resources:
   - cert-manager/test-issuer.yaml
   - cert-manager/prod-issuer.yaml
 
-  # cilium (hubble UI)
-  - cilium/hubble-oidc.sops.yaml
-  - cilium/hubble-route.yaml
-  - cilium/hubble-security-policy.yaml
-  - cilium/service-monitor.yaml
-  - cilium/grafana-dashboard.yaml
+  # hubble (Cilium observability UI; the CNI itself is bootstrapped via Talos)
+  - hubble/hubble-oidc.sops.yaml
+  - hubble/hubble-route.yaml
+  - hubble/hubble-security-policy.yaml
+  - hubble/service-monitor.yaml
+  - hubble/grafana-dashboard.yaml
 
   # cloudnative-pg
   - cloudnative-pg/cluster.yaml

@@ -1,15 +1,15 @@
 [tools]
-"ubi:siderolabs/talos" = "1.10.6"
+"github:siderolabs/talos" = "1.12.4"
 "aqua:helm/helm" = "3.18.4"
 "aqua:getsops/sops" = "3.10.2"
 "aqua:FiloSottile/age" = "1.2.1"
-"ubi:casey/just" = "1.42.4"
 "asdf:mise-plugins/mise-pipx" = "1.7.1"
 ansible = "latest"
 "npm:oxfmt" = "latest"
 flux2 = "latest"
 lefthook = "latest"
 "aqua:mikefarah/yq" = "latest"
+"github:budimanjojo/talhelper" = "latest"
 
 [hooks]
 postinstall = "lefthook install"

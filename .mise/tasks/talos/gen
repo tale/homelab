@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Render Talos machineconfigs (re-renders Cilium first)"
+#MISE depends=["talos:render-cilium"]
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT/talos"
+talhelper genconfig

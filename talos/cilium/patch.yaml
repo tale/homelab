@@ -1,0 +1,8 @@
+cluster:
+  proxy:
+    disabled: true
+  inlineManifests:
+    - name: cilium
+      # `just render-cilium` appends the indented Helm-rendered chart below
+      # this header and writes the combined patch to `manifest.gen.yaml`.
+      contents: |

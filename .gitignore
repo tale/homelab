@@ -1,1 +1,4 @@
 *.gen.*
+dev-config.json
+k8s/**/charts/
+talos/clusterconfig/

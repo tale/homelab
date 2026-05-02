@@ -1,0 +1,7 @@
+---
+TALOS_VERSION: v1.12.4
+CILIUM_VERSION: 1.18.0
+# Sidero Image Factory schematic for the secureboot installer with the
+# `siderolabs/tailscale` extension.  Bump alongside TALOS_VERSION and
+# refresh from https://factory.talos.dev when changing extensions.
+TALOS_SCHEMATIC_ID: 4a0d65c669d46663f377e7161e50cfd570c401f26fd9e7bda34a0216b6f1922b

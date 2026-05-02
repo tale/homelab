@@ -1,0 +1,53 @@
+---
+clusterName: tale-lab
+endpoint: https://172.31.42.100:6443
+talosVersion: ${TALOS_VERSION}
+allowSchedulingOnControlPlanes: true
+
+clusterPodNets:
+  - 10.244.0.0/16
+clusterSvcNets:
+  - 10.96.0.0/12
+
+# Cilium replaces kube-proxy and is the CNI; the chart is rendered into
+# `./cilium/manifest.gen.yaml` by `just render-cilium` and inlined as a patch.
+cniConfig:
+  name: none
+
+# Cluster-wide patches, applied to every node in declared order.
+patches:
+  - "@./patches/shared.yaml"
+  - "@./patches/openebs.yaml"
+  - "@./patches/tailscale.sops.yaml"
+  - "@./cilium/manifest.gen.yaml"
+
+# Defaults inherited by every control-plane node.
+controlPlane:
+  # Image Factory secureboot installer that bundles the siderolabs/tailscale
+  # extension. talhelper appends `:${TALOS_VERSION}` automatically.
+  talosImageURL: factory.talos.dev/metal-installer-secureboot/${TALOS_SCHEMATIC_ID}
+
+nodes:
+  - hostname: node-1
+    ipAddress: 172.31.42.2
+    controlPlane: true
+    installDiskSelector:
+      model: CT240BX500SSD1
+    patches:
+      - "@./nodes/node-1.yaml"
+
+  - hostname: node-2
+    ipAddress: 172.31.42.3
+    controlPlane: true
+    installDiskSelector:
+      model: CT240BX500SSD1
+    patches:
+      - "@./nodes/node-2.yaml"
+
+  - hostname: node-3
+    ipAddress: 172.31.42.4
+    controlPlane: true
+    installDiskSelector:
+      model: CT240BX500SSD1
+    patches:
+      - "@./nodes/node-3.yaml"
