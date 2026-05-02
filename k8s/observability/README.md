@@ -49,6 +49,7 @@ All scrape configs are colocated with their respective app/infra directories.
 | OpenEBS IO Engine | VMServiceScrape | `infra/configs/openebs/` |
 | Blocky DNS | VMServiceScrape | `blocky/manifests/` |
 | Forgejo | VMServiceScrape | `forgejo/manifests/` |
+| Authentik | VMServiceScrape | `authentik/manifests/` |
 
 ### Dashboards (via Grafana Operator CRDs)
 
@@ -68,6 +69,7 @@ Dashboards are colocated with their apps where possible.
 | Kubernetes Pods | 15760 | Kubernetes | `observability/` |
 | Blocky DNS | 17996 | Applications | `blocky/` |
 | Forgejo | 22363 | Applications | `forgejo/` |
+| Authentik | 14837 | Applications | `authentik/` |
 | Envoy Gateway | 22539 | Network | `infra/configs/envoy/` |
 | Hubble Overview | 16611 | Network | `infra/configs/cilium/` |
 

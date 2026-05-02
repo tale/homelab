@@ -1,0 +1,33 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMRule
+metadata:
+  name: authentik
+  namespace: authentik
+spec:
+  groups:
+    - name: authentik
+      rules:
+        - alert: AuthentikServerDown
+          expr: up{namespace="authentik", service="authentik-server-metrics"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Authentik server {{ $labels.pod }} is down"
+            description: "Authentik metrics endpoint on {{ $labels.pod }} has been unreachable for more than 5 minutes."
+        - alert: AuthentikOutpostDisconnected
+          expr: authentik_outpost_connection == 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Authentik outpost {{ $labels.outpost_name }} is disconnected"
+            description: "Outpost {{ $labels.outpost_name }} ({{ $labels.outpost_type }}) has been disconnected for more than 10 minutes."
+        - alert: AuthentikHighRequestLatency
+          expr: histogram_quantile(0.95, sum(rate(authentik_main_request_duration_seconds_bucket[5m])) by (le, dest)) > 2
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Authentik p95 request latency is high ({{ $labels.dest }})"
+            description: "p95 request latency for dest={{ $labels.dest }} is {{ $value | humanizeDuration }} (threshold 2s)."

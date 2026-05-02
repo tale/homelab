@@ -6,8 +6,9 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: authentik-server
       app.kubernetes.io/instance: authentik
+      app.kubernetes.io/name: authentik
+      app.kubernetes.io/component: server-metrics
   endpoints:
     - port: metrics
       path: /metrics

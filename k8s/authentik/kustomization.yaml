@@ -10,3 +10,5 @@ resources:
   - manifests/apply-blueprints-job.yaml
   - manifests/authentik-data-pvc.yaml
   - manifests/service-monitor.yaml
+  - manifests/grafana-dashboard.yaml
+  - manifests/vmrule.yaml
