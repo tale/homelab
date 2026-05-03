@@ -29,6 +29,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /config
+            - name: ha-secrets
+              mountPath: /config/secrets.yaml
+              subPath: secrets.yaml
+              readOnly: true
           ports:
             - name: ui
               containerPort: 8123
@@ -61,3 +65,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: home-assistant-data
+        - name: ha-secrets
+          secret:
+            secretName: home-assistant-secrets
+            items:
+              - key: secrets.yaml
+                path: secrets.yaml

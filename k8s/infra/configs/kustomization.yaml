@@ -19,6 +19,7 @@ resources:
   - cloudnative-pg/forgejo-database.yaml
   - cloudnative-pg/authentik-database.yaml
   - cloudnative-pg/grafana-database.yaml
+  - cloudnative-pg/home-assistant-database.yaml
   - cloudnative-pg/wasabi-credentials.sops.yaml
   - cloudnative-pg/scheduled-backup.yaml
   - cloudnative-pg/pod-monitor.yaml
