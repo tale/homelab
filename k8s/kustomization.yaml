@@ -10,5 +10,4 @@ resources:
   - forgejo/flux.yaml
   - authentik/flux.yaml
   - bluesky-pds/flux.yaml
-  - tranquil-pds/flux.yaml
   - home-assistant/flux.yaml
