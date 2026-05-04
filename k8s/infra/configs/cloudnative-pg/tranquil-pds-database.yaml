@@ -1,0 +1,10 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: central-postgres-tranquil-pds
+  namespace: cnpg-system
+spec:
+  name: tranquil_pds
+  owner: app
+  cluster:
+    name: central-postgres
