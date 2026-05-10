@@ -11,3 +11,4 @@ resources:
   - authentik/flux.yaml
   - bluesky-pds/flux.yaml
   - home-assistant/flux.yaml
+  - wakapi/flux.yaml

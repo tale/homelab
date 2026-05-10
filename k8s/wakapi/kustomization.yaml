@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - manifests/namespace.yaml
+  - manifests/wakapi-secrets.sops.yaml
+  - manifests/wakapi-db-credentials.sops.yaml
+  - manifests/wakapi-oidc.sops.yaml
+  - manifests/wakapi-deployment.yaml
+  - manifests/wakapi-service.yaml
+  - manifests/wakapi-http-route.yaml

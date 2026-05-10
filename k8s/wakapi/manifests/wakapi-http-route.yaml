@@ -1,0 +1,18 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: wakapi-http-route
+  namespace: wakapi
+  annotations:
+    external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+spec:
+  parentRefs:
+    - name: envoy-gw
+      sectionName: https
+      namespace: default
+  hostnames:
+    - wakatime.tale.me
+  rules:
+    - backendRefs:
+        - name: wakapi
+          port: 3000
