@@ -28,7 +28,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: wakapi
-          image: ghcr.io/muety/wakapi:2.14.1
+          image: ghcr.io/muety/wakapi:2.17.3
           imagePullPolicy: IfNotPresent
           env:
             - name: ENVIRONMENT
