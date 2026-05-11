@@ -7,7 +7,6 @@ resources:
   - manifests/authentik-secrets.sops.yaml
   - manifests/authentik-http-route.yaml
   - manifests/authentik-blueprints.yaml
-  - manifests/apply-blueprints-job.yaml
   - manifests/authentik-data-pvc.yaml
   - manifests/service-monitor.yaml
   - manifests/grafana-dashboard.yaml

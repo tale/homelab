@@ -135,6 +135,7 @@ data:
           failure_result: true
 
   brand-theme.yaml: |
+    # rev: 2 — bump this to invalidate worker's last_applied_hash and force re-apply
     version: 1
     metadata:
       name: Tale - Brand & Theme
@@ -142,11 +143,22 @@ data:
       # Default brand: dark theme + custom CSS
       # The CSS is Pocket ID-inspired for the login flow and a refined
       # monochrome dark theme for the user/admin interface.
+      #
+      # `state: present` makes the importer UPDATE the existing default brand
+      # (matched by domain). Without an explicit state the importer also defaults
+      # to `present`, but we set it explicitly so it can never be confused with
+      # the system's `default-brand.yaml`, which uses `state: created` (= no-op
+      # if the brand already exists).
+      #
+      # NOTE: `attributes` is a JSONField — the importer REPLACES it whole on
+      # apply, it does not deep-merge. We're OK because the default brand ships
+      # with empty attributes; if you later add other settings via the UI, fold
+      # them into this blueprint or they will be wiped on the next apply.
       - model: authentik_brands.brand
+        state: present
         identifiers:
           domain: authentik-default
         attrs:
-          default: true
           branding_title: Tale
           attributes:
             settings:
