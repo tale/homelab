@@ -133,3 +133,360 @@ data:
           policy: !KeyOf policy-skip-mfa
         attrs:
           failure_result: true
+
+  brand-theme.yaml: |
+    version: 1
+    metadata:
+      name: Tale - Brand & Theme
+    entries:
+      # Default brand: dark theme + custom CSS
+      # The CSS is Pocket ID-inspired for the login flow and a refined
+      # monochrome dark theme for the user/admin interface.
+      - model: authentik_brands.brand
+        identifiers:
+          domain: authentik-default
+        attrs:
+          default: true
+          branding_title: Tale
+          attributes:
+            settings:
+              theme:
+                base: dark
+              navbar:
+                userDisplay: name
+          branding_custom_css: |
+            /*
+             * Tale — Authentik Theme
+             *   • Pocket ID-style login (passkey-first via WebAuthn conditional UI)
+             *   • Cohesive monochrome dark theme for user & admin interfaces
+             *
+             * Built on top of `data-theme="dark"` (set via brand attribute).
+             * PatternFly CSS variables cascade into shadow DOM, so prefer
+             * variable overrides; fall back to direct selectors only where needed.
+             */
+
+            :root,
+            :root[data-theme="dark"] {
+              --tale-bg: #0a0a0a;
+              --tale-surface: #141414;
+              --tale-surface-2: #1c1c1c;
+              --tale-border: #262626;
+              --tale-border-strong: #353535;
+              --tale-text: #ededed;
+              --tale-text-dim: #8a8a8a;
+              --tale-accent: #fafafa;
+              --tale-accent-fg: #0a0a0a;
+              --tale-radius: 12px;
+              --tale-radius-lg: 18px;
+
+              /* PatternFly variable overrides */
+              --pf-global--BackgroundColor--100: var(--tale-bg);
+              --pf-global--BackgroundColor--200: var(--tale-surface);
+              --pf-global--BackgroundColor--dark-100: var(--tale-bg);
+              --pf-global--BackgroundColor--dark-200: var(--tale-surface);
+              --pf-global--BackgroundColor--dark-300: var(--tale-surface-2);
+              --pf-global--Color--100: var(--tale-text);
+              --pf-global--Color--200: var(--tale-text-dim);
+              --pf-global--BorderColor--100: var(--tale-border);
+              --pf-global--primary-color--100: var(--tale-accent);
+              --pf-global--link--Color: var(--tale-text);
+            }
+
+            body,
+            .pf-c-page,
+            .pf-c-page__main,
+            .pf-c-page__main-section {
+              background-color: var(--tale-bg);
+            }
+
+            /* ========================================================
+               FLOW / LOGIN — Pocket ID-style
+               ======================================================== */
+
+            .pf-c-login {
+              background: radial-gradient(circle at 50% -10%, #1d1d1d 0%, var(--tale-bg) 55%);
+              background-image: none;
+            }
+
+            .pf-c-login__container {
+              width: min(420px, 100%);
+              margin: 0 auto;
+              display: flex;
+              flex-direction: column;
+              gap: 1rem;
+              justify-content: center;
+              min-height: 100vh;
+              padding: 1.5rem;
+            }
+
+            /* Hide the outer "Powered by" footer; keep source buttons inside the card. */
+            .pf-c-login__footer {
+              display: none;
+            }
+
+            /* Logo above the card (executor's own header slot) */
+            .pf-c-login__header {
+              display: flex;
+              justify-content: center;
+              margin-bottom: 0.25rem;
+              filter: grayscale(1) brightness(1.1);
+            }
+
+            .pf-c-login__header img,
+            .pf-c-login__header .branding-logo {
+              max-height: 48px;
+              width: auto;
+            }
+
+            /* The card itself */
+            .pf-c-login__main {
+              background: var(--tale-surface);
+              border: 1px solid var(--tale-border);
+              border-radius: var(--tale-radius-lg);
+              box-shadow:
+                0 24px 48px -16px rgba(0, 0, 0, 0.6),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+              overflow: hidden;
+            }
+
+            /* Card header — title only; suppress the duplicate logo that
+               ak-flow-card renders inside .pf-c-login__main-header.pf-c-brand */
+            .pf-c-login__main-header,
+            .pf-c-login__main-header.pf-c-brand {
+              background: transparent;
+              padding: 1.75rem 1.75rem 0.25rem;
+              text-align: center;
+              display: block;
+            }
+
+            .pf-c-login__main-header.pf-c-brand .branding-logo {
+              display: none;
+            }
+
+            .pf-c-login__main-header .pf-c-title,
+            ak-flow-card .pf-c-title {
+              font-size: 1.35rem;
+              font-weight: 600;
+              color: var(--tale-text);
+              letter-spacing: -0.01em;
+            }
+
+            .pf-c-login__main-header-desc {
+              color: var(--tale-text-dim);
+              font-size: 0.9rem;
+              margin-top: 0.25rem;
+            }
+
+            .pf-c-login__main-body {
+              padding: 1.25rem 1.75rem 1.75rem;
+            }
+
+            .pf-c-login__main-footer {
+              background: transparent;
+              border-top: 1px solid var(--tale-border);
+              padding: 1rem 1.75rem;
+            }
+
+            /* Form labels — small, all-caps tracking */
+            .pf-c-form__label,
+            .pf-c-form__label-text {
+              color: var(--tale-text-dim);
+              font-size: 0.72rem;
+              font-weight: 500;
+              text-transform: uppercase;
+              letter-spacing: 0.06em;
+              margin-bottom: 0.4rem;
+            }
+
+            /* Inputs — generous padding so the single field feels like the focus */
+            .pf-c-form-control {
+              background-color: var(--tale-surface-2);
+              border: 1px solid var(--tale-border-strong);
+              color: var(--tale-text);
+              border-radius: 10px;
+              padding: 0.85rem 0.95rem;
+              font-size: 1rem;
+              height: auto;
+              transition: border-color 120ms ease, box-shadow 120ms ease;
+            }
+
+            .pf-c-form-control:hover {
+              border-color: #444;
+            }
+
+            .pf-c-form-control:focus {
+              border-color: var(--tale-accent);
+              box-shadow: 0 0 0 3px rgba(250, 250, 250, 0.08);
+              outline: none;
+            }
+
+            /* Buttons */
+            .pf-c-button {
+              border-radius: 10px;
+              font-weight: 500;
+              letter-spacing: -0.005em;
+              transition: background-color 120ms ease, transform 80ms ease;
+            }
+
+            .pf-c-button.pf-m-primary {
+              background-color: var(--tale-accent);
+              color: var(--tale-accent-fg);
+              padding: 0.8rem 1rem;
+            }
+
+            .pf-c-button.pf-m-primary:hover {
+              background-color: #ffffff;
+            }
+
+            .pf-c-button.pf-m-primary:active {
+              transform: translateY(1px);
+            }
+
+            .pf-c-button.pf-m-secondary {
+              background: transparent;
+              color: var(--tale-text);
+              border: 1px solid var(--tale-border-strong);
+            }
+
+            .pf-c-button.pf-m-secondary:hover {
+              background: var(--tale-surface-2);
+              border-color: #444;
+            }
+
+            .pf-c-button.pf-m-block {
+              width: 100%;
+            }
+
+            /* Divider between primary action and passwordless link */
+            ak-divider,
+            .pf-c-login__main-body hr {
+              margin: 1rem 0;
+              border-color: var(--tale-border);
+              color: var(--tale-text-dim);
+            }
+
+            /* Source / SSO buttons inside the card footer */
+            fieldset[name="login-sources"] {
+              border: 0;
+              padding: 0;
+              display: flex;
+              flex-direction: column;
+              gap: 0.5rem;
+            }
+
+            /* Enroll / recovery action band */
+            fieldset[name="additional-actions"] {
+              border: 0;
+              padding: 0;
+              margin-top: 0.5rem;
+              text-align: center;
+              font-size: 0.85rem;
+              color: var(--tale-text-dim);
+            }
+
+            fieldset[name="additional-actions"] a {
+              color: var(--tale-text);
+              text-decoration: none;
+              border-bottom: 1px dashed var(--tale-border-strong);
+            }
+
+            fieldset[name="additional-actions"] a:hover {
+              border-bottom-color: var(--tale-accent);
+            }
+
+            /* ========================================================
+               USER & ADMIN INTERFACE
+               ======================================================== */
+
+            /* Cards */
+            .pf-c-card {
+              background: var(--tale-surface);
+              border: 1px solid var(--tale-border);
+              border-radius: var(--tale-radius);
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+            }
+
+            .pf-c-card.pf-m-hoverable {
+              transition: transform 120ms ease, border-color 120ms ease;
+            }
+
+            .pf-c-card.pf-m-hoverable:hover {
+              border-color: var(--tale-border-strong);
+              transform: translateY(-1px);
+            }
+
+            /* Sidebar / nav */
+            .pf-c-page__sidebar {
+              background: var(--tale-bg);
+              border-right: 1px solid var(--tale-border);
+              box-shadow: none;
+            }
+
+            .pf-c-nav__link {
+              border-radius: 8px;
+              margin: 1px 8px;
+            }
+
+            .pf-c-nav__link:hover,
+            .pf-c-nav__link.pf-m-current {
+              background-color: var(--tale-surface);
+            }
+
+            /* Tables, toolbars, pagination */
+            .pf-c-table,
+            .pf-c-toolbar,
+            .pf-c-pagination {
+              background-color: var(--tale-surface);
+            }
+
+            .pf-c-toolbar {
+              border-radius: var(--tale-radius) var(--tale-radius) 0 0;
+            }
+
+            .pf-c-pagination {
+              border-radius: 0 0 var(--tale-radius) var(--tale-radius);
+            }
+
+            tr.pf-m-hoverable:hover {
+              background-color: var(--tale-surface-2);
+            }
+
+            /* Modals & wizards */
+            .pf-c-modal-box,
+            .pf-c-modal-box__header,
+            .pf-c-modal-box__body,
+            .pf-c-modal-box__footer,
+            .pf-c-wizard__header,
+            .pf-c-wizard__main,
+            .pf-c-wizard__footer,
+            .pf-c-wizard__nav {
+              background-color: var(--tale-surface);
+            }
+
+            .pf-c-modal-box {
+              border-radius: var(--tale-radius);
+              border: 1px solid var(--tale-border);
+            }
+
+            /* Drawers */
+            .pf-c-drawer__panel {
+              background: var(--tale-surface);
+              border-left: 1px solid var(--tale-border);
+            }
+
+            /* Dropdowns */
+            .pf-c-dropdown__menu {
+              background: var(--tale-surface);
+              border: 1px solid var(--tale-border);
+              border-radius: var(--tale-radius);
+              overflow: hidden;
+            }
+
+            .pf-c-dropdown__menu-item:hover {
+              background: var(--tale-surface-2);
+            }
+
+            /* Titles */
+            .pf-c-title {
+              color: var(--tale-text);
+            }

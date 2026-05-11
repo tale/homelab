@@ -19,25 +19,32 @@ spec:
               from authentik.blueprints.models import BlueprintInstance
               from authentik.blueprints.v1.importer import Importer
 
-              path = "mounted/cm-authentik-blueprints/passkey-authentication-flow.yaml"
-              bp, created = BlueprintInstance.objects.get_or_create(
-                  path=path,
-                  defaults={"name": "Tale - Passkey Authentication Flow", "enabled": True},
-              )
-              print(f"Blueprint instance {'created' if created else 'exists'}: {bp.name}")
+              blueprints = [
+                  ("mounted/cm-authentik-blueprints/passkey-authentication-flow.yaml",
+                   "Tale - Passkey Authentication Flow"),
+                  ("mounted/cm-authentik-blueprints/brand-theme.yaml",
+                   "Tale - Brand & Theme"),
+              ]
 
-              content = bp.retrieve()
-              importer = Importer.from_string(content, {})
-              valid, logs = importer.validate()
-              if not valid:
-                  for log in logs:
-                      print(log)
-                  raise SystemExit("Blueprint validation failed")
+              for path, name in blueprints:
+                  bp, created = BlueprintInstance.objects.get_or_create(
+                      path=path,
+                      defaults={"name": name, "enabled": True},
+                  )
+                  print(f"Blueprint instance {'created' if created else 'exists'}: {bp.name}")
 
-              applied = importer.apply()
-              bp.status = "successful"
-              bp.save()
-              print(f"Blueprint applied: {applied}")
+                  content = bp.retrieve()
+                  importer = Importer.from_string(content, {})
+                  valid, logs = importer.validate()
+                  if not valid:
+                      for log in logs:
+                          print(log)
+                      raise SystemExit(f"Blueprint validation failed: {name}")
+
+                  applied = importer.apply()
+                  bp.status = "successful"
+                  bp.save()
+                  print(f"Blueprint applied ({name}): {applied}")
           env:
             - name: AUTHENTIK_SECRET_KEY
               valueFrom:
