@@ -135,7 +135,7 @@ data:
           failure_result: true
 
   brand-theme.yaml: |
-    # rev: 2 — bump this to invalidate worker's last_applied_hash and force re-apply
+    # rev: 3 — bump this to invalidate worker's last_applied_hash and force re-apply
     version: 1
     metadata:
       name: Tale - Brand & Theme
@@ -216,8 +216,21 @@ data:
                ======================================================== */
 
             .pf-c-login {
-              background: radial-gradient(circle at 50% -10%, #1d1d1d 0%, var(--tale-bg) 55%);
+              background:
+                radial-gradient(circle at 15% 20%, rgba(80, 80, 120, 0.18) 0%, transparent 50%),
+                radial-gradient(circle at 85% 80%, rgba(120, 80, 100, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% -10%, #1d1d1d 0%, var(--tale-bg) 55%);
               background-image: none;
+              background-color: var(--tale-bg);
+            }
+
+            /* Re-enable the radial layers (the previous rule strips background-image
+               that PatternFly inlines for the default flow background) */
+            .pf-c-login.pf-c-login {
+              background-image:
+                radial-gradient(circle at 15% 20%, rgba(80, 80, 120, 0.18) 0%, transparent 50%),
+                radial-gradient(circle at 85% 80%, rgba(120, 80, 100, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% -10%, #1d1d1d 0%, var(--tale-bg) 55%);
             }
 
             .pf-c-login__container {
@@ -250,15 +263,34 @@ data:
               width: auto;
             }
 
-            /* The card itself */
+            /* The card itself — frosted glass */
             .pf-c-login__main {
-              background: var(--tale-surface);
-              border: 1px solid var(--tale-border);
+              background: rgba(20, 20, 20, 0.55);
+              backdrop-filter: blur(28px) saturate(1.4);
+              -webkit-backdrop-filter: blur(28px) saturate(1.4);
+              border: 1px solid rgba(255, 255, 255, 0.08);
               border-radius: var(--tale-radius-lg);
               box-shadow:
                 0 24px 48px -16px rgba(0, 0, 0, 0.6),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
               overflow: hidden;
+            }
+
+            /* Tight, deliberate form spacing — no PatternFly default margins */
+            .pf-c-login__main-body .pf-c-form,
+            .pf-c-login__main-body form {
+              display: flex;
+              flex-direction: column;
+              gap: 1rem;
+            }
+
+            .pf-c-login__main-body .pf-c-form__group {
+              margin: 0;
+              padding: 0;
+            }
+
+            .pf-c-login__main-body .pf-c-form__group.pf-m-action {
+              margin-top: 0.25rem;
             }
 
             /* Card header — title only; suppress the duplicate logo that
@@ -332,41 +364,142 @@ data:
               outline: none;
             }
 
-            /* Buttons */
+            /* Buttons — comprehensive coverage of all PatternFly variants */
             .pf-c-button {
               border-radius: 10px;
               font-weight: 500;
               letter-spacing: -0.005em;
-              transition: background-color 120ms ease, transform 80ms ease;
+              transition: background-color 120ms ease, border-color 120ms ease, transform 80ms ease;
             }
 
+            /* Primary — solid white-ish */
             .pf-c-button.pf-m-primary {
               background-color: var(--tale-accent);
               color: var(--tale-accent-fg);
-              padding: 0.8rem 1rem;
+              border: 1px solid var(--tale-accent);
+              padding: 0.6rem 1rem;
             }
 
             .pf-c-button.pf-m-primary:hover {
               background-color: #ffffff;
+              border-color: #ffffff;
             }
 
             .pf-c-button.pf-m-primary:active {
               transform: translateY(1px);
             }
 
-            .pf-c-button.pf-m-secondary {
+            /* Secondary & Tertiary — outlined */
+            .pf-c-button.pf-m-secondary,
+            .pf-c-button.pf-m-tertiary {
               background: transparent;
               color: var(--tale-text);
               border: 1px solid var(--tale-border-strong);
             }
 
-            .pf-c-button.pf-m-secondary:hover {
+            .pf-c-button.pf-m-secondary:hover,
+            .pf-c-button.pf-m-tertiary:hover {
               background: var(--tale-surface-2);
-              border-color: #444;
+              border-color: #555;
+              color: var(--tale-text);
+            }
+
+            /* Plain / control buttons (icon buttons inside input-groups, toolbars) */
+            .pf-c-button.pf-m-plain,
+            .pf-c-button.pf-m-control {
+              background: transparent;
+              color: var(--tale-text-dim);
+              border: 1px solid transparent;
+            }
+
+            .pf-c-button.pf-m-plain:hover,
+            .pf-c-button.pf-m-control:hover {
+              color: var(--tale-text);
+              background: var(--tale-surface-2);
+            }
+
+            /* Danger — red but tasteful */
+            .pf-c-button.pf-m-danger {
+              background-color: #b94a48;
+              color: #fff;
+              border: 1px solid #b94a48;
+            }
+
+            .pf-c-button.pf-m-danger:hover {
+              background-color: #d05552;
+              border-color: #d05552;
+            }
+
+            /* Link buttons (text-only actions like "Delete" in toolbars) */
+            .pf-c-button.pf-m-link {
+              background: transparent;
+              border: 1px solid transparent;
+              color: var(--tale-text);
+              padding: 0.5rem 0.75rem;
+            }
+
+            .pf-c-button.pf-m-link.pf-m-danger {
+              background: transparent;
+              color: #ff7a7a;
+              border-color: transparent;
+            }
+
+            .pf-c-button.pf-m-link:hover {
+              background: var(--tale-surface-2);
+            }
+
+            /* Disabled state */
+            .pf-c-button:disabled,
+            .pf-c-button.pf-m-disabled {
+              opacity: 0.4;
+              cursor: not-allowed;
             }
 
             .pf-c-button.pf-m-block {
               width: 100%;
+            }
+
+            /* ========================================================
+               INPUT GROUPS — fix double-border on search inputs etc.
+               ======================================================== */
+
+            /* The wrapper carries the rounded border; inner control is flat */
+            .pf-c-input-group {
+              background-color: var(--tale-surface-2);
+              border: 1px solid var(--tale-border-strong);
+              border-radius: 10px;
+              overflow: hidden;
+              transition: border-color 120ms ease, box-shadow 120ms ease;
+            }
+
+            .pf-c-input-group:focus-within {
+              border-color: var(--tale-accent);
+              box-shadow: 0 0 0 3px rgba(250, 250, 250, 0.08);
+            }
+
+            .pf-c-input-group > .pf-c-form-control,
+            .pf-c-input-group > input.pf-c-form-control {
+              background: transparent;
+              border: 0;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .pf-c-input-group > .pf-c-form-control:focus {
+              border: 0;
+              box-shadow: none;
+            }
+
+            .pf-c-input-group > .pf-c-button {
+              border-radius: 0;
+              border: 0;
+              border-left: 1px solid var(--tale-border);
+            }
+
+            /* Toolbar search-filter wrapper (admin list pages) */
+            .pf-c-toolbar__item.pf-m-search-filter,
+            .pf-c-toolbar__group.pf-m-filter-group {
+              background: transparent;
             }
 
             /* Divider between primary action and passwordless link */
@@ -501,4 +634,41 @@ data:
             /* Titles */
             .pf-c-title {
               color: var(--tale-text);
+            }
+
+            /* Switch toggle (e.g. "Show deactivated users") */
+            .pf-c-switch__toggle {
+              background-color: var(--tale-surface-2);
+              border: 1px solid var(--tale-border-strong);
+              border-radius: 999px;
+            }
+
+            .pf-c-switch__input:checked ~ .pf-c-switch__toggle {
+              background-color: var(--tale-accent);
+              border-color: var(--tale-accent);
+            }
+
+            .pf-c-switch__toggle-icon {
+              color: var(--tale-accent-fg);
+            }
+
+            .pf-c-switch__label {
+              color: var(--tale-text);
+            }
+
+            /* Folder/tree panels (e.g. user folders sidebar) */
+            .pf-c-card.pf-m-flat,
+            .pf-c-tree-view {
+              background: var(--tale-surface);
+            }
+
+            /* Toolbar inside admin list pages — flatten so it sits on the page bg */
+            .pf-c-toolbar {
+              padding: 0.75rem 1rem;
+            }
+
+            /* "1 - N of M" pagination text spacing */
+            .pf-c-options-menu__toggle-text,
+            .pf-c-pagination__nav {
+              color: var(--tale-text-dim);
             }
