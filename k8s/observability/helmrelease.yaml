@@ -93,13 +93,15 @@ spec:
       rules:
         KubeJobFailed:
           create: false
+        TooManyLogs:
+          create: false
         LogErrors: {}
         CPUThrottlingHigh:
           spec:
             expr: >-
               sum(increase(container_cpu_cfs_throttled_periods_total{container!="",
-              }[5m])) by (cluster, container, pod, namespace) /
-              sum(increase(container_cpu_cfs_periods_total{}[5m])) by (cluster,
+              container!~"io-engine|agent-core"}[5m])) by (cluster, container, pod, namespace) /
+              sum(increase(container_cpu_cfs_periods_total{container!~"io-engine|agent-core"}[5m])) by (cluster,
               container, pod, namespace) > ( 50 / 100 )
             for: 30m
     victoria-metrics-operator:
