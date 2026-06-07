@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: atm10-curseforge
+  namespace: minecraft-atm10
+stringData:
+  CF_API_KEY: ENC[AES256_GCM,data:308qouuWSgAk4lVP3O/KObzTly41z3np+1LQpG830FiEyGmIOsQlu07Z5Bao5p1FjPC+QF/5B3uGDrCv,iv:V8/b2BB1dHV71qthYeI1ATVY5V65TDFOiLl62FV3N7g=,tag:Dz8XtLcIs0jCXVeqTHD0Qw==,type:str]
+sops:
+  age:
+    - recipient: age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBYd2R5T2c5eStoREJCRHlh
+        Q1BIYVU1azVRQUgrMnhlMnVsQ2VRUUhjaWkwCmdUQ1ExVXB0aFNGbm5qdVhWTWtW
+        UnFKekZlZW5uWm4reUtwazU3NllkN3MKLS0tIEl5TnV5Ty9mNXJWemk0cVJoMW5O
+        d0JuUDZSS05YRC9ieWdYb1lBU3hISE0KCzhSEud7P6iWFzRyHvhBMcYs3toqd5Pv
+        EyxXU7XHpbkdhgpB40Dre/j6pEblsDC4iLblRceFlRb9mXrZMyr62g==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-06-07T23:15:41Z"
+  mac: ENC[AES256_GCM,data:PW2aihS+jzz+1r/tHDd+XYz9jumGXxOWdf+5RdHJpuW/NQfRDcRIJAErFIqUCkzxnNo8CO4OikYUHr8wE0klSqYEbQ6kJLb5A7HCbkIRu3kab1zWPSsANpCQqIunxzv0nPYVLvivhfI1MbXmkyOLOfyQgdWHV6HelKtNbynMJ2E=,iv:wsuZK6DmDPjyNCqS9ED4WRS5SQJICh//8RkARVXk4FE=,tag:8Aq2eszT6V3El7C1tGxybw==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  version: 3.10.2

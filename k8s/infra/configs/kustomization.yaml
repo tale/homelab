@@ -29,6 +29,7 @@ resources:
   - metallb/omada-pool.yaml
   - metallb/blocky-pool.yaml
   - metallb/samba-pool.yaml
+  - metallb/minecraft-atm10-pool.yaml
 
   # envoy
   - envoy/metallb.yaml

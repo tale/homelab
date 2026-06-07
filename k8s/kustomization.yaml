@@ -12,3 +12,4 @@ resources:
   - bluesky-pds/flux.yaml
   - home-assistant/flux.yaml
   - wakapi/flux.yaml
+  - minecraft-atm10/flux.yaml
