@@ -1,0 +1,14 @@
+---
+# Enables Tailscale proxy metrics on the ProxyGroup. With this applied, each
+# proxy Pod serves its Tailscale metrics at :9002/metrics and the operator
+# creates a `<statefulset>-metrics` Service in the tailscale namespace. The
+# metrics are scraped by VictoriaMetrics via a VMServiceScrape (see
+# vmservicescrape.yaml) rather than a Prometheus ServiceMonitor, so
+# metrics.serviceMonitor is left off.
+apiVersion: "tailscale.com/v1alpha1"
+kind: "ProxyClass"
+metadata:
+  name: "metrics"
+spec:
+  metrics:
+    enable: true

@@ -1,0 +1,23 @@
+---
+# Scrapes Tailscale proxy metrics into VictoriaMetrics. The operator creates a
+# `<proxygroup>-metrics` Service (port "metrics"/9002) in this namespace for any
+# ProxyGroup/proxy that uses the `metrics` ProxyClass; the Exists selector picks
+# up all of them. Service labels (ts_proxy_type, ts_proxy_parent_name) are
+# promoted onto the scraped series so dashboards can distinguish proxies.
+apiVersion: "operator.victoriametrics.com/v1beta1"
+kind: "VMServiceScrape"
+metadata:
+  name: "tailscale-proxies"
+  namespace: "tailscale"
+spec:
+  selector:
+    matchExpressions:
+      - key: "tailscale.com/metrics-target"
+        operator: "Exists"
+  targetLabels:
+    - "ts_proxy_type"
+    - "ts_proxy_parent_name"
+  endpoints:
+    - port: "metrics"
+      path: "/metrics"
+      interval: "30s"
