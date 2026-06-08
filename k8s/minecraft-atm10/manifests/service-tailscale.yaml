@@ -1,0 +1,23 @@
+---
+# Exposes the server to the tailnet as its own device via the Tailscale
+# Kubernetes Operator. The operator provisions a 100.x address and a MagicDNS
+# name from the hostname annotation, so it reaches "atm10.<tailnet>.ts.net:25565"
+# with no public exposure and no reliance on subnet routes (which collide with
+# any remote LAN that also uses 10.0.0.0/24).
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "atm10-tailscale"
+  namespace: "minecraft-atm10"
+  annotations:
+    tailscale.com/hostname: "atm10"
+spec:
+  type: "LoadBalancer"
+  loadBalancerClass: "tailscale"
+  ports:
+    - name: "minecraft"
+      port: 25565
+      targetPort: 25565
+      protocol: "TCP"
+  selector:
+    app.kubernetes.io/name: "atm10"

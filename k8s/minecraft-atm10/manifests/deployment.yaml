@@ -55,8 +55,17 @@ spec:
               value: "2"
             - name: "MOTD"
               value: "All the Mods 10 - 1.21.4"
+            # Freeze the JVM (SIGSTOP) when empty so the world stops ticking
+            # — no days passing, no machines/crops/mobs running while nobody is
+            # online. Resumes automatically on the next connection. MAX_TICK_TIME
+            # must be disabled or the watchdog force-restarts the container on
+            # resume (a long pause looks like one enormous tick).
             - name: "ENABLE_AUTOPAUSE"
-              value: "false"
+              value: "true"
+            - name: "AUTOPAUSE_TIMEOUT_EST"
+              value: "300"
+            - name: "MAX_TICK_TIME"
+              value: "-1"
             - name: "STOP_SERVER_ANNOUNCE_DELAY"
               value: "20"
           ports:
