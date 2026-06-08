@@ -75,9 +75,12 @@ spec:
           resources:
             requests:
               cpu: "2"
-              memory: "13Gi"
-            limits:
               memory: "14Gi"
+            # 12G heap + JVM overhead (metaspace, GC, direct buffers, ~500
+            # mods) sits near 14Gi at idle, so the limit needs headroom above
+            # that to avoid an OOMKill once players load more chunks.
+            limits:
+              memory: "16Gi"
           volumeMounts:
             - name: "data"
               mountPath: "/data"
