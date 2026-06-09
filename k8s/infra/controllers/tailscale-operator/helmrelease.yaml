@@ -13,12 +13,8 @@ spec:
         kind: HelmRepository
         name: tailscale
   values:
-    # OAuth credentials are provided via the pre-created `operator-oauth`
-    # Secret (keys: client_id / client_secret) rather than inline values.
     oauth: {}
     operatorConfig:
       hostname: tale-lab-operator
-    # We only use the operator for cluster ingress (exposing the Minecraft
-    # service to the tailnet), so the Kubernetes API server proxy is disabled.
     apiServerProxyConfig:
       mode: "false"

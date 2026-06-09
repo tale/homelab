@@ -1,16 +1,4 @@
 ---
-# Highly-available pool of Tailscale ingress proxies shared by all cluster
-# Services that expose themselves to the tailnet. Using a ProxyGroup (instead of
-# the per-Service `loadBalancerClass: tailscale` dedicated proxy) means a Service
-# stays reachable during proxy Pod restarts/upgrades, and many Services coalesce
-# onto this one set of Pods. Services opt in with the annotation
-# `tailscale.com/proxy-group: ts-ingress`.
-#
-# The operator itself is installed out-of-band (Helm); this CR only needs the
-# ProxyGroup CRD it ships. Prereqs on the tailnet side: the operator's OAuth
-# client needs Services + Devices Core + Auth Keys write scopes, and the policy
-# file must auto-approve the ProxyGroup's tag (tag:k8s) to advertise Tailscale
-# Services.
 apiVersion: "tailscale.com/v1alpha1"
 kind: "ProxyGroup"
 metadata:
@@ -18,6 +6,4 @@ metadata:
 spec:
   type: "ingress"
   replicas: 2
-  # Serve Tailscale proxy metrics (scraped by VictoriaMetrics). See
-  # proxyclass.yaml and vmservicescrape.yaml.
   proxyClass: "metrics"

@@ -1,10 +1,4 @@
 ---
-# Exposes the server to the tailnet via the shared HA `ts-ingress` ProxyGroup
-# (see k8s/infra/configs/tailscale/proxygroup.yaml). The operator creates a
-# Tailscale Service fronted by every ProxyGroup replica, so the server stays
-# reachable across proxy Pod restarts. The hostname annotation sets the first
-# DNS label, making it reachable at "mc.heron-mahi.ts.net:25565" with no public
-# exposure.
 apiVersion: "v1"
 kind: "Service"
 metadata:

@@ -43,6 +43,7 @@ resources:
   - tailscale/proxyclass.yaml
   - tailscale/proxygroup.yaml
   - tailscale/vmservicescrape.yaml
+  - tailscale/grafana-dashboard.yaml
 
   # flux-operator
   - flux-operator/instance.yaml

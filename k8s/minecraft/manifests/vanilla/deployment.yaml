@@ -27,22 +27,13 @@ spec:
           type: "RuntimeDefault"
       containers:
         - name: "minecraft"
-          # Minecraft 26.1.2 is compiled for Java 25 (class file 69), so the
-          # image must ship a JRE at least that new — the older java21 tag fails
-          # to load the server with UnsupportedClassVersionError.
           image: "itzg/minecraft-server:java25"
           imagePullPolicy: "IfNotPresent"
           env:
             - name: "EULA"
               value: "TRUE"
-            # Plain Mojang vanilla server. The world (formerly a Paper/Fabric
-            # survival world) carries no world-altering mods, so it loads on
-            # vanilla and is upgraded in place by Mojang's DataFixerUpper on the
-            # first launch under this newer version.
             - name: "TYPE"
               value: "VANILLA"
-            # Migrated from 1.21.8; pinned to the latest release for a
-            # reproducible GitOps deploy. Bump this to upgrade.
             - name: "VERSION"
               value: "26.1.2"
             - name: "MEMORY"
@@ -52,21 +43,15 @@ spec:
             - name: "TZ"
               value: "America/New_York"
             - name: "DIFFICULTY"
-              value: "hard"
-            # Players reach the server over the Tailscale userspace-WireGuard
-            # proxy, whose NAT path flaps. A high view distance creates a huge
-            # chunk-send burst on join that overruns that path and times clients
-            # out, so it is kept moderate.
+              value: "normal"
             - name: "VIEW_DISTANCE"
-              value: "10"
+              value: "12"
             - name: "SIMULATION_DISTANCE"
-              value: "10"
+              value: "12"
             - name: "MAX_PLAYERS"
               value: "2"
             - name: "MOTD"
               value: "Bauhause"
-            # Only authenticated Mojang accounts on the whitelist may join.
-            # ENFORCE kicks anyone not whitelisted even if already connected.
             - name: "ENABLE_WHITELIST"
               value: "true"
             - name: "ENFORCE_WHITELIST"
@@ -77,11 +62,6 @@ spec:
               value: "Aerum,semsclub"
             - name: "OPS"
               value: "Aerum,semsclub"
-            # Minecraft 1.21.2+ pauses itself natively when empty (the world
-            # stops ticking — no days passing, no crops/mobs running while
-            # nobody is online) and resumes on the next connection, so the
-            # itzg knockd-based autopause (which needs NET_RAW we drop) is not
-            # used. Maps to the pause-when-empty-seconds server property.
             - name: "PAUSE_WHEN_EMPTY_SECONDS"
               value: "60"
           ports:
@@ -92,9 +72,6 @@ spec:
             requests:
               cpu: "1"
               memory: "2560Mi"
-            # 2G heap + JVM overhead (metaspace, GC, direct buffers) sits near
-            # 2.5Gi; the limit needs headroom above that to avoid an OOMKill as
-            # players load more chunks.
             limits:
               memory: "3Gi"
           volumeMounts:

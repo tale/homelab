@@ -1,0 +1,17 @@
+---
+apiVersion: "grafana.integreatly.org/v1beta1"
+kind: "GrafanaDashboard"
+metadata:
+  name: "tailscale-machine"
+  namespace: "tailscale"
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  allowCrossNamespaceImport: true
+  folder: "Infrastructure"
+  grafanaCom:
+    id: 24178
+  datasources:
+    - inputName: "DS_PROMETHEUS"
+      datasourceName: "VictoriaMetrics"
