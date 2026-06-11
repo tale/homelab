@@ -15,13 +15,19 @@ run in the Oracle Cloud. All Kubernetes deployments are managed with
 - [cert-manager](https://cert-manager.io/) — TLS certificates
 - [CloudNativePG](https://cloudnative-pg.io/) — Centralized PostgreSQL cluster
 - [Flux Operator](https://fluxoperator.dev/) — Flux lifecycle management
+- [Tailscale](https://tailscale.com/) — Operator with an HA `ProxyGroup` for tailnet ingress, plus metrics ([k8s/infra/configs/tailscale/](./k8s/infra/configs/tailscale/))
 
 **Apps** (`k8s/`)
+- [Authentik](./k8s/authentik/) — Identity provider / SSO (OIDC) for cluster apps
 - [Blocky](./k8s/blocky/) — DNS proxy and ad-blocker
+- [Bluesky PDS](./k8s/bluesky-pds/) — Personal Data Server for atproto
 - [Forgejo](./k8s/forgejo/) — Git server with GitHub mirroring via Gickup
+- [Home Assistant](./k8s/home-assistant/) — Home automation, with Eufy WS and Scrypted
+- [Minecraft](./k8s/minecraft/) — Vanilla survival server, exposed over Tailscale
 - [Observability](./k8s/observability/) — VictoriaMetrics, Grafana, alerting
 - [Omada Controller](./k8s/omada-controller/) — TP-Link network management
 - [Samba](./k8s/samba/) — Network file shares
+- [Wakapi](./k8s/wakapi/) — Self-hosted WakaTime-compatible coding stats
 
 ## Dependency Graph
 
@@ -30,11 +36,16 @@ flowchart TD
     infra_controllers[infra-controllers]
     infra_configs[infra-configs]
     infra_configs --> infra_controllers
+    authentik --> infra_configs
     blocky --> infra_configs
+    bluesky_pds[bluesky-pds] --> infra_configs
     forgejo --> infra_configs
+    home_assistant[home-assistant] --> infra_configs
+    minecraft --> infra_configs
     observability --> infra_configs
     omada_controller[omada-controller] --> infra_configs
     samba --> infra_configs
+    wakapi --> infra_configs
 ```
 
 ## Bootstrap
