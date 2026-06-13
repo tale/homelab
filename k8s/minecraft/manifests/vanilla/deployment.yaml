@@ -40,6 +40,8 @@ spec:
               value: "surveyor"
             - name: "MODRINTH_DOWNLOAD_DEPENDENCIES"
               value: "required"
+            - name: "PATCH_DEFINITIONS"
+              value: "/patches"
             - name: "MEMORY"
               value: "2G"
             - name: "USE_AIKAR_FLAGS"
@@ -81,6 +83,9 @@ spec:
           volumeMounts:
             - name: "data"
               mountPath: "/data"
+            - name: "surveyor-patch"
+              mountPath: "/patches"
+              readOnly: true
           startupProbe:
             exec:
               command:
@@ -115,3 +120,6 @@ spec:
         - name: "data"
           persistentVolumeClaim:
             claimName: "vanilla-data"
+        - name: "surveyor-patch"
+          configMap:
+            name: "vanilla-surveyor-patch"

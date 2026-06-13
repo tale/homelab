@@ -19,6 +19,18 @@ Fabric so server-side mods can be loaded.
   `MODRINTH_DOWNLOAD_DEPENDENCIES=required` so transitive deps (Fabric API,
   etc.) resolve automatically. Currently:
   [Surveyor](https://modrinth.com/mod/surveyor) — co-op world-map backend
+- Surveyor writes `config/surveyor.toml` on first launch. The
+  [`vanilla-surveyor-patch`](manifests/vanilla/surveyor-config.yaml) ConfigMap
+  is mounted at `/patches` and applied via `PATCH_DEFINITIONS` (an itzg feature
+  that JSON-path-patches existing config files before the JVM starts). It sets
+  `networking.{terrain,structures,landmarks,waypoints}=SERVER` so a solo login
+  receives the full server-recorded map even when everyone else is offline (the
+  `GROUP` default only sends what the share group knows). `globalSharing=true`
+  keeps the whole server as one share group, and `networking.positions=GROUP`
+  shares group members' last-known offline location instead of the `SERVER`
+  default, which only broadcasts players currently online. The patch is a no-op
+  until the toml exists, so on a brand-new PVC Surveyor boots once with defaults
+  and the values take effect on the next restart.
 - Image tag is `java25` because 26.1.2 is compiled for Java 25 (the older
   `java21` tag fails with `UnsupportedClassVersionError`)
 - Native empty-pause (`PAUSE_WHEN_EMPTY_SECONDS`, 1.21.2+) freezes world ticking
