@@ -4,8 +4,8 @@ kind: Kustomization
 resources:
   - manifests/namespace.yaml
 
-  # vanilla — survival world migrated from lab-cloud. Tailscale-only access
-  # (mc.heron-mahi.ts.net); no LAN LoadBalancer.
+  # vanilla — survival world migrated from lab-cloud. Exposed on the LAN via a
+  # MetalLB LoadBalancer (10.0.0.235:25565); port-forwarded externally on Omada.
   - manifests/vanilla/pvc.yaml
   - manifests/vanilla/deployment.yaml
-  - manifests/vanilla/service-tailscale.yaml
+  - manifests/vanilla/service.yaml

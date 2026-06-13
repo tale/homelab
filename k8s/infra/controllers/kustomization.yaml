@@ -47,9 +47,3 @@ resources:
   # openebs
   - openebs/repository.yaml
   - openebs/helmrelease.yaml
-
-  # tailscale-operator
-  - tailscale-operator/namespace.yaml
-  - tailscale-operator/repository.yaml
-  - tailscale-operator/helmrelease.yaml
-  - tailscale-operator/oauth.sops.yaml

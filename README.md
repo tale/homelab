@@ -15,7 +15,6 @@ run in the Oracle Cloud. All Kubernetes deployments are managed with
 - [cert-manager](https://cert-manager.io/) — TLS certificates
 - [CloudNativePG](https://cloudnative-pg.io/) — Centralized PostgreSQL cluster
 - [Flux Operator](https://fluxoperator.dev/) — Flux lifecycle management
-- [Tailscale](https://tailscale.com/) — Operator with an HA `ProxyGroup` for tailnet ingress, plus metrics ([k8s/infra/configs/tailscale/](./k8s/infra/configs/tailscale/))
 
 **Apps** (`k8s/`)
 - [Authentik](./k8s/authentik/) — Identity provider / SSO (OIDC) for cluster apps
@@ -23,7 +22,7 @@ run in the Oracle Cloud. All Kubernetes deployments are managed with
 - [Bluesky PDS](./k8s/bluesky-pds/) — Personal Data Server for atproto
 - [Forgejo](./k8s/forgejo/) — Git server with GitHub mirroring via Gickup
 - [Home Assistant](./k8s/home-assistant/) — Home automation, with Eufy WS and Scrypted
-- [Minecraft](./k8s/minecraft/) — Vanilla survival server, exposed over Tailscale
+- [Minecraft](./k8s/minecraft/) — Vanilla survival server, exposed on the LAN via MetalLB
 - [Observability](./k8s/observability/) — VictoriaMetrics, Grafana, alerting
 - [Omada Controller](./k8s/omada-controller/) — TP-Link network management
 - [Samba](./k8s/samba/) — Network file shares

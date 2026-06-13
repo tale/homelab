@@ -29,6 +29,7 @@ resources:
   - metallb/omada-pool.yaml
   - metallb/blocky-pool.yaml
   - metallb/samba-pool.yaml
+  - metallb/minecraft-pool.yaml
 
   # envoy
   - envoy/metallb.yaml
@@ -38,12 +39,6 @@ resources:
   - envoy/fallback-page.yaml
   - envoy/service-monitor.yaml
   - envoy/grafana-dashboard.yaml
-
-  # tailscale (operator installed out-of-band; this manages shared CRs)
-  - tailscale/proxyclass.yaml
-  - tailscale/proxygroup.yaml
-  - tailscale/vmservicescrape.yaml
-  - tailscale/grafana-dashboard.yaml
 
   # flux-operator
   - flux-operator/instance.yaml
