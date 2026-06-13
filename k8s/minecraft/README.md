@@ -9,12 +9,16 @@ subdirectory under [`manifests/`](manifests/).
 ### Vanilla (`vanilla`)
 
 The "Bauhause" survival world, migrated from a Fabric/Paper 1.21.8 server on
-`lab-cloud` and upgraded in place to the latest release (`26.1.2`). The world
-carries no world-altering mods (only server-side performance/QoL mods on the
-old host), so it runs on plain Mojang vanilla.
+`lab-cloud` and upgraded in place to the latest release (`26.1.2`). It runs on
+Fabric so server-side mods can be loaded.
 
-- `TYPE=VANILLA`, pinned `VERSION` — bump it to upgrade; Mojang's
-  DataFixerUpper migrates the save on the next launch
+- `TYPE=FABRIC`, pinned `VERSION` — bump it to upgrade; Mojang's
+  DataFixerUpper migrates the save on the next launch. The itzg image installs
+  the latest Fabric loader/launcher for that `VERSION`.
+- Mods are pulled from Modrinth at startup via `MODRINTH_PROJECTS`, with
+  `MODRINTH_DOWNLOAD_DEPENDENCIES=required` so transitive deps (Fabric API,
+  etc.) resolve automatically. Currently:
+  [Surveyor](https://modrinth.com/mod/surveyor) — co-op world-map backend
 - Image tag is `java25` because 26.1.2 is compiled for Java 25 (the older
   `java21` tag fails with `UnsupportedClassVersionError`)
 - Native empty-pause (`PAUSE_WHEN_EMPTY_SECONDS`, 1.21.2+) freezes world ticking
@@ -53,6 +57,6 @@ Note: 26.x reorganized the save format — chunks now live under
 
 ## Observability
 
-The Minecraft servers expose no metrics: vanilla can't load plugins/mods, so
-there is no `/metrics` endpoint to scrape without adding an external exporter
-sidecar.
+The Minecraft servers expose no metrics out of the box — there is no `/metrics`
+endpoint to scrape unless a metrics-exporter mod (or sidecar) is added to
+`MODRINTH_PROJECTS`.
