@@ -10,6 +10,8 @@
 ---
 mmdebstrap:
   packages:
+    - curl
+    - iproute2
     - nut-server
     - nut-client
   customize-hooks:
