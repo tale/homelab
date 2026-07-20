@@ -19,6 +19,7 @@ patches:
   - "@./patches/shared.yaml"
   - "@./patches/openebs.yaml"
   - "@./patches/tailscale.sops.yaml"
+  - "@./patches/nut-client.yaml"
   - "@./cilium/manifest.gen.yaml"
 
 # Defaults inherited by every control-plane node.

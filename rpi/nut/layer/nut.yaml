@@ -1,0 +1,20 @@
+# METABEGIN
+# X-Env-Layer-Name: nut
+# X-Env-Layer-Category: app
+# X-Env-Layer-Desc: NUT (Network UPS Tools) server for a CyberPower UPS, plus a
+#  Prometheus exporter. Air-gapped: native systemd services, no containers,
+#  nothing pulled at runtime.
+# X-Env-Layer-Version: 1.0.0
+# X-Env-Layer-Requires: device-user-admin,openssh-server,systemd-net-min
+# METAEND
+---
+mmdebstrap:
+  packages:
+    - nut-server
+    - nut-client
+  customize-hooks:
+    # Debian has no package for a NUT Prometheus exporter, so the builder image
+    # carries the release binary and it gets installed from there — the Pi never
+    # fetches anything.
+    - install -m 0755 /opt/nut_exporter $1/usr/bin/nut_exporter
+    - $BDEBSTRAP_HOOKS/enable-units "$1" nut-server nut-client nut-exporter

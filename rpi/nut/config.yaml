@@ -1,0 +1,18 @@
+include:
+  file: trixie-minbase.yaml
+
+device:
+  layer: rpi4
+  user1: core
+  user1sudo: nopasswd
+
+image:
+  name: nut
+  compression: none
+
+layer:
+  app: nut
+
+ssh:
+  pubkey_user1: ${@SRCROOT}/authorized_keys
+  pubkey_only: y

@@ -1,0 +1,6 @@
+# Not a secret. NUT's protocol requires upsmon to LOGIN with a password, but the
+# only peers on this air-gapped 172.31.42.0/24 switch are our own Talos nodes,
+# and a secondary can't do anything but watch.
+[upsmon]
+  password = cluster-local
+  upsmon secondary

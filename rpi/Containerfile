@@ -1,0 +1,26 @@
+# The builder: rpi-image-gen and its dependencies. It expects a Debian host, so
+# on macOS this container is that host. Everything here is setup, not build
+# logic — the build itself is config.yaml and the nut layer.
+FROM debian:trixie
+
+# One layer: install_deps.sh apt-installs the build toolchain itself, so the
+# package lists have to survive until after it runs.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates curl git sudo \
+ && git clone --depth 1 https://github.com/raspberrypi/rpi-image-gen /opt/rpi-image-gen \
+ && /opt/rpi-image-gen/install_deps.sh \
+ && rm -rf /var/lib/apt/lists/*
+
+# Debian packages no NUT Prometheus exporter; the nut layer installs it from
+# here so the air-gapped Pi never has to fetch anything.
+ARG NUT_EXPORTER_VERSION=v3.3.0
+ADD --chmod=0755 \
+  https://github.com/DRuggeri/nut_exporter/releases/download/${NUT_EXPORTER_VERSION}/nut_exporter-${NUT_EXPORTER_VERSION}-linux-arm64 \
+  /opt/nut_exporter
+
+ENV PATH="/opt/rpi-image-gen:${PATH}"
+
+# The build tree must live on the container's own filesystem. A bind mount from
+# macOS is case-insensitive, and Debian ships colliding pairs of files (eg
+# PAM.7.gz and pam.7.gz), which makes dpkg fail partway through the chroot.
+WORKDIR /build

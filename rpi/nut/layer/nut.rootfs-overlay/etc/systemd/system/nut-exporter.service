@@ -1,0 +1,13 @@
+[Unit]
+Description=NUT Prometheus exporter
+After=nut-server.service
+Wants=nut-server.service
+
+[Service]
+ExecStart=/usr/bin/nut_exporter --nut.server=127.0.0.1 --web.listen-address=:9199
+Restart=always
+RestartSec=10
+DynamicUser=yes
+
+[Install]
+WantedBy=multi-user.target
