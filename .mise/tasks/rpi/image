@@ -13,8 +13,8 @@ rpi="$MISE_PROJECT_ROOT/rpi"
 # It builds in /build (container-local, case-sensitive) and only the finished
 # image is copied back onto the macOS-shared mount. See rpi/Containerfile.
 "$runtime" run --rm --privileged -v "$rpi:/rpi" rpi-image-gen \
-	sh -c 'rpi-image-gen build -S /rpi/nut -c /rpi/nut/config.yaml \
-	  && cp /build/work/image-nut/nut.img /rpi/nut/nut.img'
+	sh -c 'rpi-image-gen build -S /rpi -c /rpi/config.yaml \
+	  && cp /build/work/deploy-*/nut.img.zst /rpi/nut.img.zst'
 
-echo "Flash rpi/nut/nut.img, then boot the Pi 4:"
-echo "  sudo dd if=rpi/nut/nut.img of=/dev/rdiskN bs=4m  # macOS (Ctrl-T for progress)"
+echo "Flash rpi/nut.img.zst, then boot the Pi 4:"
+echo "  unzstd rpi/nut.img.zst && sudo dd if=rpi/nut.img of=/dev/rdiskN bs=4m"

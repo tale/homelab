@@ -1,112 +1,63 @@
-# Raspberry Pi Hosts (Debian, rpi-image-gen)
+# Raspberry Pi Network UPS Tools (NUT) Device
 
-Bare-metal Raspberry Pi hosts built with
-[rpi-image-gen](https://github.com/raspberrypi/rpi-image-gen), Raspberry Pi's own
-image builder: a declarative `config.yaml` picks the device and base system, a
-layer adds packages and a rootfs overlay, and the tool emits a `.img` you flash.
-It wants a Debian host, so on macOS `rpi/Containerfile` is that host.
+The Raspberry Pi 4 in the cluster is used as a NUT server, monitoring the UPS
+over USB and is responsible for signaling the Talos cluster to shut down safely.
+It's built with [rpi-image-gen](https://github.com/raspberrypi/rpi-image-gen),
+an officially supported tool to produce a bootable Pi image.
 
-> **These are frozen appliances, deliberately.** The Pi is air-gapped (see
-> below), so it can never pull an update — which is exactly why it isn't built
-> on bootc or Fedora IoT. Those pay for atomic updates, A/B rollback and
-> registry-delivered images, and none of that is reachable from an isolated L2
-> segment. A tool that bakes a fixed image and stops is honest about what this
-> box actually is. To change it, rebuild and reflash.
+The Pi is intentionally a **minimal, static appliance**. Dealing with power loss is
+critical and the best way to control the behavior of the Pi is to keep it as
+minimal and static as possible.
 
-The other reason: rpi-image-gen owns the Pi boot partition natively. Generic
-image builders don't, and on a Pi 4 — which has no UEFI, so its ROM reads the
-FAT partition directly — that means hand-staging Broadcom firmware and U-Boot
-into an ESP after the fact. Here it's the vendor's problem.
-
-### Hosts
-
-- **nut** (`nut/`): [Network UPS Tools](https://networkupstools.org/) server on
-  a Raspberry Pi 4, monitoring a **CyberPower CP550SLG** over USB (`usbhid-ups`,
-  pinned to CyberPower vendor id `0764`). `upsd` and `upsmon` are Debian
-  packages run by systemd — no containers, nothing to pull at runtime. A
-  `nut_exporter` binary baked into the image serves Prometheus metrics on
-  `:9199`.
+It can never pull an update, which is why this isn't bootc or Fedora IoT — those
+pay for atomic updates and registry-delivered images, none of which it can
+reach. rpi-image-gen also owns the Pi boot partition natively; the Pi 4 has no
+UEFI, so anything else means hand-staging Broadcom firmware and U-Boot into an
+ESP. To change the box, rebuild and reflash.
 
 ### Networking
 
-The Pi shares the isolated 2.5G cluster switch with the Talos nodes and takes a
-static **`172.31.42.5/24`** on it — same as a node's VPC interface: no DHCP, no
-gateway, no DNS. That segment is a dumb L2 island with no route off it, so the
-box is **air-gapped**: it never reaches a registry. The point is that UPS
-shutdown coordination (the nodes' `upsmon` → this Pi's `upsd`, over
-`172.31.42.5`) keeps working with the router dead and the internet gone —
-same-subnet traffic only touches the switch.
+Static `172.31.42.5/24` on the 2.5G cluster switch, alongside the Talos nodes'
+VPC interfaces. What makes shutdown survive an outage isn't isolation, it's that
+the path is **same-subnet** — Pi ↔ node traffic crosses only that switch, so the
+router at `10.0.0.1` can be dead and `upsmon` → `upsd` still works. The two
+things that actually matter: static addressing (no DHCP to depend on) and that
+switch being on the UPS. The LAN switch deliberately is not; UPS runtime is a
+budget, and only the shutdown path needs to survive.
 
-Everything the Pi runs is baked in, so the air gap costs nothing: no images to
-pre-load, no update daemon to starve.
+Management access is therefore a separate, expendable concern. The nodes are
+dual-homed and forward, so the Pi carries one route to the LAN via the VIP —
+management only, no default route, so it still can't reach the internet.
+
+> ⚠️ **This needs a static route on the router**, which lives outside this repo:
+>
+> ```
+> 172.31.42.0/24 via 10.0.0.201
+> ```
+>
+> Without it nothing on the LAN can reach the Pi. Set it on the router so every
+> client benefits, or on one machine to test. Untested against Cilium — if it
+> mangles transit traffic across nodes, the fallback is a USB ethernet adapter on
+> the LAN, or a spare port on the 2.5G switch with your machine at
+> `172.31.42.99/24` (the only option that works with every node down).
+
+SSH is key-only as `core`, from `authorized_keys`. The account has no password,
+so an HDMI console can't rescue a bad image — set `device.user1passhash` if you
+want that break-glass path.
 
 ### Bootstrap
 
-**Build in CI, not on the Mac.** The `rpi image` workflow builds on a native
-arm64 runner; grab `nut-img` from the run's artefacts:
-
 ```bash
 gh run download -n nut-img
-unxz nut.img.xz
+unzstd nut.img.zst
 sudo dd if=nut.img of=/dev/rdiskN bs=4m   # macOS (Ctrl-T for progress)
 ```
 
-Then boot the Pi 4 — no keyboard, no firmware menus, no first-boot setup.
-
-> **Do not run `mise run rpi:image` on macOS.** rpi-image-gen needs a privileged
-> container doing mount-namespace and loop-device work, and under a macOS
-> hypervisor that reliably takes the whole host down (confirmed on macOS 27, and
-> no change to the image definition avoids it). The task is kept for running on
-> a real Linux box, where the same build is unremarkable.
-
-There the build tree also has to stay on the container's own filesystem: a
-macOS bind mount is case-insensitive, and Debian ships colliding pairs like
-`PAM.7.gz` / `pam.7.gz`, which makes dpkg fail partway through the chroot.
-
-The `core` user gets passwordless sudo and key-only SSH; its authorized keys are
-the committed `nut/authorized_keys`, wired in via `ssh.pubkey_user1`.
-
-### On the NUT password
-
-There isn't a secret here, deliberately. NUT's protocol makes `upsmon` LOGIN
-with a password — only anonymous `LIST VAR` (what the exporter uses) is
-credential-free — so the field can't be empty, but on an air-gapped L2 island
-whose only peers are our own nodes it protects nothing: a secondary can watch
-and nothing else. It's a committed constant (`cluster-local`) on both ends,
-`nut/layer/nut.rootfs-overlay/etc/nut/upsd.users` here and
-`talos/patches/nut-client.yaml` on the nodes. That's why the build needs no sops.
-
-### Metrics
-
-`nut_exporter` serves UPS metrics at
-`http://172.31.42.5:9199/ups_metrics?ups=cyberpower` (it reads `upsd` on
-`127.0.0.1:3493`, anonymous LIST VAR — no creds needed). The Pi isn't in the
-cluster, but it's on the nodes' `172.31.42.0/24` switch, so wire it into the
-existing VictoriaMetrics/Grafana stack (`k8s/observability/`) as a static scrape
-target when ready:
-
-```yaml
-# a VMStaticScrape (or vmagent static_config) pointing at the Pi's cluster IP
-- targets: ["172.31.42.5:9199"]
-  labels: { job: "nut" }
-  # metrics_path: /ups_metrics, params: { ups: [cyberpower] }
-```
-
-Grafana dashboard [10914](https://grafana.com/grafana/dashboards/10914) covers
-`nut_exporter`. Not wired yet — this is the eventual integration.
-
 ### Layout
 
-- `Containerfile`: the builder — rpi-image-gen, its deps, and the exporter
-  binary. Setup only; no build logic.
-- `nut/config.yaml`: which device (`pi4`), which base (`trixie-minbase`), which
-  layer, and the user/SSH variables the library layers consume.
-- `nut/layer/nut.yaml`: packages and the two hooks that install the exporter and
-  enable the units.
-- `nut/layer/nut.rootfs-overlay/`: files laid into the rootfs verbatim (NUT
-  config, static network, udev rule, exporter unit).
-- `nut/authorized_keys`: who may log in as `core`.
-
-User creation, sudo, and SSH key installation come from rpi-image-gen's own
-`device-user-admin` and `openssh-server` layers rather than anything hand-rolled
-here — that's why `config.yaml` sets `device.user1*` and `ssh.*` variables.
+- `Containerfile`: the builder — rpi-image-gen, its deps, the exporter binary.
+- `config.yaml`: device (`rpi4`), base (`trixie-minbase`), and the user/SSH
+  variables consumed by rpi-image-gen's `device-user-admin` and `openssh-server`
+  layers, which is why there's no hand-rolled user or key setup here.
+- `layer/nut.yaml`: packages, plus hooks to install the exporter and enable it.
+- `layer/nut.rootfs-overlay/`: files laid into the rootfs verbatim.

@@ -2,4 +2,4 @@
 dev-config.json
 k8s/**/charts/
 talos/clusterconfig/
-rpi/**/*.img
+rpi/*.img*

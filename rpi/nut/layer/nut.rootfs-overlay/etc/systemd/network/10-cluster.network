@@ -1,9 +1,0 @@
-# Static address on the 172.31.42.0/24 cluster switch, mirroring the Talos
-# nodes' VPC interface: no DHCP, no gateway, no DNS. The segment is an isolated
-# L2 island, so UPS shutdown coordination rides the dumb switch on a fixed IP
-# and depends on nothing routed — it works with the router dead.
-[Match]
-Type=ether
-
-[Network]
-Address=172.31.42.5/24

@@ -1,0 +1,18 @@
+# Static address on the 172.31.42.0/24 cluster switch, mirroring the Talos
+# nodes' VPC interface: no DHCP, no DNS, and deliberately no default route. UPS
+# shutdown coordination is same-subnet, so it rides the dumb switch and works
+# with the router dead.
+#
+# The one route is management only: the nodes are dual-homed and forward
+# (net.ipv4.ip_forward), so this reaches the LAN through whichever control plane
+# holds the VIP. It needs a matching static route on the router — see README.
+# Without a default route the Pi still can't reach anything off these two nets.
+[Match]
+Type=ether
+
+[Network]
+Address=172.31.42.5/24
+
+[Route]
+Destination=10.0.0.0/24
+Gateway=172.31.42.100
