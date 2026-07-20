@@ -30,7 +30,9 @@ jobs:
               && cp /build/work/image-nut/nut.img /rpi/nut/nut.img'
 
       - name: Compress the image
-        run: xz -T0 -3 rpi/nut/nut.img
+        run: |
+          sudo chown "$(id -u):$(id -g)" rpi/nut/nut.img
+          xz -T0 -3 rpi/nut/nut.img
 
       - name: Upload the image artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
