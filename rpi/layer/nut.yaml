@@ -17,4 +17,7 @@ mmdebstrap:
     # carries the release binary and it gets installed from there — the Pi never
     # fetches anything.
     - install -m 0755 /opt/nut_exporter $1/usr/bin/nut_exporter
-    - $BDEBSTRAP_HOOKS/enable-units "$1" nut-server nut-client nut-exporter
+    # nut-exporter is missing here on purpose: it ships in the rootfs overlay,
+    # which is applied after these hooks run, so enabling it here silently does
+    # nothing. It gets a wants symlink in the overlay instead.
+    - $BDEBSTRAP_HOOKS/enable-units "$1" nut-server nut-client

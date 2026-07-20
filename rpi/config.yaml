@@ -3,6 +3,7 @@ include:
 
 device:
   layer: rpi4
+  hostname: nut
   user1: core
   user1sudo: nopasswd
 
