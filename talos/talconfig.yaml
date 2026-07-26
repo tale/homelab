@@ -2,7 +2,13 @@
 clusterName: tale-lab
 endpoint: https://172.31.42.100:6443
 talosVersion: ${TALOS_VERSION}
+kubernetesVersion: ${KUBERNETES_VERSION}
 allowSchedulingOnControlPlanes: true
+
+# The VIP the endpoint points at. Talos may derive it anyway, but an apiserver
+# cert that silently loses this SAN locks everyone out of the cluster.
+additionalApiServerCertSans:
+  - 172.31.42.100
 
 clusterPodNets:
   - 10.244.0.0/16
@@ -24,12 +30,15 @@ patches:
 
 # Defaults inherited by every control-plane node.
 controlPlane:
-  # Image Factory secureboot installer that bundles the siderolabs/tailscale
-  # extension. talhelper appends `:${TALOS_VERSION}` automatically.
+  # Image Factory secureboot installer bundling the siderolabs/tailscale and
+  # siderolabs/nut-client extensions. talhelper appends `:${TALOS_VERSION}`.
   talosImageURL: factory.talos.dev/metal-installer-secureboot/${TALOS_SCHEMATIC_ID}
 
+# Hostnames are Talos' own generated names, adopted rather than chosen. Renaming
+# a node re-registers it in Kubernetes under a new name, which orphans its
+# mayastor DiskPool and every PV pinned to it by nodeAffinity. Not worth it.
 nodes:
-  - hostname: node-1
+  - hostname: talos-pk9-lp1
     ipAddress: 172.31.42.2
     controlPlane: true
     installDiskSelector:
@@ -37,7 +46,7 @@ nodes:
     patches:
       - "@./nodes/node-1.yaml"
 
-  - hostname: node-2
+  - hostname: talos-z4f-vra
     ipAddress: 172.31.42.3
     controlPlane: true
     installDiskSelector:
@@ -45,7 +54,7 @@ nodes:
     patches:
       - "@./nodes/node-2.yaml"
 
-  - hostname: node-3
+  - hostname: talos-74p-1fd
     ipAddress: 172.31.42.4
     controlPlane: true
     installDiskSelector:

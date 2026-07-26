@@ -9,7 +9,7 @@ ansible = "latest"
 flux2 = "latest"
 lefthook = "latest"
 "aqua:mikefarah/yq" = "latest"
-"github:budimanjojo/talhelper" = "latest"
+"github:budimanjojo/talhelper" = "3.1.15"
 
 [hooks]
 postinstall = "lefthook install"

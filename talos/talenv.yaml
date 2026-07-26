@@ -1,7 +1,9 @@
 ---
-TALOS_VERSION: v1.12.4
+TALOS_VERSION: v1.13.7
+KUBERNETES_VERSION: v1.33.3
 CILIUM_VERSION: 1.18.0
 # Sidero Image Factory schematic for the secureboot installer with the
-# `siderolabs/tailscale` + `siderolabs/nut-client` extensions.  Bump alongside
-# TALOS_VERSION and refresh from https://factory.talos.dev when changing them.
+# `siderolabs/tailscale` + `siderolabs/nut-client` extensions. The ID hashes the
+# extension set, not the Talos version, so it survives a TALOS_VERSION bump —
+# only refresh it from https://factory.talos.dev when the extensions change.
 TALOS_SCHEMATIC_ID: 4aa284544d753d1ef1452b4f6129ba3a399b805bb2a7dbe0b1d05e149d3c4dd5
