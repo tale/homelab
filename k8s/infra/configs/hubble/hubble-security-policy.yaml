@@ -10,8 +10,8 @@ spec:
       name: hubble-ui
   oidc:
     provider:
-      issuer: https://idp.tale.me
-    clientID: 85c11401-2b6a-4c58-8db4-62283d593560
+      issuer: https://auth.tale.me/application/o/hubble/
+    clientID: 1ec362e68efbaf1aaeb53ed30601395d859edd9d
     clientSecret:
       name: hubble-ui-oidc-secret
     redirectURL: https://hubble.tale.me/oauth2/callback

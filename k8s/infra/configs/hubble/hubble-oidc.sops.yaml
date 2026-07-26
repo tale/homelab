@@ -5,7 +5,7 @@ metadata:
   namespace: kube-system
 type: Opaque
 stringData:
-  client-secret: ENC[AES256_GCM,data:zDGkANKRHaYPna7qH6wOKIB/xSc6ICAAAcidH+IV6rs=,iv:Pd/SZLIKhcJ9ACyVy4NBbYNRDIk1JztPWzZwoiUiBuc=,tag:ClhuAwYY9SitQh8+5JjX0w==,type:str]
+  client-secret: ENC[AES256_GCM,data:4m9uGfK80r2rgnU7il8afzyuRoSZNGEWDMcCRgZRBittGWESOtucJAPxqK11U47ZSxQagSkSC9BAb0PnXeQieg4nBuHLl5FE2LMAgE/DdzA=,iv:9nUiur8Vd10qx+L1LmU6IMjo0Q9djEo+5HYgT0RyJZM=,tag:rMUec0HeyZDNcRnJRWzRng==,type:str]
 sops:
   age:
     - recipient: age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
@@ -17,7 +17,7 @@ sops:
         YmtLZWtkTDMveGJ6aEVPbCs0MG1GTTAKLLCytbimdULxFFAXoHfA+LlQE4/I+uTU
         9FOs28A1xopJv0qw7cNV2a3zMlCCH3MMnJs5cqOoIB9+FK55Rg8AVw==
         -----END AGE ENCRYPTED FILE-----
-  lastmodified: "2025-08-05T03:44:39Z"
-  mac: ENC[AES256_GCM,data:38mehFNXRW1JTBDJkw0DhrWoxrbp/JKgp+Q3Gd8APhpr3ShGHnl6ucD10KRntfuB8kSD1tw5UopkIKuqKXeN70Do2b3Fs7QyT7yScjJdcAgaPRLuiBEhRYzUeATkqphmekxlNwp9WzQZAZ4yYzHkUyAP1WTByhtPoWv1aNQEv0c=,iv:OUeTAZsQOZHNNzHCqOc8ckngZ3GKf9+8n3iP0oe1OWU=,tag:XhQ9yIQrMyGEgOs6ohwTRQ==,type:str]
+  lastmodified: "2026-07-25T19:13:02Z"
+  mac: ENC[AES256_GCM,data:53n99Fh2uh95F9D8JrrNxcsRs8V65F01jRGMjdSnlVSWb7N+1Brv4QhWiFTMVzGBa/NirDgPSy4Ax1+sZlLeGeyGMsYUfXFNiL1veuT2c1/6kmCDdWNtJxzKA0XXiczzDZypXtp3PJdVbViVjVPrIkJ1XGK+3pP4xac5Cw+vhlA=,iv:mHeelUMWcUeCTsLHyO9fybSJjHVMz4wiEAaiV1tF5l4=,tag:iTPydebEB1HWWoN88eskwQ==,type:str]
   encrypted_regex: ^(data|stringData)$
   version: 3.10.2

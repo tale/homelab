@@ -4,6 +4,180 @@ metadata:
   name: authentik-blueprints
   namespace: authentik
 data:
+  oidc-providers.yaml: |
+    # Every OAuth2 provider + application, adopted from objects originally
+    # created through the admin UI.
+    #
+    # Providers are keyed on `client_id`, not `name` — both are unique, but
+    # client_id is what each relying party is pinned to, so it never changes
+    # casually. Keying on it makes `name` a free-form attribute that renames in
+    # place. Change a client_id here and you fork the object: a second provider
+    # appears, the application stays bound to the original, and nothing errors.
+    #
+    # `client_secret` comes from `!Env`, wired in helmrelease.yaml out of the
+    # `authentik-oidc-secrets` sops secret. Values were seeded from what was
+    # already live, so this declares the running state rather than replacing it.
+    #
+    # Rotating one means updating the relying party in the same change. Five of
+    # these have their client config in this repo and rotate cleanly. headplane
+    # (deployed elsewhere) and home-assistant (config in `.storage` on its PVC)
+    # do not — change their secret here and you must update the far side by hand
+    # or the integration breaks.
+    version: 1
+    metadata:
+      name: Tale - OIDC Providers
+    context:
+      oauth2_defaults: &oauth2-defaults
+        client_type: confidential
+        include_claims_in_id_token: true
+        sub_mode: hashed_user_id
+        signing_key: !Find [authentik_crypto.certificatekeypair, [name, authentik Self-signed Certificate]]
+        authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+        invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+        property_mappings:
+          - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid]]
+          - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-email]]
+          - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
+    entries:
+      - model: authentik_providers_oauth2.oauth2provider
+        id: flux-provider
+        identifiers:
+          client_id: 6VoYqXzcFTThzCT4QlxQAii4be1Z0vAck8yarWAq
+        attrs:
+          <<: *oauth2-defaults
+          client_secret: !Env AUTHENTIK_OIDC_SECRET_FLUX
+          name: Provider for Flux
+          redirect_uris:
+            - matching_mode: strict
+              url: https://flux.tale.me/oauth2/callback
+
+      - model: authentik_providers_oauth2.oauth2provider
+        id: forgejo-provider
+        identifiers:
+          client_id: M0bUdSesfFaBDiP6tTThiUtLzLdnbza0oeU1Cv58
+        attrs:
+          <<: *oauth2-defaults
+          client_secret: !Env AUTHENTIK_OIDC_SECRET_FORGEJO
+          name: Provider for Forgejo
+          redirect_uris:
+            - matching_mode: strict
+              url: https://git.tale.me/user/oauth2/Authentik/callback
+
+      - model: authentik_providers_oauth2.oauth2provider
+        id: grafana-provider
+        identifiers:
+          client_id: 23dwmTqKfdjbQ027aYufmGoYJFBrcCBCBSabnZgS
+        attrs:
+          <<: *oauth2-defaults
+          client_secret: !Env AUTHENTIK_OIDC_SECRET_GRAFANA
+          name: Provider for Grafana
+          redirect_uris:
+            - matching_mode: strict
+              url: https://grafana.tale.me/login/generic_oauth
+            - matching_mode: strict
+              url: http://localhost:3000/login/generic_oauth
+
+      # Explicit consent, unlike every other provider here.
+      - model: authentik_providers_oauth2.oauth2provider
+        id: headplane-provider
+        identifiers:
+          client_id: CORbjQR4NF5Fy6BFqDuR5Sca2Q9Hr2zszLr9Mh4r
+        attrs:
+          <<: *oauth2-defaults
+          client_secret: !Env AUTHENTIK_OIDC_SECRET_HEADPLANE
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-explicit-consent]]
+          name: Provider for Headplane
+          redirect_uris:
+            - matching_mode: strict
+              url: http://localhost:3000/admin/oidc/callback
+
+      - model: authentik_providers_oauth2.oauth2provider
+        id: home-assistant-provider
+        identifiers:
+          client_id: q7BwQZlr4HAhev0FAdJblprxLAtdUSL5aXGphhZI
+        attrs:
+          <<: *oauth2-defaults
+          client_secret: !Env AUTHENTIK_OIDC_SECRET_HOME_ASSISTANT
+          name: Provider for Home Assistant
+          redirect_uris:
+            - matching_mode: strict
+              url: https://home.tale.me/auth/oidc/callback
+
+      - model: authentik_providers_oauth2.oauth2provider
+        id: wakatime-provider
+        identifiers:
+          client_id: Qsd53gAIpvq9Xaq2Q2oD9xHkOxREVYYKhL3xfzyk
+        attrs:
+          <<: *oauth2-defaults
+          client_secret: !Env AUTHENTIK_OIDC_SECRET_WAKAPI
+          name: Provider for WakaTime
+          redirect_uris:
+            - matching_mode: strict
+              url: https://wakatime.tale.me/oidc/authentik/callback
+
+      - model: authentik_providers_oauth2.oauth2provider
+        id: hubble-provider
+        identifiers:
+          client_id: 1ec362e68efbaf1aaeb53ed30601395d859edd9d
+        attrs:
+          <<: *oauth2-defaults
+          client_secret: !Env AUTHENTIK_OIDC_SECRET_HUBBLE
+          sub_mode: user_email
+          name: Provider for Hubble
+          redirect_uris:
+            - matching_mode: strict
+              url: https://hubble.tale.me/oauth2/callback
+
+      - model: authentik_core.application
+        identifiers:
+          slug: flux
+        attrs:
+          name: Flux
+          provider: !KeyOf flux-provider
+
+      - model: authentik_core.application
+        identifiers:
+          slug: forgejo
+        attrs:
+          name: Forgejo
+          provider: !KeyOf forgejo-provider
+
+      - model: authentik_core.application
+        identifiers:
+          slug: grafana
+        attrs:
+          name: Grafana
+          provider: !KeyOf grafana-provider
+
+      - model: authentik_core.application
+        identifiers:
+          slug: headplane
+        attrs:
+          name: Headplane
+          provider: !KeyOf headplane-provider
+
+      - model: authentik_core.application
+        identifiers:
+          slug: home-assistant
+        attrs:
+          name: Home Assistant
+          provider: !KeyOf home-assistant-provider
+
+      - model: authentik_core.application
+        identifiers:
+          slug: waka-time
+        attrs:
+          name: WakaTime
+          provider: !KeyOf wakatime-provider
+
+      - model: authentik_core.application
+        identifiers:
+          slug: hubble
+        attrs:
+          name: Hubble
+          provider: !KeyOf hubble-provider
+          meta_launch_url: https://hubble.tale.me
+
   passkey-authentication-flow.yaml: |
     version: 1
     metadata:

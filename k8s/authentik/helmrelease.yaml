@@ -46,6 +46,45 @@ spec:
             secretKeyRef:
               name: authentik-secrets
               key: ses-password
+        # Consumed by `!Env` in the oidc-providers blueprint. Rotating any of
+        # these means updating the relying party too — for headplane and
+        # home-assistant that side is not in this repo, so they cannot be
+        # rotated from here alone.
+        - name: AUTHENTIK_OIDC_SECRET_FLUX
+          valueFrom:
+            secretKeyRef:
+              name: authentik-oidc-secrets
+              key: flux
+        - name: AUTHENTIK_OIDC_SECRET_FORGEJO
+          valueFrom:
+            secretKeyRef:
+              name: authentik-oidc-secrets
+              key: forgejo
+        - name: AUTHENTIK_OIDC_SECRET_GRAFANA
+          valueFrom:
+            secretKeyRef:
+              name: authentik-oidc-secrets
+              key: grafana
+        - name: AUTHENTIK_OIDC_SECRET_HEADPLANE
+          valueFrom:
+            secretKeyRef:
+              name: authentik-oidc-secrets
+              key: headplane
+        - name: AUTHENTIK_OIDC_SECRET_HOME_ASSISTANT
+          valueFrom:
+            secretKeyRef:
+              name: authentik-oidc-secrets
+              key: home-assistant
+        - name: AUTHENTIK_OIDC_SECRET_HUBBLE
+          valueFrom:
+            secretKeyRef:
+              name: authentik-oidc-secrets
+              key: hubble
+        - name: AUTHENTIK_OIDC_SECRET_WAKAPI
+          valueFrom:
+            secretKeyRef:
+              name: authentik-oidc-secrets
+              key: wakapi
     authentik:
       avatars: "gravatar,https://github.com/%(username)s.png,initials"
       log_level: info

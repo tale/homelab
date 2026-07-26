@@ -5,6 +5,7 @@ resources:
   - manifests/namespace.yaml
   - helmrelease.yaml
   - manifests/authentik-secrets.sops.yaml
+  - manifests/authentik-oidc-secrets.sops.yaml
   - manifests/authentik-http-route.yaml
   - manifests/authentik-blueprints.yaml
   - manifests/authentik-data-pvc.yaml
