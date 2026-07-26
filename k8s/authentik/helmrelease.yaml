@@ -109,7 +109,11 @@ spec:
     redis:
       enabled: true
     server:
-      strategy:
+      # Must be Recreate: the data PVC is RWO, so a rolling update deadlocks —
+      # the new pod cannot attach the volume until the old one releases it, and
+      # the old one is not torn down until the new one is ready. The chart key
+      # is `deploymentStrategy`; a plain `strategy` block is silently ignored.
+      deploymentStrategy:
         type: Recreate
       initContainers:
         - name: fix-permissions
