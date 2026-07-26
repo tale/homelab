@@ -23,6 +23,10 @@ spec:
         name: authentik
   install:
     createNamespace: true
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled
   values:
     global:
       env:

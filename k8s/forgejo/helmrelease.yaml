@@ -24,6 +24,10 @@ spec:
         name: forgejo
   install:
     createNamespace: true
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled
   values:
     global:
       storageClass: cluster-nvmf

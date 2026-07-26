@@ -14,3 +14,7 @@ spec:
         name: victoriametrics
   install:
     createNamespace: true
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled

@@ -12,6 +12,10 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: external-dns
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled
   values:
     image:
       repository: registry.k8s.io/external-dns/external-dns

@@ -22,6 +22,10 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: mbentley
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled
   values:
     config:
       timezone: America/New_York

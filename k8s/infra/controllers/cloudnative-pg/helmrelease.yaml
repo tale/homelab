@@ -14,6 +14,10 @@ spec:
         name: cloudnative-pg
   install:
     createNamespace: true
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled
   values:
     monitoring:
       podMonitorEnabled: false

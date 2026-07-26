@@ -24,6 +24,10 @@ spec:
         name: bluesky-pds
   install:
     createNamespace: false
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled
   values:
     image:
       tag: "0.4.219"

@@ -12,6 +12,10 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: metallb
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled
   values:
     prometheus:
       rbacPrometheus: false

@@ -1,6 +1,6 @@
 [tools]
 "github:siderolabs/talos" = "1.12.4"
-"aqua:helm/helm" = "3.18.4"
+"aqua:helm/helm" = "4.2.3"
 "aqua:getsops/sops" = "3.10.2"
 "aqua:FiloSottile/age" = "1.2.1"
 "asdf:mise-plugins/mise-pipx" = "1.7.1"

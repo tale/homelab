@@ -12,6 +12,10 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: flux-operator
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled
   valuesFrom:
     - kind: Secret
       name: flux-ui-oidc-secret
