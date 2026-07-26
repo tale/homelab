@@ -9,9 +9,12 @@ spec:
       app.kubernetes.io/component: controller
       app.kubernetes.io/name: metallb
   podMetricsEndpoints:
-    - port: monitoring
+    - port: metricshttps
       path: /metrics
       interval: 30s
+      scheme: https
+      tlsConfig:
+        insecureSkipVerify: true
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMPodScrape
@@ -24,6 +27,9 @@ spec:
       app.kubernetes.io/component: speaker
       app.kubernetes.io/name: metallb
   podMetricsEndpoints:
-    - port: monitoring
+    - port: metricshttps
       path: /metrics
       interval: 30s
+      scheme: https
+      tlsConfig:
+        insecureSkipVerify: true
