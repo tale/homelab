@@ -18,6 +18,14 @@ spec:
     serverSideApply: enabled
   rollback:
     serverSideApply: enabled
+  # io-engine is OnDelete on purpose: its restarts are sequenced by
+  # kubectl-openebs, not by the DaemonSet controller. kstatus counts that as
+  # InProgress forever because updatedNumberScheduled never catches up, so
+  # judge readiness instead.
+  healthCheckExprs:
+    - apiVersion: apps/v1
+      kind: DaemonSet
+      current: status.numberReady == status.desiredNumberScheduled
   values:
     engines:
       local:
