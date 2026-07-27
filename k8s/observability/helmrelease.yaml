@@ -173,8 +173,18 @@ spec:
         enabled: false
         plain: false
       operator:
-        disable_prometheus_converter: true
+        # Charts render ServiceMonitor/PodMonitor; the converter turns those into
+        # VMServiceScrape/VMPodScrape so chart upgrades carry their own scrape
+        # config instead of silently breaking a hand-written CR.
+        disable_prometheus_converter: false
+        # Owner-reference converted objects to their source, so deleting a
+        # ServiceMonitor garbage-collects the VMServiceScrape it produced. Set
+        # through the chart's own key — adding the equivalent env var by hand
+        # collides with the one the chart already renders and SSA rejects the
+        # whole Deployment.
+        enable_converter_ownership: true
       env:
+        # The ScrapeConfig CRD is deliberately not installed.
         - name: VM_ENABLEDPROMETHEUSCONVERTER_SCRAPECONFIG
           value: "false"
     prometheus-node-exporter:

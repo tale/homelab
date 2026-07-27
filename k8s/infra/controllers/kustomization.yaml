@@ -6,7 +6,6 @@ resources:
   - cert-manager/repository.yaml
   - cert-manager/helmrelease.yaml
   - cert-manager/cf-apikey.sops.yaml
-  - cert-manager/service-monitor.yaml
 
   # cloudnative-pg
   - cloudnative-pg/namespace.yaml
@@ -24,7 +23,10 @@ resources:
   # grafana-operator
   - grafana-operator/repository.yaml
   - grafana-operator/helmrelease.yaml
-  - grafana-operator/service-monitor.yaml
+
+  # prometheus-operator (ServiceMonitor/PodMonitor CRDs only)
+  - prometheus-operator-crds/repository.yaml
+  - prometheus-operator-crds/helmrelease.yaml
 
   # victoria-metrics-operator (CRDs only)
   - victoria-metrics-operator/repository.yaml
@@ -42,7 +44,6 @@ resources:
   - metallb/helmrelease.yaml
   - metallb/ddns-config.sops.yaml
   - metallb/ddns-deployment.yaml
-  - metallb/service-monitor.yaml
 
   # openebs
   - openebs/repository.yaml

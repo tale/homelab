@@ -20,4 +20,4 @@ spec:
     serverSideApply: enabled
   values:
     serviceMonitor:
-      enabled: false
+      enabled: true

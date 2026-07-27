@@ -20,6 +20,6 @@ spec:
     serverSideApply: enabled
   values:
     monitoring:
-      podMonitorEnabled: false
+      podMonitorEnabled: true
       grafanaDashboard:
         create: false

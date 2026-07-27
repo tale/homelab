@@ -1,0 +1,47 @@
+# Charts only ever render ServiceMonitor/PodMonitor, so tracking their scrape
+# config means installing those two CRDs. The VM operator's converter turns them
+# into VMServiceScrape/VMPodScrape; nothing here runs prometheus-operator itself.
+#
+# Only the two kinds the converter consumes are installed — the other eight
+# (Prometheus, Alertmanager, ThanosRuler, ...) would be pure API surface for
+# controllers that do not exist in this cluster.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: prometheus-operator-crds
+  namespace: observability-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: prometheus-operator-crds
+      version: 30.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled
+  values:
+    crds:
+      alertmanagerconfigs:
+        enabled: false
+      alertmanagers:
+        enabled: false
+      podmonitors:
+        enabled: true
+      probes:
+        enabled: false
+      prometheusagents:
+        enabled: false
+      prometheuses:
+        enabled: false
+      prometheusrules:
+        enabled: false
+      scrapeconfigs:
+        enabled: false
+      servicemonitors:
+        enabled: true
+      thanosrulers:
+        enabled: false

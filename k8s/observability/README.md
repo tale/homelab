@@ -7,7 +7,20 @@ Centralized metrics, logging, and alerting stack for the cluster.
 - **VMOperator** (victoria-metrics-k8s-stack): Manages VMSingle, vmagent, vmalert, VMAlertmanager, node-exporter, kube-state-metrics.
 - **Grafana Operator**: Manages Grafana instance, datasources, dashboards, and folders via CRDs.
 
-All scrape targets use **VM-native CRDs** (`VMServiceScrape`, `VMPodScrape`, `VMRule`). The prometheus-operator converter is disabled — no `monitoring.coreos.com` CRDs are installed.
+Scrape config comes from two places, deliberately:
+
+- **Chart-rendered `ServiceMonitor`/`PodMonitor`**, converted to their VM
+  equivalents by the operator's prometheus converter. Preferred wherever the
+  chart supports it, so a chart upgrade carries its own scrape config — port,
+  label and auth changes included — instead of silently breaking a hand-written
+  CR. Only the `servicemonitors` and `podmonitors` CRDs are installed
+  (`infra/controllers/prometheus-operator-crds/`); nothing runs
+  prometheus-operator itself.
+- **Hand-written VM-native CRs** (`VMServiceScrape`, `VMPodScrape`,
+  `VMStaticScrape`) for targets no chart covers: see the table below.
+
+Alerting rules are always hand-written `VMRule`s — the `PrometheusRule` CRD is
+not installed.
 
 ### Components
 
@@ -54,7 +67,8 @@ is indistinguishable from a healthy cluster.
 
 ### Scrape Targets
 
-All scrape configs are colocated with their respective app/infra directories.
+Chart-managed targets are enabled through a values flag in the app's own
+HelmRelease. Hand-written CRs stay colocated with their app/infra directory.
 
 | Target | Type | Location |
 |---|---|---|
@@ -63,18 +77,24 @@ All scrape configs are colocated with their respective app/infra directories.
 | kubelet / cAdvisor | Built-in (k8s-stack) | `observability/helmrelease.yaml` |
 | kube-apiserver | Built-in (k8s-stack) | `observability/helmrelease.yaml` |
 | CoreDNS | Built-in (k8s-stack) | `observability/helmrelease.yaml` |
-| cert-manager | VMServiceScrape | `infra/controllers/cert-manager/` |
-| MetalLB | VMServiceScrape | `infra/controllers/metallb/` |
-| Grafana Operator | VMServiceScrape | `infra/controllers/grafana-operator/` |
-| CNPG Postgres | VMPodScrape | `infra/configs/cloudnative-pg/` |
-| CNPG Operator | VMPodScrape | `infra/configs/cloudnative-pg/` |
-| Hubble | VMServiceScrape | `infra/configs/cilium/` |
-| Cilium Envoy | VMServiceScrape | `infra/configs/cilium/` |
+| cert-manager | Chart ServiceMonitor | `infra/controllers/cert-manager/helmrelease.yaml` |
+| MetalLB | Chart ServiceMonitor | `infra/controllers/metallb/helmrelease.yaml` |
+| Grafana Operator | Chart ServiceMonitor | `infra/controllers/grafana-operator/helmrelease.yaml` |
+| CNPG Operator | Chart PodMonitor | `infra/controllers/cloudnative-pg/helmrelease.yaml` |
+| CNPG Postgres | Cluster `enablePodMonitor` | `infra/configs/cloudnative-pg/cluster.yaml` |
+| Authentik | Chart ServiceMonitor | `authentik/helmrelease.yaml` |
+| Forgejo | Chart ServiceMonitor | `forgejo/helmrelease.yaml` |
+| Hubble | VMServiceScrape | `infra/configs/hubble/` |
+| Cilium Envoy | VMServiceScrape | `infra/configs/hubble/` |
 | Envoy Gateway | VMServiceScrape | `infra/configs/envoy/` |
 | OpenEBS IO Engine | VMServiceScrape | `infra/configs/openebs/` |
 | Blocky DNS | VMServiceScrape | `blocky/manifests/` |
-| Forgejo | VMServiceScrape | `forgejo/manifests/` |
-| Authentik | VMServiceScrape | `authentik/manifests/` |
+| NUT exporter | VMStaticScrape | `observability/manifests/nut-scrape.yaml` |
+
+The five hand-written entries are not oversights: `gateway-helm` and `openebs`
+ship no ServiceMonitor, Blocky is raw manifests with no chart, Cilium's manifest
+is applied by Talos before any CRD exists, and the NUT exporter is off-cluster
+so nothing can discover it.
 
 ### Dashboards (via Grafana Operator CRDs)
 
