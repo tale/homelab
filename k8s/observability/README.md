@@ -11,10 +11,11 @@ All scrape targets use **VM-native CRDs** (`VMServiceScrape`, `VMPodScrape`, `VM
 
 ### Components
 
-- **VMSingle**: Long-term metrics storage (180d retention, 150Gi).
-- **vmagent**: Lightweight metrics scraper, writes directly to VMSingle.
-- **vmalert**: Evaluates alerting and recording rules against VMSingle.
-- **VMAlertmanager**: Pushover notifications for critical/warning alerts.
+- **VMSingle**: Long-term metrics storage (90d retention, 150Gi).
+- **vmagent**: Lightweight metrics scraper, writes directly to VMSingle. Drops
+  apiserver/kubelet histogram buckets globally — see `helmrelease.yaml`.
+- **vmalert**: Evaluates alerting rules against VMSingle.
+- **VMAlertmanager**: Pushover notifications, tiered by severity.
 - **VictoriaLogs**: Centralized log storage (90d retention, 50Gi), managed via VLSingle CR.
 - **victoria-logs-collector**: Fluent Bit DaemonSet that ships pod logs to VictoriaLogs.
 - **Grafana**: Dashboards for metrics and logs, exposed at `grafana.tale.me` with OIDC via Pocket ID. Backed by PostgreSQL (CNPG).
@@ -26,6 +27,29 @@ Pods → victoria-logs-collector (DaemonSet) → VictoriaLogs → Grafana
 Targets → vmagent → VMSingle → Grafana
 VMSingle → vmalert → VMAlertmanager → Pushover
 ```
+
+### Alerting
+
+The chart's `defaultRules` are **disabled**. kube-prometheus' ruleset assumes a
+multi-tenant production fleet and produced 79 simultaneous alerts on three
+nodes. Every rule now lives in `manifests/vmrules.yaml`, in three tiers:
+
+| Group | Severity | Delivery |
+|---|---|---|
+| `homelab-page` | `critical` | Pushover priority 1, immediate, never muted |
+| `homelab-notify` | `warning` | Pushover priority -1, batched hourly, muted 23:00–08:00 |
+| `homelab-watchdog` | `none` | Always firing, pings healthchecks.io every minute |
+
+Anything without a `critical` or `warning` severity routes to `blackhole`.
+
+Two inhibition rules keep a single root cause from fanning out: a node going
+down suppresses every warning cluster-wide, and a `critical` suppresses the
+matching `warning` for the same alertname and namespace.
+
+The watchdog is the reason silence can be trusted. It fires permanently and
+pings healthchecks.io once a minute; if the cluster, vmalert or Alertmanager
+dies, the pings stop and healthchecks.io notifies. Without it, a dead
+monitoring stack is indistinguishable from a healthy cluster.
 
 ### Scrape Targets
 
@@ -78,6 +102,7 @@ Dashboards are colocated with their apps where possible.
 | Secret | Namespace | Purpose |
 |---|---|---|
 | `pushover-credentials` | observability-system | Alertmanager Pushover notifications |
+| `deadman-credentials` | observability-system | healthchecks.io ping URL for the watchdog |
 | `grafana-oidc` | observability-system | Grafana OIDC client credentials |
 | `grafana-db-credentials` | observability-system | Grafana PostgreSQL password (cross-ns from CNPG) |
 | `vmbackup-wasabi-credentials` | observability-system | VMSingle backup S3 credentials |

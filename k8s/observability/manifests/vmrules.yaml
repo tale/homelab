@@ -5,48 +5,183 @@ metadata:
   namespace: observability-system
 spec:
   groups:
-    - name: homelab-critical
+    # Pushover priority 1, ignores the overnight mute. The bar is "this is
+    # losing data, or it will be broken by morning if nobody moves".
+    - name: homelab-page
       rules:
-        - alert: NodeUnreachable
+        - alert: NodeDown
           expr: up{job="node-exporter"} == 0
-          for: 2m
+          for: 5m
           labels:
             severity: critical
           annotations:
-            summary: "Node {{ $labels.instance }} is unreachable"
-        - alert: PodCrashLooping
-          expr: increase(kube_pod_container_status_restarts_total[1h]) > 5
-          for: 5m
-          labels:
-            severity: warning
-          annotations:
-            summary: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash-looping"
-        - alert: PVCAlmostFull
-          expr: kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes > 0.85
+            summary: "Node {{ $labels.instance }} stopped reporting"
+
+        - alert: NodeNotReady
+          expr: kube_node_status_condition{condition="Ready", status="true"} == 0
           for: 10m
           labels:
+            severity: critical
+          annotations:
+            summary: "Node {{ $labels.node }} is NotReady"
+
+        # Mayastor pool states: 0 unknown, 1 online, 2 degraded, 3 faulted.
+        - alert: StoragePoolDegraded
+          expr: diskpool_status != 1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "OpenEBS pool {{ $labels.name }} on {{ $labels.node }} is not online"
+            description: "diskpool_status is {{ $value }}; replicas on this pool are at risk."
+
+        - alert: StoragePoolIOStalled
+          expr: diskpool_io_stalled != 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "OpenEBS pool {{ $labels.name }} has stalled I/O"
+
+        - alert: PostgresInstanceDown
+          expr: cnpg_collector_up == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "CNPG instance {{ $labels.pod }} is down"
+
+        # Only the primary reports a meaningful replica count, so gate on the
+        # instance that is not in recovery.
+        - alert: PostgresReplicaLost
+          expr: >-
+            cnpg_pg_replication_streaming_replicas == 0
+            and on (pod) cnpg_pg_replication_in_recovery == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "CNPG primary {{ $labels.pod }} has no streaming replica"
+
+        - alert: DNSDown
+          expr: sum(up{job="blocky"}) == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Every Blocky replica is down — LAN DNS is broken"
+
+        - alert: UPSOnBattery
+          expr: network_ups_tools_ups_status{flag="OB"} == 1
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "UPS {{ $labels.ups }} is running on battery"
+
+        - alert: UPSBatteryLow
+          expr: network_ups_tools_ups_status{flag="LB"} == 1
+          labels:
+            severity: critical
+          annotations:
+            summary: "UPS {{ $labels.ups }} battery is low — shutdown imminent"
+
+        # predict_linear alone fires on any transient downward slope, so pair
+        # it with an absolute floor. Both must hold for an hour.
+        - alert: FilesystemWillFillIn24h
+          expr: >-
+            predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay"}[6h], 24 * 3600) < 0
+            and node_filesystem_avail_bytes / node_filesystem_size_bytes < 0.2
+          for: 1h
+          labels:
+            severity: critical
+          annotations:
+            summary: "{{ $labels.instance }}:{{ $labels.mountpoint }} fills within 24h"
+            description: "{{ $value | humanize1024 }}B free and trending to zero."
+
+        - alert: PVCWillFillIn24h
+          expr: >-
+            predict_linear(kubelet_volume_stats_available_bytes[6h], 24 * 3600) < 0
+            and kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes < 0.2
+          for: 1h
+          labels:
+            severity: critical
+          annotations:
+            summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} fills within 24h"
+
+    # Pushover priority -1, batched into one digest, silent 23:00–08:00.
+    # Things to deal with this week, not tonight.
+    - name: homelab-notify
+      rules:
+        # One rule instead of a per-component Down alert for every exporter.
+        # 30m rides out node reboots and Helm upgrades.
+        - alert: ScrapeTargetDown
+          expr: up == 0
+          for: 30m
+          labels:
             severity: warning
           annotations:
-            summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is {{ $value | humanizePercentage }} full"
+            summary: "Target {{ $labels.job }} ({{ $labels.instance }}) has been down 30m"
+
         - alert: CertificateExpiringSoon
           expr: certmanager_certificate_expiration_timestamp_seconds - time() < 7 * 24 * 3600
           for: 1h
           labels:
             severity: warning
           annotations:
-            summary: "Certificate {{ $labels.name }} in {{ $labels.namespace }} expires in less than 7 days"
-        - alert: PostgreSQLClusterDegraded
-          expr: cnpg_collector_up < cnpg_collector_instances_total
-          for: 5m
+            summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} expires in under 7 days"
+
+        - alert: PodCrashLooping
+          expr: increase(kube_pod_container_status_restarts_total[1h]) > 3
+          for: 30m
           labels:
-            severity: critical
+            severity: warning
           annotations:
-            summary: "CNPG cluster {{ $labels.cluster }} has degraded instances"
+            summary: "{{ $labels.namespace }}/{{ $labels.pod }} restarted {{ $value | humanize }} times in an hour"
+
+        - alert: PodNotReady
+          expr: kube_pod_status_phase{phase=~"Pending|Unknown"} == 1
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{ $labels.namespace }}/{{ $labels.pod }} stuck in {{ $labels.phase }} for 30m"
+
         - alert: KubeJobFailed
-          expr: kube_job_status_failed{job="kube-state-metrics"} > 0
+          expr: kube_job_status_failed > 0
           for: 15m
           labels:
             severity: warning
           annotations:
             summary: "Job {{ $labels.namespace }}/{{ $labels.job_name }} failed"
-            description: "Job {{ $labels.job_name }} in namespace {{ $labels.namespace }} has failed {{ $value }} time(s)"
+
+        # Replicas report 0 until they are promoted, so ignore the unset value.
+        - alert: PostgresBackupStale
+          expr: >-
+            cnpg_collector_last_available_backup_timestamp > 0
+            and time() - cnpg_collector_last_available_backup_timestamp > 48 * 3600
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "CNPG backup for {{ $labels.pod }} is over 48h old"
+
+        - alert: VMAgentDroppingSamples
+          expr: sum(rate(vmagent_remotewrite_packets_dropped_total[10m])) > 0
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "vmagent is dropping samples on the way to VMSingle"
+
+    - name: homelab-watchdog
+      rules:
+        # Always firing. Routed to healthchecks.io, which alerts if the pings
+        # stop — the only signal that distinguishes a quiet cluster from a
+        # dead monitoring stack.
+        - alert: Watchdog
+          expr: vector(1)
+          labels:
+            severity: none
+          annotations:
+            summary: "Alerting pipeline is alive"
