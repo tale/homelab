@@ -420,7 +420,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "(1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100",
+              "expr": "(1 - max by (instance) (node_memory_MemAvailable_bytes) / max by (instance) (node_memory_MemTotal_bytes)) * 100",
               "legendFormat": "{{instance}}",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
@@ -529,7 +529,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "node_load1",
+              "expr": "max by (instance) (node_load1)",
               "legendFormat": "{{instance}}",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
@@ -637,7 +637,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "100 - (node_filesystem_avail_bytes{fstype!~\"tmpfs|ramfs|overlay\"} / node_filesystem_size_bytes * 100)",
+              "expr": "100 - (max by (instance, mountpoint) (node_filesystem_avail_bytes{fstype!~\"tmpfs|ramfs|overlay\"}) / max by (instance, mountpoint) (node_filesystem_size_bytes) * 100)",
               "legendFormat": "{{instance}} {{mountpoint}}",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
@@ -713,7 +713,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "diskpool_used_size_bytes / diskpool_total_size_bytes * 100",
+              "expr": "max by (node, name) (diskpool_used_size_bytes) / max by (node, name) (diskpool_total_size_bytes) * 100",
               "legendFormat": "{{node}} {{name}}",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
@@ -776,7 +776,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "topk(12, kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes * 100)",
+              "expr": "topk(12, max by (namespace, persistentvolumeclaim) (kubelet_volume_stats_used_bytes) / max by (namespace, persistentvolumeclaim) (kubelet_volume_stats_capacity_bytes) * 100)",
               "legendFormat": "{{namespace}}/{{persistentvolumeclaim}}",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
@@ -972,7 +972,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "cnpg_pg_replication_lag",
+              "expr": "max by (pod) (cnpg_pg_replication_lag)",
               "legendFormat": "{{pod}}",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
@@ -1117,7 +1117,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "network_ups_tools_battery_charge",
+              "expr": "max(network_ups_tools_battery_charge)",
               "legendFormat": "",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
@@ -1177,7 +1177,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "network_ups_tools_ups_load",
+              "expr": "max(network_ups_tools_ups_load)",
               "legendFormat": "",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
@@ -1237,7 +1237,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "network_ups_tools_input_voltage",
+              "expr": "max(network_ups_tools_input_voltage)",
               "legendFormat": "input",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
@@ -1373,7 +1373,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "vm_cache_entries{type=\"storage/hour_metric_ids\"}",
+              "expr": "max(vm_cache_entries{type=\"storage/hour_metric_ids\"})",
               "legendFormat": "series",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",

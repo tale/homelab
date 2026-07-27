@@ -1,0 +1,454 @@
+# Hand-written: mayastor ships no community dashboard, and the exporter's metric
+# names are specific enough that no generic storage board fits.
+#
+# Every query aggregates with `max by (...)` over the identifying labels. The
+# io-engine exporter re-registers under a new pod on every node reboot, so the
+# raw series carry a stale generation alongside the live one; without the
+# aggregation each pool renders twice.
+#
+# diskpool_* counters are declared `gauge` but are cumulative totals, hence
+# rate() on the throughput and latency panels.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: openebs-mayastor
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: Infrastructure
+  resyncPeriod: 10m
+  json: |
+    {
+      "uid": "openebs-mayastor",
+      "title": "OpenEBS / Mayastor",
+      "tags": [
+        "homelab",
+        "storage"
+      ],
+      "timezone": "browser",
+      "editable": true,
+      "schemaVersion": 39,
+      "refresh": "1m",
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "panels": [
+        {
+          "id": 1,
+          "type": "row",
+          "title": "Health",
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "panels": []
+        },
+        {
+          "id": 2,
+          "type": "stat",
+          "title": "Pool Status",
+          "description": "1 = Online. A pool drops off this panel entirely when its node is unreachable.",
+          "datasource": "VictoriaMetrics",
+          "gridPos": { "h": 4, "w": 8, "x": 0, "y": 1 },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max by (name) (diskpool_status)",
+              "legendFormat": "{{name}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "orientation": "horizontal",
+            "textMode": "value_and_name",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "0": { "text": "Unknown", "color": "#8e8e8e", "index": 0 },
+                    "1": { "text": "Online", "color": "#0ca30c", "index": 1 },
+                    "2": { "text": "Degraded", "color": "#fab219", "index": 2 },
+                    "3": { "text": "Faulted", "color": "#d03b3b", "index": 3 }
+                  }
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [{ "color": "#8e8e8e", "value": null }]
+              }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "Nodes Online",
+          "datasource": "VictoriaMetrics",
+          "gridPos": { "h": 4, "w": 8, "x": 8, "y": 1 },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max by (node_id) (mayastor_node_online)",
+              "legendFormat": "{{node_id}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "orientation": "horizontal",
+            "textMode": "value_and_name",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "0": { "text": "Offline", "color": "#d03b3b", "index": 0 },
+                    "1": { "text": "Online", "color": "#0ca30c", "index": 1 }
+                  }
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [{ "color": "#8e8e8e", "value": null }]
+              }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Pool I/O Errors",
+          "datasource": "VictoriaMetrics",
+          "gridPos": { "h": 4, "w": 8, "x": 16, "y": 1 },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(max by (name) (diskpool_io_error_count))",
+              "legendFormat": "errors",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "orientation": "auto",
+            "textMode": "value",
+            "colorMode": "value",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "decimals": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "#0ca30c", "value": null },
+                  { "color": "#d03b3b", "value": 1 }
+                ]
+              }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 5,
+          "type": "row",
+          "title": "Capacity",
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+          "panels": []
+        },
+        {
+          "id": 6,
+          "type": "bargauge",
+          "title": "Pool Used",
+          "datasource": "VictoriaMetrics",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max by (node, name) (diskpool_used_size_bytes) / max by (node, name) (diskpool_total_size_bytes) * 100",
+              "legendFormat": "{{node}} {{name}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "displayMode": "basic",
+            "orientation": "horizontal",
+            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+            "showUnfilled": true,
+            "valueMode": "text",
+            "minVizWidth": 0,
+            "minVizHeight": 16
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "min": 0,
+              "max": 100,
+              "decimals": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "#0ca30c", "value": null },
+                  { "color": "#fab219", "value": 75 },
+                  { "color": "#d03b3b", "value": 90 }
+                ]
+              }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 7,
+          "type": "timeseries",
+          "title": "Pool Used Bytes",
+          "datasource": "VictoriaMetrics",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max by (name) (diskpool_used_size_bytes)",
+              "legendFormat": "{{name}} used",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            },
+            {
+              "refId": "B",
+              "expr": "max by (name) (diskpool_total_size_bytes)",
+              "legendFormat": "{{name}} capacity",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes",
+              "custom": { "fillOpacity": 8, "lineWidth": 1, "showPoints": "never" }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 8,
+          "type": "row",
+          "title": "Performance",
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+          "panels": []
+        },
+        {
+          "id": 9,
+          "type": "timeseries",
+          "title": "Pool IOPS",
+          "datasource": "VictoriaMetrics",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "rate(max by (name) (diskpool_num_read_ops)[5m:])",
+              "legendFormat": "{{name}} read",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            },
+            {
+              "refId": "B",
+              "expr": "rate(max by (name) (diskpool_num_write_ops)[5m:])",
+              "legendFormat": "{{name}} write",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "iops",
+              "min": 0,
+              "custom": { "fillOpacity": 8, "lineWidth": 1, "showPoints": "never" }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 10,
+          "type": "timeseries",
+          "title": "Pool Throughput",
+          "datasource": "VictoriaMetrics",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "rate(max by (name) (diskpool_bytes_read)[5m:])",
+              "legendFormat": "{{name}} read",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            },
+            {
+              "refId": "B",
+              "expr": "rate(max by (name) (diskpool_bytes_written)[5m:])",
+              "legendFormat": "{{name}} write",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "Bps",
+              "min": 0,
+              "custom": { "fillOpacity": 8, "lineWidth": 1, "showPoints": "never" }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 11,
+          "type": "timeseries",
+          "title": "Pool Latency (avg per op)",
+          "datasource": "VictoriaMetrics",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 23 },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "rate(max by (name) (diskpool_read_latency_us)[5m:]) / clamp_min(rate(max by (name) (diskpool_num_read_ops)[5m:]), 1)",
+              "legendFormat": "{{name}} read",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            },
+            {
+              "refId": "B",
+              "expr": "rate(max by (name) (diskpool_write_latency_us)[5m:]) / clamp_min(rate(max by (name) (diskpool_num_write_ops)[5m:]), 1)",
+              "legendFormat": "{{name}} write",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "µs",
+              "min": 0,
+              "custom": { "fillOpacity": 0, "lineWidth": 1, "showPoints": "never" }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 12,
+          "type": "row",
+          "title": "Volumes",
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+          "panels": []
+        },
+        {
+          "id": 13,
+          "type": "timeseries",
+          "title": "Top Volume IOPS",
+          "datasource": "VictoriaMetrics",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "topk(8, rate(max by (pv_name) (volume_num_read_ops)[5m:]))",
+              "legendFormat": "{{pv_name}} read",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            },
+            {
+              "refId": "B",
+              "expr": "topk(8, rate(max by (pv_name) (volume_num_write_ops)[5m:]))",
+              "legendFormat": "{{pv_name}} write",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+            "tooltip": { "mode": "multi", "sort": "desc" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "iops",
+              "min": 0,
+              "custom": { "fillOpacity": 8, "lineWidth": 1, "showPoints": "never" }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 14,
+          "type": "timeseries",
+          "title": "Volume Count",
+          "datasource": "VictoriaMetrics",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max(volume_manager_total_volumes)",
+              "legendFormat": "volumes",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": { "displayMode": "list", "placement": "bottom", "showLegend": false },
+            "tooltip": { "mode": "single", "sort": "none" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "decimals": 0,
+              "min": 0,
+              "custom": { "fillOpacity": 8, "lineWidth": 1, "showPoints": "never" }
+            },
+            "overrides": []
+          }
+        }
+      ]
+    }

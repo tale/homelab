@@ -15,5 +15,6 @@ resources:
   - manifests/grafana-datasources.yaml
   - manifests/grafana-dashboards.yaml
   - manifests/grafana-overview.yaml
+  - manifests/grafana-openebs.yaml
   - manifests/nut-scrape.yaml
   - manifests/vmrules.yaml

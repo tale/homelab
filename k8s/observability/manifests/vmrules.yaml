@@ -43,6 +43,21 @@ spec:
           annotations:
             summary: "OpenEBS pool {{ $labels.name }} has stalled I/O"
 
+        # The exporter runs beside the io-engine, so a pool whose node is down
+        # stops reporting entirely rather than reporting a bad status —
+        # StoragePoolDegraded cannot see that. Compare against an hour ago so a
+        # vanished pool still pages without hardcoding the pool count.
+        - alert: StoragePoolMissing
+          expr: >-
+            count by (name) (diskpool_status offset 1h)
+            unless count by (name) (diskpool_status)
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "OpenEBS pool {{ $labels.name }} stopped reporting"
+            description: "Its node is likely down; replicas on this pool are unavailable."
+
         - alert: PostgresInstanceDown
           expr: cnpg_collector_up == 0
           for: 5m
