@@ -18,7 +18,7 @@ spec:
   chart:
     spec:
       chart: omada-controller-helm
-      version: 1.1.5
+      version: 1.4.1
       sourceRef:
         kind: HelmRepository
         name: mbentley
