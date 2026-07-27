@@ -29,6 +29,7 @@ resources:
   - prometheus-operator-crds/helmrelease.yaml
 
   # volsync (PVC backups to S3 via restic)
+  - volsync/namespace.yaml
   - volsync/repository.yaml
   - volsync/helmrelease.yaml
 
