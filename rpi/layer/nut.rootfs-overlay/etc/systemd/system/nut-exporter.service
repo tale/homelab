@@ -4,7 +4,11 @@ After=nut-server.service
 Wants=nut-server.service
 
 [Service]
-ExecStart=/usr/bin/nut_exporter --nut.server=127.0.0.1 --web.listen-address=:9199
+# nut.vars_enable defaults to a seven-variable whitelist that drops
+# battery.runtime, the one number worth alerting on. The CP550SLG reports
+# everything below — check `LIST VAR cyberpower` on :3493 before adding more.
+ExecStart=/usr/bin/nut_exporter --nut.server=127.0.0.1 --web.listen-address=:9199 \
+  --nut.vars_enable=battery.charge,battery.charge.low,battery.charge.warning,battery.runtime,battery.runtime.low,battery.voltage,battery.voltage.nominal,input.transfer.high,input.transfer.low,input.voltage,input.voltage.nominal,output.voltage,ups.load,ups.realpower.nominal,ups.status
 Restart=always
 RestartSec=10
 DynamicUser=yes
