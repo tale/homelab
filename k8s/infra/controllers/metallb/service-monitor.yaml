@@ -15,6 +15,10 @@ spec:
       scheme: https
       tlsConfig:
         insecureSkipVerify: true
+      # 0.16 dropped kube-rbac-proxy for a native TLS endpoint that also
+      # authenticates. vmagent's ClusterRole already covers the /metrics
+      # nonResourceURL, it just has to present the token.
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
 ---
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMPodScrape
@@ -33,3 +37,7 @@ spec:
       scheme: https
       tlsConfig:
         insecureSkipVerify: true
+      # 0.16 dropped kube-rbac-proxy for a native TLS endpoint that also
+      # authenticates. vmagent's ClusterRole already covers the /metrics
+      # nonResourceURL, it just has to present the token.
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
