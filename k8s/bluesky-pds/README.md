@@ -44,6 +44,53 @@ the network (Bluesky, Tangled, etc.) instead of `tale.bsky.social`.
    curl -fsSL https://pds.tale.me/xrpc/_health
    ```
 
+### Backups
+
+`/pds` is the one volume in this cluster that cannot be rebuilt from anything —
+it holds the actor signing keys and the atproto repo, so losing it loses the
+identity behind the handle. VolSync snapshots it to Wasabi nightly at 03:00,
+keeping 7 daily / 5 weekly / 6 monthly.
+
+The mover uses `copyMethod: Snapshot` because `/pds` is SQLite in WAL mode.
+Reading the live volume can copy a database and its `-wal` at different instants;
+a `VolumeSnapshot` is atomic across every file at one point in time, which is the
+crash-consistent state SQLite recovery expects.
+
+Bootstrap the repository secret before the first reconcile — the Kustomization
+will not build without it. This reuses the Wasabi keys already in the cluster, so
+no credential is ever copied by hand:
+
+```bash
+cat > k8s/bluesky-pds/manifests/restic-credentials.sops.yaml <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bluesky-pds-restic
+  namespace: bluesky-pds
+stringData:
+  RESTIC_REPOSITORY: s3:https://s3.wasabisys.com/tale-home/volsync/bluesky-pds
+  RESTIC_PASSWORD: $(openssl rand -base64 32)
+  AWS_ACCESS_KEY_ID: $(kubectl -n cnpg-system get secret cnpg-wasabi-credentials \
+    -o jsonpath='{.data.ACCESS_KEY_ID}' | base64 -d)
+  AWS_SECRET_ACCESS_KEY: $(kubectl -n cnpg-system get secret cnpg-wasabi-credentials \
+    -o jsonpath='{.data.ACCESS_SECRET_KEY}' | base64 -d)
+EOF
+
+sops -e -i k8s/bluesky-pds/manifests/restic-credentials.sops.yaml
+```
+
+> `RESTIC_PASSWORD` is the only thing that can decrypt these backups. It lives in
+> this repo under SOPS, so the age key in `~/.config/sops/age/keys.txt` is the
+> root of trust for the entire PDS identity — keep a copy somewhere that does not
+> depend on this cluster or this laptop.
+
+Verify a run, and restore into a fresh PVC with a `ReplicationDestination`:
+
+```bash
+kubectl -n bluesky-pds get replicationsource bluesky-pds \
+  -o jsonpath='{.status.lastSyncTime}{"  "}{.status.lastSyncDuration}{"\n"}'
+```
+
 ### Claiming `@tale.me`
 
 ```bash

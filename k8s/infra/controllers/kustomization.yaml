@@ -28,6 +28,10 @@ resources:
   - prometheus-operator-crds/repository.yaml
   - prometheus-operator-crds/helmrelease.yaml
 
+  # volsync (PVC backups to S3 via restic)
+  - volsync/repository.yaml
+  - volsync/helmrelease.yaml
+
   # victoria-metrics-operator (CRDs only)
   - victoria-metrics-operator/repository.yaml
   - victoria-metrics-operator/helmrelease.yaml

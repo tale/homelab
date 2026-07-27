@@ -5,4 +5,6 @@ resources:
   - manifests/namespace.yaml
   - manifests/pds-secrets.sops.yaml
   - manifests/pds-http-route.yaml
+  - manifests/restic-credentials.sops.yaml
+  - manifests/backup.yaml
   - helmrelease.yaml

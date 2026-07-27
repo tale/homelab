@@ -43,4 +43,5 @@ resources:
   # openebs
   - openebs/disk-pools.yaml
   - openebs/storage-class.yaml
+  - openebs/snapshot-class.yaml
   - openebs/service-monitor.yaml

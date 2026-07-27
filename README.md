@@ -8,15 +8,18 @@ run in the Oracle Cloud. All Kubernetes deployments are managed with
 ## What's Running
 
 **Infrastructure** (`k8s/infra/`)
+
 - [Cilium](https://cilium.io/) — Cluster Networking
 - [OpenEBS](https://openebs.io/) — Replicated NVMe storage
 - [MetalLB](https://metallb.universe.tf/) — Bare-metal load balancer
 - [Envoy Gateway](https://gateway.envoyproxy.io/) — Gateway API
 - [cert-manager](https://cert-manager.io/) — TLS certificates
 - [CloudNativePG](https://cloudnative-pg.io/) — Centralized PostgreSQL cluster
+- [VolSync](https://volsync.readthedocs.io/) — PVC backups to S3 via restic
 - [Flux Operator](https://fluxoperator.dev/) — Flux lifecycle management
 
 **Apps** (`k8s/`)
+
 - [Authentik](./k8s/authentik/) — Identity provider / SSO (OIDC) for cluster apps
 - [Blocky](./k8s/blocky/) — DNS proxy and ad-blocker
 - [Bluesky PDS](./k8s/bluesky-pds/) — Personal Data Server for atproto
@@ -82,3 +85,4 @@ The `dependsOn` chain handles ordering: controllers → configs → apps.
 - **TP-Link Omada ER605 Router** (WAN + 1GbE management)
 - **TP-Link Omada SG2008 Switch** (8x 1GbE for management and IoT)
 - **2x TP-Link Omada EAP773 Access Point** (Wi-Fi 7 AP)
+- **Raspberry Pi 4B** (4GB) — NUT UPS monitoring, CyberPower CP550SLG

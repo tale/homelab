@@ -1,0 +1,31 @@
+# The PDS holds the actor signing keys and the atproto repo itself. Unlike every
+# other volume here it cannot be rebuilt from anything — losing it loses the
+# identity behind the tale.me handle permanently.
+#
+# copyMethod Snapshot, not Direct: /pds is SQLite in WAL mode, and reading the
+# live volume can copy a database and its -wal at different instants. A
+# VolumeSnapshot is one atomic point in time across every file, which is exactly
+# the crash-consistent state SQLite's recovery is built to handle.
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: bluesky-pds
+  namespace: bluesky-pds
+spec:
+  sourcePVC: bluesky-pds-data
+  trigger:
+    # An hour before the Postgres backup so the two never contend for the NVMe.
+    schedule: "0 3 * * *"
+  restic:
+    repository: bluesky-pds-restic
+    copyMethod: Snapshot
+    volumeSnapshotClassName: cluster-nvmf-snapshot
+    storageClassName: cluster-nvmf
+    # /pds is ~2Mi today; the floor here is restic's own metadata, not the data.
+    cacheCapacity: 1Gi
+    cacheStorageClassName: cluster-nvmf
+    pruneIntervalDays: 14
+    retain:
+      daily: 7
+      weekly: 5
+      monthly: 6
