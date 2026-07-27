@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: victoria-metrics-k8s-stack
-      version: 0.72.5
+      version: 0.87.0
       sourceRef:
         kind: HelmRepository
         name: victoriametrics
@@ -148,7 +148,7 @@ spec:
   chart:
     spec:
       chart: victoria-logs-collector
-      version: 0.2.14
+      version: 0.3.7
       sourceRef:
         kind: HelmRepository
         name: victoriametrics
