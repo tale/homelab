@@ -1,0 +1,32 @@
+# The operator's generated vmagent Role grants get and watch on its own config
+# secret, but the config-reloader watches that secret through the Kubernetes API
+# and client-go cannot establish a watch without list. RBAC ignores
+# resourceNames for collection requests, so list has to be namespace-wide.
+#
+# Without this, vmagent silently keeps whatever config it booted with: the
+# secret updates, no reload ever fires, and the CRs look correct while the
+# running config is hours stale. The operator already grants Alertmanager this
+# exact rule for the same reloader.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vmagent-config-reloader
+  namespace: observability-system
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vmagent-config-reloader
+  namespace: observability-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vmagent-config-reloader
+subjects:
+  - kind: ServiceAccount
+    name: vmagent-victoria-metrics-k8s-stack
+    namespace: observability-system
