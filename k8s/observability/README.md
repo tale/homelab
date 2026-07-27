@@ -98,25 +98,45 @@ so nothing can discover it.
 
 ### Dashboards (via Grafana Operator CRDs)
 
-Dashboards are colocated with their apps where possible.
+Imported by grafana.com ID at a **pinned revision**. `grafanaCom.id` alone tracks
+whatever the author publishes next, which silently changes panels under you; the
+pin makes an upgrade a deliberate bump. Dashboards stay colocated with their apps.
 
-| Dashboard | grafana.com ID | Folder | Location |
-|---|---|---|---|
-| VictoriaMetrics Single | 10229 | VictoriaMetrics | `observability/` |
-| vmagent | 12683 | VictoriaMetrics | `observability/` |
-| vmalert | 14950 | VictoriaMetrics | `observability/` |
-| VictoriaLogs Single | 21599 | Logging | `observability/` |
-| Alertmanager | 9578 | Alerting | `observability/` |
-| Node Exporter Full | 1860 | Infrastructure | `observability/` |
-| cert-manager | 20842 | Infrastructure | `observability/` |
-| CloudNativePG | 20417 | Infrastructure | `observability/` |
-| Kubernetes Global | 15757 | Kubernetes | `observability/` |
-| Kubernetes Pods | 15760 | Kubernetes | `observability/` |
-| Blocky DNS | 17996 | Applications | `blocky/` |
-| Forgejo | 22363 | Applications | `forgejo/` |
-| Authentik | 14837 | Applications | `authentik/` |
-| Envoy Gateway | 22539 | Network | `infra/configs/envoy/` |
-| Hubble Overview | 16611 | Network | `infra/configs/cilium/` |
+| Dashboard | ID | Rev | Folder | Location |
+|---|---|---|---|---|
+| Homelab Overview | — | — | Homelab | `observability/manifests/grafana-overview.yaml` |
+| VictoriaMetrics Single | 10229 | 56 | VictoriaMetrics | `observability/` |
+| vmagent | 12683 | 40 | VictoriaMetrics | `observability/` |
+| vmalert | 14950 | 21 | VictoriaMetrics | `observability/` |
+| VictoriaLogs Single | 22084 | 11 | Infrastructure | `observability/` |
+| Alertmanager | 9578 | 4 | Alerting | `observability/` |
+| Node Exporter Full | 1860 | 45 | Infrastructure | `observability/` |
+| cert-manager | 20842 | 3 | Infrastructure | `observability/` |
+| CloudNativePG | 20417 | 4 | Infrastructure | `observability/` |
+| NUT UPS | 19308 | 4 | Infrastructure | `observability/` |
+| Kubernetes Global | 15757 | 43 | Kubernetes | `observability/` |
+| Kubernetes Pods | 15760 | 39 | Kubernetes | `observability/` |
+| Blocky DNS | 17996 | 15 | Applications | `blocky/` |
+
+**Homelab Overview** is the only hand-written dashboard — 21 panels, every query
+verified against live data. No community dashboard knows which six things matter
+here (nodes, capacity, OpenEBS pools, Postgres backups, the UPS, and whether the
+monitoring stack itself is keeping up), so that one is ours.
+
+Four imports were removed rather than repaired:
+
+| Removed | Why |
+|---|---|
+| Envoy Gateway (22539) | unpublished from grafana.com — returns HTTP 404 |
+| Forgejo (22363) | unpublished from grafana.com — returns HTTP 404 |
+| Authentik (14837) | targets an older authentik metric schema; 21 of 24 metrics absent |
+| Hubble (13542) | written for Cilium v1.8; metric names long since renamed |
+
+Panels that stay blank on purpose: `alertmanager_cluster_*` (single replica, no
+gossip), `windows_container_*` (no Windows nodes), `kube_ingress_info` and
+`kube_hpa_labels` (no Ingress or HPA objects — this cluster uses Gateway API),
+`node_hwmon_fan_*` and `node_power_supply_*` (hardware does not report them), and
+the apiserver latency quantiles whose `_bucket` series vmagent drops.
 
 ### Secrets
 

@@ -11,7 +11,6 @@ resources:
   - hubble/hubble-route.yaml
   - hubble/hubble-security-policy.yaml
   - hubble/service-monitor.yaml
-  - hubble/grafana-dashboard.yaml
 
   # cloudnative-pg
   - cloudnative-pg/cluster.yaml
@@ -37,7 +36,6 @@ resources:
   - envoy/gateway-grant.yaml
   - envoy/fallback-page.yaml
   - envoy/service-monitor.yaml
-  - envoy/grafana-dashboard.yaml
 
   # flux-operator
   - flux-operator/instance.yaml

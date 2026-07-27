@@ -8,4 +8,3 @@ resources:
   - manifests/forgejo-db-credentials.sops.yaml
   - manifests/gickup-config.sops.yaml
   - manifests/gickup-cronjob.yaml
-  - manifests/grafana-dashboard.yaml

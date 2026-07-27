@@ -189,8 +189,26 @@ spec:
           value: "false"
     prometheus-node-exporter:
       enabled: true
+      # Node Exporter Full has a Processes row that stays blank without this;
+      # the collector is off by default and costs a handful of series per node.
+      # `interrupts` would fill two more panels but is per-CPU per-IRQ, which is
+      # exactly the cardinality this stack just spent an afternoon shedding.
+      extraArgs:
+        - --collector.processes
     kube-state-metrics:
       enabled: true
+      # kube_*_labels only exist for resources named here, and the Kubernetes
+      # Views dashboards join on them for nearly half their panels. Scoped to
+      # cluster-level objects — roughly 90 in total, so one series each. Pods
+      # are deliberately excluded: 555 of them times every label is the
+      # cardinality blowup the chart docs warn about.
+      metricLabelsAllowlist:
+        - namespaces=[*]
+        - nodes=[*]
+        - deployments=[*]
+        - daemonsets=[*]
+        - statefulsets=[*]
+        - networkpolicies=[*]
     kubeProxy:
       enabled: false
     kubeControllerManager:

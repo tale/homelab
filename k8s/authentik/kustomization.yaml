@@ -9,5 +9,4 @@ resources:
   - manifests/authentik-http-route.yaml
   - manifests/authentik-blueprints.yaml
   - manifests/authentik-data-pvc.yaml
-  - manifests/grafana-dashboard.yaml
   - manifests/vmrule.yaml
