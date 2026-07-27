@@ -48,8 +48,12 @@ rm -rf clusterconfig cilium/manifest.gen.yaml            # clean
 ```
 
 `talos:gen` always re-renders `cilium/manifest.gen.yaml` first (it depends on
-`talos:render-cilium`), so bumping `CILIUM_VERSION` in `talenv.yaml` and
-re-running is enough to roll the CNI.
+`talos:render-cilium`), so bumping `CILIUM_VERSION` in `talenv.yaml` picks up
+the new chart. Rolling the CNI takes more than that: Talos only ever *creates*
+missing resources from `inlineManifests` — it never updates or deletes them. A
+version bump therefore needs the config applied to every control-plane node
+(they must all be identical) followed by `upgrade-k8s`, which is what actually
+re-applies the manifests.
 
 ## Versions & secrets
 

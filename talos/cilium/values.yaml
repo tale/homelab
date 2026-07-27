@@ -5,13 +5,17 @@ operator:
   replicas: 1
 hubble:
   enabled: true
+  # `helm` mints a fresh CA on every render — `helm template` cannot look the
+  # live secret up, so it falls through to genCA. The CronJob issues certs
+  # in-cluster instead, keeping the rendered manifest free of key material and
+  # byte-stable across renders.
+  tls:
+    auto:
+      enabled: true
+      method: cronJob
+      certValidityDuration: 1095
   relay:
     enabled: true
-    tls:
-      auto:
-        enabled: true
-        method: helm
-        certValidityDuration: 1095
   ui:
     enabled: true
     service:
