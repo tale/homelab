@@ -176,9 +176,9 @@ spec:
 
     - name: homelab-watchdog
       rules:
-        # Always firing. Routed to healthchecks.io, which alerts if the pings
-        # stop — the only signal that distinguishes a quiet cluster from a
-        # dead monitoring stack.
+        # Always firing, currently routed to blackhole. Pointing it at an
+        # external ping endpoint is what makes silence mean "healthy" rather
+        # than "the monitoring stack is dead"; until then it does nothing.
         - alert: Watchdog
           expr: vector(1)
           labels:

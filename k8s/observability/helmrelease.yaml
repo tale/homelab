@@ -83,7 +83,6 @@ spec:
         configSecret: ""
         secrets:
           - pushover-credentials
-          - deadman-credentials
         storage:
           volumeClaimTemplate:
             spec:
@@ -104,15 +103,6 @@ spec:
           group_interval: 5m
           repeat_interval: 24h
           routes:
-            # Fires continuously by design. healthchecks.io pages when the
-            # pings stop, which is the only way silence can mean "healthy"
-            # rather than "the whole stack is down".
-            - receiver: deadman
-              matchers:
-                - alertname = "Watchdog"
-              group_wait: 0s
-              group_interval: 1m
-              repeat_interval: 1m
             - receiver: pushover-page
               matchers:
                 - severity = "critical"
@@ -153,10 +143,6 @@ spec:
             equal: ["alertname", "namespace"]
         receivers:
           - name: blackhole
-          - name: deadman
-            webhook_configs:
-              - url_file: /etc/vm/secrets/deadman-credentials/ping_url
-                send_resolved: false
           - name: pushover-page
             pushover_configs:
               - user_key_file: /etc/vm/secrets/pushover-credentials/user_key

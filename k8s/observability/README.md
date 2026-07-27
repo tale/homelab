@@ -38,7 +38,7 @@ nodes. Every rule now lives in `manifests/vmrules.yaml`, in three tiers:
 |---|---|---|
 | `homelab-page` | `critical` | Pushover priority 1, immediate, never muted |
 | `homelab-notify` | `warning` | Pushover priority -1, batched hourly, muted 23:00–08:00 |
-| `homelab-watchdog` | `none` | Always firing, pings healthchecks.io every minute |
+| `homelab-watchdog` | `none` | Always firing, currently inert (see below) |
 
 Anything without a `critical` or `warning` severity routes to `blackhole`.
 
@@ -46,10 +46,11 @@ Two inhibition rules keep a single root cause from fanning out: a node going
 down suppresses every warning cluster-wide, and a `critical` suppresses the
 matching `warning` for the same alertname and namespace.
 
-The watchdog is the reason silence can be trusted. It fires permanently and
-pings healthchecks.io once a minute; if the cluster, vmalert or Alertmanager
-dies, the pings stop and healthchecks.io notifies. Without it, a dead
-monitoring stack is indistinguishable from a healthy cluster.
+The watchdog fires permanently but routes to `blackhole` for now, so it does
+nothing. Pointing it at an external ping endpoint is what would make silence
+trustworthy: if the cluster, vmalert or Alertmanager dies, the pings stop and
+the external service notifies. Until that is wired, a dead monitoring stack
+is indistinguishable from a healthy cluster.
 
 ### Scrape Targets
 
@@ -102,7 +103,6 @@ Dashboards are colocated with their apps where possible.
 | Secret | Namespace | Purpose |
 |---|---|---|
 | `pushover-credentials` | observability-system | Alertmanager Pushover notifications |
-| `deadman-credentials` | observability-system | healthchecks.io ping URL for the watchdog |
 | `grafana-oidc` | observability-system | Grafana OIDC client credentials |
 | `grafana-db-credentials` | observability-system | Grafana PostgreSQL password (cross-ns from CNPG) |
 | `vmbackup-wasabi-credentials` | observability-system | VMSingle backup S3 credentials |
