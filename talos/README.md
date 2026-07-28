@@ -1,65 +1,33 @@
-# Talos
+# Talos Cluster
 
-This cluster is bootstrapped with [Talos Linux](https://talos.dev/), driven
-declaratively by [talhelper](https://budimanjojo.github.io/talhelper/). One
-`talconfig.yaml` is the single source of truth for cluster identity, node
-networking, patches, and the inline Cilium CNI manifest.
+The workhorse of my homelab is a 3-node Talos cluster running on bare-metal. See
+[the main README](../README.md#hardware) for hardware specs. Each node runs as a
+Kubernetes control-plane and worker, allowing for maximum availability.
 
-## Layout
-
-```
-talconfig.yaml          # cluster definition + nodes + global patches
-talenv.yaml             # versions: TALOS_VERSION, CILIUM_VERSION, schematic ID
-talsecret.sops.yaml     # PKI + bootstrap tokens (sops-encrypted)
-patches/
-  shared.yaml           # kubelet, network, install, ntp, sysctls
-  openebs.yaml          # PSA exemption + hugepages + node label
-  tailscale.sops.yaml   # ExtensionServiceConfig (TS_AUTHKEY, routes)
-nodes/
-  node-1.yaml           # interfaces, addresses, VIP per node
-  node-2.yaml
-  node-3.yaml
-cilium/
-  values.yaml           # Helm values for Cilium (version from talenv.yaml)
-  patch.yaml            # `inlineManifests` header
-  manifest.gen.yaml     # generated, gitignored
-clusterconfig/          # generated machineconfigs + talosconfig (gitignored)
-```
-
-Tasks live under [`.mise/tasks/talos/`](../.mise/tasks/talos/) and are run with
-`mise run talos:<task>`.
+To make managing the [Talos](https://talos.dev) config easier, I use
+[talhelper](https://budimanjojo.github.io/talhelper/) to generate the configs
+and manage other concerns like SOPS and extensions. See `talconfig.yaml` for the
+cluster definition and `talenv.yaml` for fixed variables.
 
 ## Day-to-day
 
 ```bash
-mise run talos:gen                                       # render Cilium + machineconfigs
-mise run talos:render-cilium                             # just the Cilium step
+mise run talos:gen     # render Cilium + machineconfigs
+mise run talos:clean   # drop everything generated
 
-# Talos lifecycle goes through talhelper directly; pipe to bash to execute:
-talhelper gencommand apply --node node-1 | bash          # normal apply
-talhelper gencommand apply --node node-1 \
-  --extra-flags --insecure | bash                        # first-time / maintenance mode
-talhelper gencommand bootstrap --node node-1 | bash      # one-shot etcd bootstrap
-talhelper gencommand upgrade --node node-2 | bash        # Talos OS upgrade
-talhelper gencommand upgrade-k8s --node node-1 | bash    # Kubernetes upgrade
-talhelper gencommand reset --node node-3 | bash          # wipe to maintenance mode
-
-rm -rf clusterconfig cilium/manifest.gen.yaml            # clean
+# Talos lifecycle goes through talhelper; `--node` takes a hostname or IP from
+# talconfig.yaml and defaults to every node. Pipe to bash to execute:
+talhelper gencommand apply --node talos-pk9-lp1 | bash
+talhelper gencommand apply --node talos-pk9-lp1 \
+  --extra-flags --insecure | bash                            # maintenance mode
+talhelper gencommand bootstrap --node talos-pk9-lp1 | bash   # one-shot etcd bootstrap
+talhelper gencommand upgrade --node talos-z4f-vra | bash     # Talos OS upgrade
+talhelper gencommand upgrade-k8s --node talos-pk9-lp1 | bash # Kubernetes upgrade
+talhelper gencommand reset --node talos-74p-1fd | bash       # wipe to maintenance mode
 ```
 
-`talos:gen` always re-renders `cilium/manifest.gen.yaml` first (it depends on
-`talos:render-cilium`), so bumping `CILIUM_VERSION` in `talenv.yaml` picks up
-the new chart. Rolling the CNI takes more than that: Talos only ever *creates*
-missing resources from `inlineManifests` — it never updates or deletes them. A
-version bump therefore needs the config applied to every control-plane node
-(they must all be identical) followed by `upgrade-k8s`, which is what actually
-re-applies the manifests.
-
-## Versions & secrets
-
-- Talos / Cilium / installer schematic ID live in `talenv.yaml` and are
-  interpolated into `talconfig.yaml` via `${VAR}`.
-- `talsecret.sops.yaml` is the canonical secret bundle (cluster CA, etcd CA,
-  k8s CA, k8s aggregator CA, service-account key, bootstrap tokens). Never
-  regenerate against a live cluster. To create a fresh one for a new cluster:
-  `talhelper gensecret > talsecret.gen.yaml && sops -e -i talsecret.gen.yaml`.
+Rolling the CNI takes more than a `CILIUM_VERSION` bump: Talos only ever
+_creates_ missing resources from `inlineManifests` — it never updates or deletes
+them. The config has to go out to every control-plane node (they must all be
+identical) followed by `upgrade-k8s`, which is what actually re-applies the
+manifests.

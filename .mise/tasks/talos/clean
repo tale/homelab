@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Remove generated Talos machineconfigs and the rendered Cilium manifest"
+set -euo pipefail
+
+cd "$MISE_PROJECT_ROOT/talos"
+rm -rf clusterconfig cilium/manifest.gen.yaml
