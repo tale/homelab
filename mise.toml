@@ -1,5 +1,5 @@
 [tools]
-"github:siderolabs/talos" = "1.12.4"
+"github:siderolabs/talos" = "1.13.7"
 "aqua:helm/helm" = "4.2.3"
 "aqua:getsops/sops" = "3.10.2"
 "aqua:FiloSottile/age" = "1.2.1"

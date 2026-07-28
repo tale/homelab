@@ -29,6 +29,14 @@ machine:
     net.ipv4.ip_forward: "1"
     net.ipv6.conf.all.forwarding: "1"
 
+  # Talos 1.13 labels control-plane nodes as excluded from external load
+  # balancers. MetalLB honours that label, and every node here is a
+  # control-plane node, so leaving it on kills every LoadBalancer service.
+  nodeLabels:
+    # `$$` escapes talhelper's own `${VAR}` interpolation down to a literal `$`.
+    node.kubernetes.io/exclude-from-external-load-balancers:
+      $$patch: delete
+
 cluster:
   # Make `kubectl top` work out of the box.
   extraManifests:
