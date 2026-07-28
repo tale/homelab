@@ -84,17 +84,19 @@ HelmRelease. Hand-written CRs stay colocated with their app/infra directory.
 | CNPG Postgres | Cluster `enablePodMonitor` | `infra/configs/cloudnative-pg/cluster.yaml` |
 | Authentik | Chart ServiceMonitor | `authentik/helmrelease.yaml` |
 | Forgejo | Chart ServiceMonitor | `forgejo/helmrelease.yaml` |
-| Hubble | VMServiceScrape | `infra/configs/hubble/` |
-| Cilium Envoy | VMServiceScrape | `infra/configs/hubble/` |
+| Cilium Agent | VMServiceScrape | `infra/configs/cilium/` |
+| Cilium Operator | VMServiceScrape | `infra/configs/cilium/` |
+| Cilium Envoy | VMServiceScrape | `infra/configs/cilium/` |
+| Hubble | VMServiceScrape | `infra/configs/cilium/` |
 | Envoy Gateway | VMServiceScrape | `infra/configs/envoy/` |
 | OpenEBS IO Engine | VMServiceScrape | `infra/configs/openebs/` |
 | Blocky DNS | VMServiceScrape | `blocky/manifests/` |
 | NUT exporter | VMStaticScrape | `observability/manifests/nut-scrape.yaml` |
 
-The five hand-written entries are not oversights: `gateway-helm` and `openebs`
-ship no ServiceMonitor, Blocky is raw manifests with no chart, Cilium's manifest
-is applied by Talos before any CRD exists, and the NUT exporter is off-cluster
-so nothing can discover it.
+The hand-written entries are not oversights: `gateway-helm` and `openebs` ship
+no ServiceMonitor, Blocky is raw manifests with no chart, Cilium's manifest is
+applied by Talos before any CRD exists, and the NUT exporter is off-cluster so
+nothing can discover it.
 
 ### Dashboards (via Grafana Operator CRDs)
 
@@ -105,6 +107,8 @@ pin makes an upgrade a deliberate bump. Dashboards stay colocated with their app
 | Dashboard | ID | Rev | Folder | Location |
 |---|---|---|---|---|
 | Homelab Overview | — | — | Homelab | `observability/manifests/grafana-overview.yaml` |
+| Cilium | — | — | Infrastructure | `observability/manifests/grafana-cilium.yaml` |
+| OpenEBS / Mayastor | — | — | Infrastructure | `observability/manifests/grafana-openebs.yaml` |
 | VictoriaMetrics Single | 10229 | 56 | VictoriaMetrics | `observability/` |
 | vmagent | 12683 | 40 | VictoriaMetrics | `observability/` |
 | vmalert | 14950 | 21 | VictoriaMetrics | `observability/` |
@@ -118,10 +122,12 @@ pin makes an upgrade a deliberate bump. Dashboards stay colocated with their app
 | Kubernetes Pods | 15760 | 39 | Kubernetes | `observability/` |
 | Blocky DNS | 17996 | 15 | Applications | `blocky/` |
 
-**Homelab Overview** is the only hand-written dashboard — 21 panels, every query
-verified against live data. No community dashboard knows which six things matter
-here (nodes, capacity, OpenEBS pools, Postgres backups, the UPS, and whether the
-monitoring stack itself is keeping up), so that one is ours.
+Three dashboards are hand-written. **Homelab Overview** — 21 panels, every query
+verified against live data — because no community dashboard knows which six
+things matter here (nodes, capacity, OpenEBS pools, Postgres backups, the UPS,
+and whether the monitoring stack itself is keeping up). **OpenEBS / Mayastor**
+and **Cilium** because the community boards for both target metric schemas that
+no longer exist.
 
 Four imports were removed rather than repaired:
 

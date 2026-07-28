@@ -114,6 +114,30 @@ spec:
             summary: "{{ $labels.instance }}:{{ $labels.mountpoint }} fills within 24h"
             description: "{{ $value | humanize1024 }}B free and trending to zero."
 
+        # A full map stops accepting inserts, so new endpoints and connections
+        # fail with nothing obviously broken. `unless` the node is already gone,
+        # which NodeDown covers and which drives pressure up on its own.
+        - alert: CiliumBPFMapPressure
+          expr: >-
+            cilium_bpf_map_pressure > 0.9
+            unless on () (kube_node_status_condition{condition="Ready", status="true"} == 0)
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Cilium BPF map {{ $labels.map_name }} on {{ $labels.instance }} is {{ $value | humanizePercentage }} full"
+
+        - alert: CiliumUnreachableNodes
+          expr: >-
+            cilium_unreachable_nodes > 0
+            unless on () (kube_node_status_condition{condition="Ready", status="true"} == 0)
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Cilium on {{ $labels.instance }} cannot reach {{ $value }} node(s)"
+            description: "Every node is Ready, so this is a datapath problem rather than a node outage."
+
         - alert: PVCWillFillIn24h
           expr: >-
             predict_linear(kubelet_volume_stats_available_bytes[6h], 24 * 3600) < 0
@@ -180,6 +204,45 @@ spec:
             severity: warning
           annotations:
             summary: "CNPG backup for {{ $labels.pod }} is over 48h old"
+
+        # No CiliumAgentDown rule: ScrapeTargetDown already covers a dead agent.
+        # These catch the agent that is up but not converging.
+        - alert: CiliumEndpointsNotReady
+          expr: sum by (state) (cilium_endpoint_state{state!="ready"}) > 0
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{ $value }} Cilium endpoint(s) stuck in {{ $labels.state }} for 15m"
+
+        - alert: CiliumEndpointRegenerationsFailing
+          expr: sum(rate(cilium_endpoint_regenerations_total{outcome="fail"}[15m])) > 0
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Cilium endpoint regenerations are failing — policy changes are not landing"
+
+        - alert: CiliumUnmanagedPods
+          expr: max(cilium_operator_unmanaged_pods) > 0
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "{{ $value }} pod(s) have no Cilium endpoint"
+            description: "They have no connectivity and no policy enforcement."
+
+        # The Hubble UI used to answer "denied between whom". The drop metric now
+        # carries workload context, so the alert can name both ends itself.
+        - alert: CiliumPolicyDropsSpiking
+          expr: >-
+            sum by (source_namespace, source, destination_namespace, destination)
+            (rate(hubble_drop_total{reason="POLICY_DENIED"}[10m])) > 0
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "NetworkPolicy is dropping {{ $labels.source_namespace }}/{{ $labels.source }} → {{ $labels.destination_namespace }}/{{ $labels.destination }}"
 
         - alert: VMAgentDroppingSamples
           expr: sum(rate(vmagent_remotewrite_packets_dropped_total[10m])) > 0

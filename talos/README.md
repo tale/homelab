@@ -20,7 +20,7 @@ nodes/
   node-2.yaml
   node-3.yaml
 cilium/
-  values.yaml           # Helm values for Cilium 1.18
+  values.yaml           # Helm values for Cilium (version from talenv.yaml)
   patch.yaml            # `inlineManifests` header
   manifest.gen.yaml     # generated, gitignored
 clusterconfig/          # generated machineconfigs + talosconfig (gitignored)

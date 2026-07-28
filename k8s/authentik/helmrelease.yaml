@@ -79,11 +79,6 @@ spec:
             secretKeyRef:
               name: authentik-oidc-secrets
               key: home-assistant
-        - name: AUTHENTIK_OIDC_SECRET_HUBBLE
-          valueFrom:
-            secretKeyRef:
-              name: authentik-oidc-secrets
-              key: hubble
         - name: AUTHENTIK_OIDC_SECRET_WAKAPI
           valueFrom:
             secretKeyRef:

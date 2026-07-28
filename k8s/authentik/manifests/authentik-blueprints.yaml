@@ -115,19 +115,6 @@ data:
             - matching_mode: strict
               url: https://wakatime.tale.me/oidc/authentik/callback
 
-      - model: authentik_providers_oauth2.oauth2provider
-        id: hubble-provider
-        identifiers:
-          client_id: 1ec362e68efbaf1aaeb53ed30601395d859edd9d
-        attrs:
-          <<: *oauth2-defaults
-          client_secret: !Env AUTHENTIK_OIDC_SECRET_HUBBLE
-          sub_mode: user_email
-          name: Provider for Hubble
-          redirect_uris:
-            - matching_mode: strict
-              url: https://hubble.tale.me/oauth2/callback
-
       - model: authentik_core.application
         identifiers:
           slug: flux
@@ -169,14 +156,6 @@ data:
         attrs:
           name: WakaTime
           provider: !KeyOf wakatime-provider
-
-      - model: authentik_core.application
-        identifiers:
-          slug: hubble
-        attrs:
-          name: Hubble
-          provider: !KeyOf hubble-provider
-          meta_launch_url: https://hubble.tale.me
 
   passkey-authentication-flow.yaml: |
     version: 1

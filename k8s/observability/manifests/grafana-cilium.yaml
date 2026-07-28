@@ -1,0 +1,799 @@
+# Hand-written: the community Cilium/Hubble boards target metric schemas from
+# v1.8 and mostly render empty. Panels are split between the agent registry
+# (`cilium_*`, port 9962), the operator (`cilium_operator_*`, 9963) and the
+# Hubble flow exporter (`hubble_*`, 9965) — three separate scrapes.
+#
+# `Policy Drops by Workload` is the reason the Hubble UI could be retired: the
+# `drop` metric carries source/destination workload context, so a denied flow
+# names both ends without an interactive flow explorer.
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: cilium
+  namespace: observability-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: "homelab"
+  folder: Infrastructure
+  resyncPeriod: 10m
+  json: |
+    {
+      "uid": "cilium",
+      "title": "Cilium",
+      "tags": [
+        "homelab",
+        "network"
+      ],
+      "timezone": "browser",
+      "editable": true,
+      "schemaVersion": 39,
+      "refresh": "1m",
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "panels": [
+        {
+          "id": 1,
+          "type": "row",
+          "title": "Health",
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "panels": []
+        },
+        {
+          "id": 2,
+          "type": "stat",
+          "title": "Agents Up",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 0,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(up{job=\"cilium-agent\"})",
+              "legendFormat": "agents",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "value_and_name",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#d03b3b",
+                    "value": null
+                  },
+                  {
+                    "color": "#0ca30c",
+                    "value": 3
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "description": "One cilium-agent per node. Anything below the node count means pods on that node have no working datapath."
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "Failing Controllers",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 6,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(cilium_controllers_failing)",
+              "legendFormat": "failing",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "value_and_name",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#0ca30c",
+                    "value": null
+                  },
+                  {
+                    "color": "#d03b3b",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "description": "Agent-internal reconcilers. Sustained non-zero means some datapath state is not converging."
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Unreachable Nodes",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 12,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max(cilium_unreachable_nodes)",
+              "legendFormat": "nodes",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "value_and_name",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#0ca30c",
+                    "value": null
+                  },
+                  {
+                    "color": "#d03b3b",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 5,
+          "type": "stat",
+          "title": "Unmanaged Pods",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 18,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max(cilium_operator_unmanaged_pods)",
+              "legendFormat": "pods",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "value_and_name",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#0ca30c",
+                    "value": null
+                  },
+                  {
+                    "color": "#d03b3b",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "description": "Pods with no Cilium endpoint \u2014 they have no policy enforcement and no connectivity."
+        },
+        {
+          "id": 6,
+          "type": "row",
+          "title": "Endpoints & Addressing",
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 5
+          },
+          "panels": []
+        },
+        {
+          "id": 7,
+          "type": "timeseries",
+          "title": "Endpoints per Node",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 6
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "cilium_endpoint",
+              "legendFormat": "{{instance}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 8,
+          "type": "timeseries",
+          "title": "Endpoint States",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 6
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (state) (cilium_endpoint_state)",
+              "legendFormat": "{{state}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          },
+          "description": "Everything should sit in `ready`. Other states are normal in bursts, not as a plateau."
+        },
+        {
+          "id": 9,
+          "type": "timeseries",
+          "title": "Endpoint Regenerations",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 13
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (outcome) (rate(cilium_endpoint_regenerations_total[5m]))",
+              "legendFormat": "{{outcome}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              },
+              "unit": "ops"
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 10,
+          "type": "timeseries",
+          "title": "IP Allocation",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 13
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (family) (cilium_ip_addresses)",
+              "legendFormat": "{{family}} allocated",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            },
+            {
+              "refId": "B",
+              "expr": "sum by (family) (cilium_ipam_capacity)",
+              "legendFormat": "{{family}} capacity",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              }
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 11,
+          "type": "row",
+          "title": "Flows & Drops",
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 20
+          },
+          "panels": []
+        },
+        {
+          "id": 12,
+          "type": "timeseries",
+          "title": "Flow Verdicts",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 21
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (verdict) (rate(hubble_flows_processed_total[5m]))",
+              "legendFormat": "{{verdict}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              },
+              "unit": "pps"
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 13,
+          "type": "timeseries",
+          "title": "Drops by Reason",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 21
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (reason) (rate(hubble_drop_total[5m]))",
+              "legendFormat": "{{reason}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              },
+              "unit": "pps"
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 14,
+          "type": "timeseries",
+          "title": "Policy Drops by Workload",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 28
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (source_namespace, source, destination_namespace, destination) (rate(hubble_drop_total{reason=\"POLICY_DENIED\"}[5m]))",
+              "legendFormat": "{{source_namespace}}/{{source}} \u2192 {{destination_namespace}}/{{destination}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              },
+              "unit": "pps"
+            },
+            "overrides": []
+          },
+          "description": "The panel that replaces the Hubble UI: which workload pair a NetworkPolicy is actually rejecting. Empty is the healthy state."
+        },
+        {
+          "id": 15,
+          "type": "row",
+          "title": "Datapath & BPF",
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 36
+          },
+          "panels": []
+        },
+        {
+          "id": 16,
+          "type": "timeseries",
+          "title": "Agent Datapath Drops",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 37
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (reason) (rate(cilium_drop_count_total[5m]))",
+              "legendFormat": "{{reason}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              },
+              "unit": "pps"
+            },
+            "overrides": []
+          },
+          "description": "Counted in the datapath itself, so it also covers packets Hubble never observes."
+        },
+        {
+          "id": 17,
+          "type": "timeseries",
+          "title": "BPF Map Pressure",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 37
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "topk(10, max by (map_name) (cilium_bpf_map_pressure))",
+              "legendFormat": "{{map_name}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              },
+              "unit": "percentunit",
+              "max": 1
+            },
+            "overrides": []
+          },
+          "description": "Required size over configured size. A map at 1.0 silently fails new inserts."
+        },
+        {
+          "id": 18,
+          "type": "timeseries",
+          "title": "TCP Flags",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 44
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (flag) (rate(hubble_tcp_flags_total[5m]))",
+              "legendFormat": "{{flag}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              },
+              "unit": "pps"
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 19,
+          "type": "timeseries",
+          "title": "Operator Memory",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 44
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "cilium_operator_process_resident_memory_bytes",
+              "legendFormat": "{{instance}}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "fillOpacity": 8,
+                "lineWidth": 1,
+                "showPoints": "never"
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          }
+        }
+      ]
+    }

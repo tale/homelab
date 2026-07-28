@@ -3,31 +3,31 @@ ipam:
 kubeProxyReplacement: true
 operator:
   replicas: 1
+  prometheus:
+    metricsService: true
+prometheus:
+  enabled: true
+  metricsService: true
 hubble:
   enabled: true
-  # `helm` mints a fresh CA on every render — `helm template` cannot look the
-  # live secret up, so it falls through to genCA. The CronJob issues certs
-  # in-cluster instead, keeping the rendered manifest free of key material and
-  # byte-stable across renders.
+  # Relay and the UI are gone, so nothing dials the Hubble gRPC API. Closing the
+  # listener is what makes disabling its TLS safe — the chart's warning is about
+  # `listenAddress` being reachable on the host network — and it keeps the
+  # rendered manifest free of the key material `genCA` would otherwise inline.
+  listenAddress: ""
   tls:
-    auto:
-      enabled: true
-      method: cronJob
-      certValidityDuration: 1095
+    enabled: false
   relay:
-    enabled: true
+    enabled: false
   ui:
-    enabled: true
-    service:
-      type: ClusterIP
+    enabled: false
   metrics:
     enabled:
-      - dns:query;ignoreAAAA
-      - drop
-      - tcp
+      # Drops are the only flow metric worth labelling by workload: it is the
+      # one question the UI used to answer that a bare counter cannot.
+      - "drop:sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity;labelsContext=source_namespace,destination_namespace"
       - flow
-      - icmp
-      - http
+      - tcp
 securityContext:
   capabilities:
     ciliumAgent:
