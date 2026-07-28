@@ -1,8 +1,7 @@
 # Tale Homelab
 
 Configuration for my homelab mini-cluster running on
-[Talos Linux](https://www.talos.dev/) along with a variety of applications that
-run in the Oracle Cloud. All Kubernetes deployments are managed with
+[Talos Linux](https://www.talos.dev/). All Kubernetes deployments are managed with
 [Flux](https://fluxcd.io/), using SOPS for secrets and Kustomize for templating.
 
 ## What's Running

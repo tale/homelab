@@ -3,8 +3,6 @@
 "aqua:helm/helm" = "4.2.3"
 "aqua:getsops/sops" = "3.10.2"
 "aqua:FiloSottile/age" = "1.2.1"
-"asdf:mise-plugins/mise-pipx" = "1.7.1"
-ansible = "latest"
 "npm:oxfmt" = "latest"
 flux2 = "latest"
 lefthook = "latest"
