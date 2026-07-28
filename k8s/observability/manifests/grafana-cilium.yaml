@@ -332,8 +332,8 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "sum by (state) (cilium_endpoint_state)",
-              "legendFormat": "{{state}}",
+              "expr": "sum by (endpoint_state) (cilium_endpoint_state)",
+              "legendFormat": "{{endpoint_state}}",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
               "range": true

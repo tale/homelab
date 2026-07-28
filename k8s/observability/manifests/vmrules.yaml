@@ -208,12 +208,12 @@ spec:
         # No CiliumAgentDown rule: ScrapeTargetDown already covers a dead agent.
         # These catch the agent that is up but not converging.
         - alert: CiliumEndpointsNotReady
-          expr: sum by (state) (cilium_endpoint_state{state!="ready"}) > 0
+          expr: sum by (endpoint_state) (cilium_endpoint_state{endpoint_state!="ready"}) > 0
           for: 15m
           labels:
             severity: warning
           annotations:
-            summary: "{{ $value }} Cilium endpoint(s) stuck in {{ $labels.state }} for 15m"
+            summary: "{{ $value }} Cilium endpoint(s) stuck in {{ $labels.endpoint_state }} for 15m"
 
         - alert: CiliumEndpointRegenerationsFailing
           expr: sum(rate(cilium_endpoint_regenerations_total{outcome="fail"}[15m])) > 0
