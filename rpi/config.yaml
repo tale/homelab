@@ -15,5 +15,32 @@ layer:
   app: nut
 
 ssh:
-  pubkey_user1: ${@SRCROOT}/authorized_keys
   pubkey_only: y
+  # A literal key, or a path to a file of them. Values are stored one per line
+  # internally, so a multi-line block scalar will not survive — point this at
+  # ${@SRCROOT}/authorized_keys if you need more than one key.
+  pubkey_user1: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL9d0H09lymx1EuydWAHYSd0pQLMRBf0ohSQSVCiBGRB GitHub Key
+
+# Everything the nut layer exposes is listed in rpi/layer/nut.yaml with a
+# description and its default. Only the deviations live here.
+nut:
+  # CyberPower CP550SLG (550VA/330W): a HID UPS on usbhid-ups. Pinning the
+  # vendor id keeps the driver off any other USB HID device — quoted, or YAML
+  # reads the leading zero as octal. lsusb calls this "CP1500 AVR UPS", which is
+  # the usb.ids label for pid 0501 that CyberPower reuses across the range, not
+  # the actual model.
+  ups_name: cyberpower
+  vendorid: "0764"
+
+  # Not really a secret. The only peers on this air-gapped switch are our own
+  # Talos nodes, and a secondary can do nothing but watch.
+  monitor_password: cluster-local
+
+  # Mirrors the Talos nodes' VPC interface on the cluster switch: no DHCP, no
+  # DNS, and deliberately no default route, so shutdown coordination rides the
+  # dumb switch and works with the router dead. The one route is management
+  # only — the nodes are dual-homed and forward, so this reaches the LAN through
+  # whichever control plane holds the VIP.
+  net_address: 172.31.42.5/24
+  net_route_destination: 10.0.0.0/24
+  net_route_gateway: 172.31.42.100

@@ -1,0 +1,136 @@
+#!/bin/sh
+# Renders the appliance's configuration into the target rootfs from the `nut`
+# section of the build config. Invoked as a bdebstrap customize hook, so $1 is
+# the rootfs and every IGconf_* variable is already in the environment.
+set -eu
+
+rootfs=$1
+
+install -d "$rootfs/etc/nut"
+
+cat > "$rootfs/etc/nut/nut.conf" <<EOF
+MODE=$IGconf_nut_mode
+EOF
+
+cat > "$rootfs/etc/nut/ups.conf" <<EOF
+[$IGconf_nut_ups_name]
+  driver = $IGconf_nut_driver
+  port = $IGconf_nut_port
+EOF
+
+if [ -n "$IGconf_nut_vendorid" ]; then
+  printf '  vendorid = %s\n' "$IGconf_nut_vendorid" >> "$rootfs/etc/nut/ups.conf"
+fi
+
+if [ -n "$IGconf_nut_productid" ]; then
+  printf '  productid = %s\n' "$IGconf_nut_productid" >> "$rootfs/etc/nut/ups.conf"
+fi
+
+cat > "$rootfs/etc/nut/upsd.conf" <<EOF
+LISTEN $IGconf_nut_listen_address $IGconf_nut_listen_port
+EOF
+
+cat > "$rootfs/etc/nut/upsd.users" <<EOF
+# NUT's protocol requires upsmon to LOGIN with a password before it can watch
+# the UPS, so this value has to exist on every client too. A secondary can do
+# nothing but read.
+[$IGconf_nut_monitor_user]
+  password = $IGconf_nut_monitor_password
+  upsmon $IGconf_nut_monitor_role
+EOF
+
+cat > "$rootfs/etc/nut/upsmon.conf" <<EOF
+# The local upsmon watches over a loopback connection to its own upsd. What it
+# does on a low-battery event is nut.shutdown_command; by default nothing, so
+# the appliance keeps serving upsd to its clients and dies last on its own.
+MINSUPPLIES 1
+MONITOR $IGconf_nut_ups_name@localhost 1 $IGconf_nut_monitor_user $IGconf_nut_monitor_password $IGconf_nut_monitor_role
+SHUTDOWNCMD "$IGconf_nut_shutdown_command"
+EOF
+
+# USB drivers don't re-grab a re-enumerated UPS on their own, so bounce upsd
+# whenever the device is plugged or pulled. Only possible when we know which
+# device to watch for.
+if [ -n "$IGconf_nut_vendorid" ]; then
+  install -d "$rootfs/etc/udev/rules.d"
+  cat > "$rootfs/etc/udev/rules.d/99-nut-ups.rules" <<EOF
+# --no-block keeps the udev worker from hanging on the restart.
+ACTION=="add|remove", SUBSYSTEM=="usb", ATTR{idVendor}=="$IGconf_nut_vendorid", RUN+="/usr/bin/systemctl --no-block try-restart nut-server.service"
+EOF
+fi
+
+# Sorts before the base layer's 01-<iface>.network on purpose — networkd applies
+# only the first matching file, so a 10- prefix silently loses to it and the
+# appliance comes up on DHCP instead.
+if [ -n "$IGconf_nut_net_address" ]; then
+  install -d "$rootfs/etc/systemd/network"
+  cat > "$rootfs/etc/systemd/network/00-$IGconf_nut_net_interface.network" <<EOF
+[Match]
+Name=$IGconf_nut_net_interface
+
+[Network]
+Address=$IGconf_nut_net_address
+EOF
+
+  if [ -n "$IGconf_nut_net_gateway" ]; then
+    printf 'Gateway=%s\n' "$IGconf_nut_net_gateway" >> "$rootfs/etc/systemd/network/00-$IGconf_nut_net_interface.network"
+  fi
+
+  if [ -n "$IGconf_nut_net_route_destination" ] && [ -n "$IGconf_nut_net_route_gateway" ]; then
+    cat >> "$rootfs/etc/systemd/network/00-$IGconf_nut_net_interface.network" <<EOF
+
+[Route]
+Destination=$IGconf_nut_net_route_destination
+Gateway=$IGconf_nut_net_route_gateway
+EOF
+  fi
+fi
+
+if igconf isy nut_exporter; then
+  install -m 0755 "$IGconf_nut_exporter_binary" "$rootfs/usr/bin/nut_exporter"
+
+  # upsd is only guaranteed to be reachable on loopback when it binds everything.
+  exporter_server=$IGconf_nut_listen_address
+  if [ "$exporter_server" = "0.0.0.0" ]; then
+    exporter_server=127.0.0.1
+  fi
+
+  install -d "$rootfs/etc/systemd/system/multi-user.target.wants"
+  cat > "$rootfs/etc/systemd/system/nut-exporter.service" <<EOF
+[Unit]
+Description=NUT Prometheus exporter
+After=nut-server.service
+Wants=nut-server.service
+
+[Service]
+ExecStart=/usr/bin/nut_exporter --nut.server=$exporter_server --nut.serverport=$IGconf_nut_listen_port \\
+  --web.listen-address=:$IGconf_nut_exporter_port \\
+  --nut.vars_enable=$IGconf_nut_exporter_variables
+Restart=always
+RestartSec=10
+DynamicUser=yes
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  ln -sf /etc/systemd/system/nut-exporter.service \
+    "$rootfs/etc/systemd/system/multi-user.target.wants/nut-exporter.service"
+fi
+
+if igconf isy nut_autologin; then
+  install -d "$rootfs/etc/systemd/system/getty@tty1.service.d"
+  cat > "$rootfs/etc/systemd/system/getty@tty1.service.d/autologin.conf" <<EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin $IGconf_device_user1 --noclear %I \$TERM
+EOF
+
+  # Serial console recovery over the UART (8N1, enable_uart=1 is already set by
+  # the base image).
+  install -d "$rootfs/etc/systemd/system/serial-getty@ttyS0.service.d"
+  cat > "$rootfs/etc/systemd/system/serial-getty@ttyS0.service.d/autologin.conf" <<EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin $IGconf_device_user1 --keep-baud $IGconf_nut_autologin_baud %I \$TERM
+EOF
+fi

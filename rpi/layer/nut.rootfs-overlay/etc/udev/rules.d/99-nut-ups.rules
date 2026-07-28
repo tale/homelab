@@ -1,4 +1,0 @@
-# usbhid-ups won't re-grab a re-enumerated UPS on its own, so bounce upsd
-# whenever the CyberPower (vendor 0764) is plugged or pulled. --no-block keeps
-# the udev worker from hanging on the restart.
-ACTION=="add|remove", SUBSYSTEM=="usb", ATTR{idVendor}=="0764", RUN+="/usr/bin/systemctl --no-block try-restart nut-server.service"

@@ -1,11 +1,186 @@
 # METABEGIN
 # X-Env-Layer-Name: nut
 # X-Env-Layer-Category: app
-# X-Env-Layer-Desc: NUT (Network UPS Tools) server for a CyberPower UPS, plus a
-#  Prometheus exporter. Air-gapped: native systemd services, no containers,
-#  nothing pulled at runtime.
-# X-Env-Layer-Version: 1.0.0
+# X-Env-Layer-Desc: NUT (Network UPS Tools) server, plus an optional Prometheus
+#  exporter. Air-gapped: native systemd services, no containers, nothing pulled
+#  at runtime. Everything is driven by the nut section of the build config.
+# X-Env-Layer-Version: 2.0.0
 # X-Env-Layer-Requires: device-user-admin,openssh-server,systemd-net-min
+#
+# X-Env-VarRequires: IGconf_device_user1
+# X-Env-VarRequires-Valid: string
+#
+# X-Env-VarPrefix: nut
+#
+# X-Env-Var-layerdir: ${DIRECTORY}
+# X-Env-Var-layerdir-Desc: Internal. Directory holding this layer and its
+#  configure script.
+# X-Env-Var-layerdir-Required: n
+# X-Env-Var-layerdir-Valid: dir
+# X-Env-Var-layerdir-Set: force
+#
+# X-Env-Var-mode: netserver
+# X-Env-Var-mode-Desc: NUT operating mode written to /etc/nut/nut.conf.
+# X-Env-Var-mode-Required: n
+# X-Env-Var-mode-Valid: keywords:standalone,netserver,netclient
+# X-Env-Var-mode-Set: y
+#
+# X-Env-Var-ups_name: ups
+# X-Env-Var-ups_name-Desc: Name of the UPS section in /etc/nut/ups.conf. This is
+#  what clients address as <name>@<host>.
+# X-Env-Var-ups_name-Required: n
+# X-Env-Var-ups_name-Valid: regex:^[a-zA-Z0-9_-]+$
+# X-Env-Var-ups_name-Set: y
+#
+# X-Env-Var-driver: usbhid-ups
+# X-Env-Var-driver-Desc: NUT driver for the UPS. See the hardware compatibility
+#  list at https://networkupstools.org/stable-hcl.html
+# X-Env-Var-driver-Required: n
+# X-Env-Var-driver-Valid: string
+# X-Env-Var-driver-Set: y
+#
+# X-Env-Var-port: auto
+# X-Env-Var-port-Desc: Driver port. USB drivers want auto; serial drivers want a
+#  device node such as /dev/ttyS0.
+# X-Env-Var-port-Required: n
+# X-Env-Var-port-Valid: string
+# X-Env-Var-port-Set: y
+#
+# X-Env-Var-vendorid:
+# X-Env-Var-vendorid-Desc: USB vendor id (hex, no 0x) to pin the driver to. Quote
+#  it in YAML or a leading zero is read as octal. If empty, the driver matches
+#  the first device it recognises and no udev rule is installed.
+# X-Env-Var-vendorid-Required: n
+# X-Env-Var-vendorid-Valid: string-or-empty
+# X-Env-Var-vendorid-Set: y
+#
+# X-Env-Var-productid:
+# X-Env-Var-productid-Desc: USB product id (hex, no 0x). Only needed when one
+#  vendor id covers several devices on the bus.
+# X-Env-Var-productid-Required: n
+# X-Env-Var-productid-Valid: string-or-empty
+# X-Env-Var-productid-Set: y
+#
+# X-Env-Var-listen_address: 0.0.0.0
+# X-Env-Var-listen_address-Desc: Address upsd binds to.
+# X-Env-Var-listen_address-Required: n
+# X-Env-Var-listen_address-Valid: string
+# X-Env-Var-listen_address-Set: y
+#
+# X-Env-Var-listen_port: 3493
+# X-Env-Var-listen_port-Desc: Port upsd binds to.
+# X-Env-Var-listen_port-Required: n
+# X-Env-Var-listen_port-Valid: int:1-65535
+# X-Env-Var-listen_port-Set: y
+#
+# X-Env-Var-monitor_user: upsmon
+# X-Env-Var-monitor_user-Desc: upsd account that upsmon clients log in as.
+# X-Env-Var-monitor_user-Required: n
+# X-Env-Var-monitor_user-Valid: regex:^[a-zA-Z0-9_-]+$
+# X-Env-Var-monitor_user-Set: y
+#
+# X-Env-Var-monitor_password:
+# X-Env-Var-monitor_password-Desc: Password for monitor_user. No default — the
+#  build fails until it is set. NUT's protocol requires upsmon to LOGIN, so
+#  every client on the network needs this value.
+# X-Env-Var-monitor_password-Required: y
+# X-Env-Var-monitor_password-Valid: string
+# X-Env-Var-monitor_password-Set: y
+#
+# X-Env-Var-monitor_role: secondary
+# X-Env-Var-monitor_role-Desc: Role of the local upsmon. A secondary can only
+#  watch; a primary is the one that tells upsd when the shutdown may proceed.
+# X-Env-Var-monitor_role-Required: n
+# X-Env-Var-monitor_role-Valid: keywords:primary,secondary
+# X-Env-Var-monitor_role-Set: y
+#
+# X-Env-Var-shutdown_command: /bin/true
+# X-Env-Var-shutdown_command-Desc: What the local upsmon runs on a low-battery
+#  event. Defaults to a no-op so the appliance keeps serving upsd to its clients
+#  and dies last on its own.
+# X-Env-Var-shutdown_command-Required: n
+# X-Env-Var-shutdown_command-Valid: string
+# X-Env-Var-shutdown_command-Set: y
+#
+# X-Env-Var-exporter: y
+# X-Env-Var-exporter-Desc: Install the Prometheus exporter.
+# X-Env-Var-exporter-Required: n
+# X-Env-Var-exporter-Valid: bool
+# X-Env-Var-exporter-Set: y
+#
+# X-Env-Var-exporter_binary: /opt/nut_exporter
+# X-Env-Var-exporter_binary-Desc: Path on the build host to the exporter binary.
+#  Debian packages no NUT exporter, so the builder image carries the release
+#  binary and it is installed from there — the target never fetches anything.
+# X-Env-Var-exporter_binary-Required: n
+# X-Env-Var-exporter_binary-Valid: string
+# X-Env-Var-exporter_binary-Set: y
+#
+# X-Env-Var-exporter_port: 9199
+# X-Env-Var-exporter_port-Desc: Port the exporter serves metrics on.
+# X-Env-Var-exporter_port-Required: n
+# X-Env-Var-exporter_port-Valid: int:1-65535
+# X-Env-Var-exporter_port-Set: y
+#
+# X-Env-Var-exporter_variables: battery.charge,battery.charge.low,battery.charge.warning,battery.runtime,battery.runtime.low,battery.voltage,battery.voltage.nominal,input.transfer.high,input.transfer.low,input.voltage,input.voltage.nominal,output.voltage,ups.load,ups.realpower.nominal,ups.status
+# X-Env-Var-exporter_variables-Desc: NUT variables the exporter publishes. Its
+#  own default is a seven-variable whitelist that drops battery.runtime, the one
+#  number worth alerting on. Run `LIST VAR <ups_name>` against upsd to see what
+#  your hardware actually reports.
+# X-Env-Var-exporter_variables-Required: n
+# X-Env-Var-exporter_variables-Valid: string
+# X-Env-Var-exporter_variables-Set: y
+#
+# X-Env-Var-net_interface: eth0
+# X-Env-Var-net_interface-Desc: Interface the static address below is applied to.
+# X-Env-Var-net_interface-Required: n
+# X-Env-Var-net_interface-Valid: string
+# X-Env-Var-net_interface-Set: y
+#
+# X-Env-Var-net_address:
+# X-Env-Var-net_address-Desc: Static CIDR address for net_interface. If empty, no
+#  network unit is written and the base layer's DHCP configuration stands.
+# X-Env-Var-net_address-Required: n
+# X-Env-Var-net_address-Valid: string-or-empty
+# X-Env-Var-net_address-Set: y
+#
+# X-Env-Var-net_gateway:
+# X-Env-Var-net_gateway-Desc: Default gateway for net_address. Left empty on
+#  purpose: UPS shutdown signalling is same-subnet and should keep working with
+#  the router dead.
+# X-Env-Var-net_gateway-Required: n
+# X-Env-Var-net_gateway-Valid: string-or-empty
+# X-Env-Var-net_gateway-Set: y
+#
+# X-Env-Var-net_route_destination:
+# X-Env-Var-net_route_destination-Desc: CIDR reachable via net_route_gateway. Use
+#  this instead of net_gateway to reach a management network without taking a
+#  default route.
+# X-Env-Var-net_route_destination-Required: n
+# X-Env-Var-net_route_destination-Valid: string-or-empty
+# X-Env-Var-net_route_destination-Set: y
+#
+# X-Env-Var-net_route_gateway:
+# X-Env-Var-net_route_gateway-Desc: Next hop for net_route_destination. Both must
+#  be set for the route to be written.
+# X-Env-Var-net_route_gateway-Required: n
+# X-Env-Var-net_route_gateway-Valid: string-or-empty
+# X-Env-Var-net_route_gateway-Set: y
+#
+# X-Env-Var-autologin: y
+# X-Env-Var-autologin-Desc: Autologin device.user1 on tty1 and the UART. Physical
+#  access already means root on an unencrypted SD card, so this lowers no bar —
+#  it makes recovery possible without a password that would otherwise have to be
+#  a real secret in a public repo.
+# X-Env-Var-autologin-Required: n
+# X-Env-Var-autologin-Valid: bool
+# X-Env-Var-autologin-Set: y
+#
+# X-Env-Var-autologin_baud: 115200,57600,38400,9600
+# X-Env-Var-autologin_baud-Desc: Baud rates agetty tries on the serial console.
+# X-Env-Var-autologin_baud-Required: n
+# X-Env-Var-autologin_baud-Valid: string
+# X-Env-Var-autologin_baud-Set: y
 # METAEND
 ---
 mmdebstrap:
@@ -15,11 +190,5 @@ mmdebstrap:
     - nut-server
     - nut-client
   customize-hooks:
-    # Debian has no package for a NUT Prometheus exporter, so the builder image
-    # carries the release binary and it gets installed from there — the Pi never
-    # fetches anything.
-    - install -m 0755 /opt/nut_exporter $1/usr/bin/nut_exporter
-    # nut-exporter is missing here on purpose: it ships in the rootfs overlay,
-    # which is applied after these hooks run, so enabling it here silently does
-    # nothing. It gets a wants symlink in the overlay instead.
     - $BDEBSTRAP_HOOKS/enable-units "$1" nut-server nut-client
+    - ${IGconf_nut_layerdir}/nut-configure "$1"

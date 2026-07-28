@@ -1,11 +1,11 @@
-name: rpi-image
+name: RPi Image
 
 on:
   workflow_dispatch:
   push:
     paths:
       - "rpi/**"
-      - ".github/workflows/rpi-image.yml"
+      - ".github/workflows/rpi-image.yaml"
 
 permissions: {}
 
@@ -27,11 +27,11 @@ jobs:
         run: |
           docker run --rm --privileged -v "$PWD/rpi:/rpi" rpi-image-gen \
             sh -c 'rpi-image-gen build -S /rpi -c /rpi/config.yaml \
-              && cp /build/work/deploy-*/nut.img.zst /rpi/nut.img.zst'
+              && cp /build/work/deploy-*/*.img.zst /rpi/'
 
       - name: Upload artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: nut-img
-          path: rpi/nut.img.zst
+          path: rpi/*.img.zst
           retention-days: 14
