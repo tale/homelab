@@ -195,6 +195,27 @@ spec:
       # exactly the cardinality this stack just spent an afternoon shedding.
       extraArgs:
         - --collector.processes
+      vmScrape:
+        spec:
+          jobLabel: jobLabel
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus-node-exporter
+          # node-exporter was the only node-scoped job without a `node` label —
+          # kubelet, kube-state-metrics and the OpenEBS exporter all carry one.
+          # Without it node metrics key on `instance` (an IP:port) and join
+          # nothing. Overriding `endpoints` replaces the chart's list wholesale,
+          # so its mountpoint drop is repeated here.
+          endpoints:
+            - port: metrics
+              relabelConfigs:
+                - action: replace
+                  source_labels: [__meta_kubernetes_pod_node_name]
+                  target_label: node
+              metricRelabelConfigs:
+                - action: drop
+                  source_labels: [mountpoint]
+                  regex: "/var/lib/kubelet/pods.+"
     kube-state-metrics:
       enabled: true
       # kube_*_labels only exist for resources named here, and the Kubernetes

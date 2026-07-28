@@ -15,6 +15,10 @@ resources:
   - manifests/grafana-datasources.yaml
   - manifests/grafana-dashboards.yaml
   - manifests/grafana-overview.yaml
+  - manifests/grafana-kubernetes.yaml
+  - manifests/grafana-ingress.yaml
+  - manifests/grafana-storage.yaml
+  - manifests/grafana-monitoring.yaml
   - manifests/grafana-openebs.yaml
   - manifests/grafana-cilium.yaml
   - manifests/nut-scrape.yaml

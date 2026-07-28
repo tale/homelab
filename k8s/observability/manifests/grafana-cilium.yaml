@@ -5,7 +5,10 @@
 #
 # `Policy Drops by Workload` is the reason the Hubble UI could be retired: the
 # `drop` metric carries source/destination workload context, so a denied flow
-# names both ends without an interactive flow explorer.
+# names both ends without an interactive flow explorer. It counts over `$__range`
+# rather than rating over 5m — denials run about eight a day here, so a 5m window
+# was empty essentially always. Empty over the selected range now means no flow
+# was denied in it, which is the answer you want.
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
@@ -572,7 +575,7 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "sum by (source_namespace, source, destination_namespace, destination) (rate(hubble_drop_total{reason=\"POLICY_DENIED\"}[5m]))",
+              "expr": "sum by (source_namespace, source, destination_namespace, destination) (increase(hubble_drop_total{reason=\"POLICY_DENIED\"}[$__range]))",
               "legendFormat": "{{source_namespace}}/{{source}} \u2192 {{destination_namespace}}/{{destination}}",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",

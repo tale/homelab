@@ -12,3 +12,35 @@ spec:
     - port: metrics
       path: /metrics
       interval: 30s
+---
+# The control-plane scrape above says nothing about traffic. Every request that
+# enters the cluster passes through the proxy pods, and until this existed none
+# of it was visible: no request rate, no 5xx, no latency for anything behind the
+# gateway. The proxy already serves stats on 19001, it just had no scrape.
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: envoy-proxy
+  namespace: envoy-gateway-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: proxy
+      app.kubernetes.io/managed-by: envoy-gateway
+  podMetricsEndpoints:
+    - port: metrics
+      path: /stats/prometheus
+      interval: 30s
+      relabelConfigs:
+        - action: replace
+          source_labels: [__meta_kubernetes_pod_label_gateway_envoyproxy_io_owning_gateway_name]
+          target_label: gateway
+      # Envoy publishes several thousand stats per listener and cluster. This is
+      # a keep-list, not a drop-list: everything the Ingress dashboard asks for,
+      # nothing else. Inverting it would let a gateway config change quietly add
+      # a few thousand series.
+      metricRelabelConfigs:
+        - action: keep
+          source_labels: [__name__]
+          regex: >-
+            envoy_http_downstream_rq_xx|envoy_http_downstream_rq_total|envoy_http_downstream_rq_time_(bucket|count|sum)|envoy_http_downstream_cx_active|envoy_http_downstream_cx_total|envoy_http_no_route|envoy_cluster_upstream_rq_xx|envoy_cluster_upstream_rq_time_(bucket|count|sum)|envoy_cluster_upstream_cx_active|envoy_cluster_membership_(healthy|total)|envoy_server_(live|uptime|memory_allocated|total_connections)
