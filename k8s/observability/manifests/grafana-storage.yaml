@@ -1,11 +1,13 @@
-# Hand-written: storage and the backups protecting it were split across three
-# places and a bargauge on the overview, so "is this volume full" and "is it
-# recoverable" were never on the same screen.
+# Hand-written: storage and the backups protecting it lived in different places,
+# so "is this volume full" and "is it recoverable" were never on one screen.
+#
+# This also absorbed the separate OpenEBS / Mayastor board, which was ~80% the same panels against the same metrics — pool status, usage, IOPS, throughput and
+# latency were on both, so "is this volume full" and "is the pool healthy" meant
+# opening two screens.
 #
 # Pool and volume panels aggregate `max by (...)`: the io-engine exporter
 # re-registers under a new pod on every node reboot, so raw series carry a stale
-# generation alongside the live one. See grafana-openebs.yaml for the deeper
-# mayastor view.
+# generation alongside the live one.
 #
 # The latency panels divide a cumulative microsecond counter by its op counter,
 # which yields mean-per-op. Mayastor exposes no histogram, so there is no p99
@@ -40,36 +42,39 @@ spec:
       "links": [
         {
           "title": "Overview",
-          "type": "dashboards",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
           "url": "/d/homelab-overview",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         },
         {
-          "title": "OpenEBS / Mayastor",
-          "type": "dashboards",
+          "title": "Postgres",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
-          "url": "/d/openebs-mayastor",
+          "url": "/d/homelab-postgres",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         },
         {
-          "title": "CloudNativePG",
-          "type": "dashboards",
+          "title": "Kubernetes",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
-          "url": "/d/cloudnative-pg",
+          "url": "/d/homelab-kubernetes",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         }
       ],
       "templating": {
@@ -96,7 +101,7 @@ spec:
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 4,
-            "w": 4,
+            "w": 3,
             "x": 0,
             "y": 1
           },
@@ -154,12 +159,188 @@ spec:
         {
           "id": 3,
           "type": "stat",
+          "title": "Mayastor Nodes",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 3,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(max by (node_id) (mayastor_node_online))",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 2
+                  },
+                  {
+                    "color": "green",
+                    "value": 3
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "description": "A cordoned or draining node still reports online; check the storage control plane if this disagrees with node readiness."
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Pool I/O Errors",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 6,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(max by (name) (diskpool_io_error_count))",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 1
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "description": "Cumulative since the pool came up. Watch the slope \u2014 a climbing count is a disk on its way out."
+        },
+        {
+          "id": 5,
+          "type": "stat",
+          "title": "Volumes",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 9,
+            "y": 1
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max(volume_manager_total_volumes)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "palette-classic"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 0
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 6,
+          "type": "stat",
           "title": "Pool Capacity",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 4,
-            "w": 4,
-            "x": 4,
+            "w": 3,
+            "x": 12,
             "y": 1
           },
           "targets": [
@@ -205,14 +386,14 @@ spec:
           }
         },
         {
-          "id": 4,
+          "id": 7,
           "type": "stat",
           "title": "Pool Used",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 4,
-            "w": 4,
-            "x": 8,
+            "w": 3,
+            "x": 15,
             "y": 1
           },
           "targets": [
@@ -258,14 +439,14 @@ spec:
           }
         },
         {
-          "id": 5,
+          "id": 8,
           "type": "stat",
           "title": "Fullest Pool",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 4,
-            "w": 4,
-            "x": 12,
+            "w": 3,
+            "x": 18,
             "y": 1
           },
           "targets": [
@@ -324,14 +505,14 @@ spec:
           }
         },
         {
-          "id": 6,
+          "id": 9,
           "type": "stat",
           "title": "PVCs Bound",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 4,
-            "w": 4,
-            "x": 16,
+            "w": 3,
+            "x": 21,
             "y": 1
           },
           "targets": [
@@ -378,15 +559,15 @@ spec:
           }
         },
         {
-          "id": 7,
+          "id": 10,
           "type": "stat",
           "title": "Fullest PVC",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 4,
-            "w": 4,
-            "x": 20,
-            "y": 1
+            "w": 3,
+            "x": 0,
+            "y": 5
           },
           "targets": [
             {
@@ -444,14 +625,14 @@ spec:
           }
         },
         {
-          "id": 8,
+          "id": 11,
           "type": "bargauge",
           "title": "OpenEBS Pool Used",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 8,
             "w": 12,
-            "x": 0,
+            "x": 3,
             "y": 5
           },
           "targets": [
@@ -514,15 +695,15 @@ spec:
           }
         },
         {
-          "id": 9,
+          "id": 12,
           "type": "bargauge",
           "title": "PVC Used",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 8,
             "w": 12,
-            "x": 12,
-            "y": 5
+            "x": 0,
+            "y": 13
           },
           "targets": [
             {
@@ -584,7 +765,7 @@ spec:
           }
         },
         {
-          "id": 10,
+          "id": 13,
           "type": "row",
           "title": "Throughput",
           "collapsed": false,
@@ -592,12 +773,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 13
+            "y": 21
           },
           "panels": []
         },
         {
-          "id": 11,
+          "id": 14,
           "type": "timeseries",
           "title": "Pool IOPS",
           "datasource": "VictoriaMetrics",
@@ -605,7 +786,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 14
+            "y": 22
           },
           "targets": [
             {
@@ -675,7 +856,7 @@ spec:
           "description": "diskpool_* counters are declared gauge but are cumulative, hence rate()."
         },
         {
-          "id": 12,
+          "id": 15,
           "type": "timeseries",
           "title": "Pool Throughput",
           "datasource": "VictoriaMetrics",
@@ -683,7 +864,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 14
+            "y": 22
           },
           "targets": [
             {
@@ -751,7 +932,7 @@ spec:
           }
         },
         {
-          "id": 13,
+          "id": 16,
           "type": "timeseries",
           "title": "Pool Latency",
           "datasource": "VictoriaMetrics",
@@ -759,7 +940,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 14
+            "y": 22
           },
           "targets": [
             {
@@ -828,7 +1009,7 @@ spec:
           }
         },
         {
-          "id": 14,
+          "id": 17,
           "type": "timeseries",
           "title": "Volume IOPS (top 10)",
           "datasource": "VictoriaMetrics",
@@ -836,7 +1017,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 21
+            "y": 29
           },
           "targets": [
             {
@@ -901,7 +1082,7 @@ spec:
           }
         },
         {
-          "id": 15,
+          "id": 18,
           "type": "timeseries",
           "title": "Volume Latency (top 10)",
           "datasource": "VictoriaMetrics",
@@ -909,7 +1090,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 21
+            "y": 29
           },
           "targets": [
             {
@@ -974,7 +1155,7 @@ spec:
           }
         },
         {
-          "id": 16,
+          "id": 19,
           "type": "row",
           "title": "Backups",
           "collapsed": false,
@@ -982,12 +1163,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 28
+            "y": 36
           },
           "panels": []
         },
         {
-          "id": 17,
+          "id": 20,
           "type": "stat",
           "title": "Postgres Backup Age",
           "datasource": "VictoriaMetrics",
@@ -995,7 +1176,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 0,
-            "y": 29
+            "y": 37
           },
           "targets": [
             {
@@ -1048,7 +1229,7 @@ spec:
           }
         },
         {
-          "id": 18,
+          "id": 21,
           "type": "stat",
           "title": "Failed Backups",
           "datasource": "VictoriaMetrics",
@@ -1056,7 +1237,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 6,
-            "y": 29
+            "y": 37
           },
           "targets": [
             {
@@ -1107,7 +1288,7 @@ spec:
           "description": "A failure that landed after the last success. Non-zero means the backup chain is broken, not merely stale."
         },
         {
-          "id": 19,
+          "id": 22,
           "type": "stat",
           "title": "VolSync Out of Sync",
           "datasource": "VictoriaMetrics",
@@ -1115,7 +1296,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 12,
-            "y": 29
+            "y": 37
           },
           "targets": [
             {
@@ -1165,7 +1346,7 @@ spec:
           }
         },
         {
-          "id": 20,
+          "id": 23,
           "type": "stat",
           "title": "VolSync Missed (24h)",
           "datasource": "VictoriaMetrics",
@@ -1173,7 +1354,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 18,
-            "y": 29
+            "y": 37
           },
           "targets": [
             {
@@ -1227,7 +1408,7 @@ spec:
           }
         },
         {
-          "id": 21,
+          "id": 24,
           "type": "table",
           "title": "Replication Sources",
           "datasource": "VictoriaMetrics",
@@ -1235,7 +1416,7 @@ spec:
             "h": 6,
             "w": 12,
             "x": 0,
-            "y": 34
+            "y": 42
           },
           "targets": [
             {
@@ -1283,7 +1464,7 @@ spec:
           "description": "Only Postgres and bluesky-pds are replicated today; everything else on this cluster is reproducible from git."
         },
         {
-          "id": 22,
+          "id": 25,
           "type": "timeseries",
           "title": "VolSync Sync Duration",
           "datasource": "VictoriaMetrics",
@@ -1291,7 +1472,7 @@ spec:
             "h": 6,
             "w": 12,
             "x": 12,
-            "y": 34
+            "y": 42
           },
           "targets": [
             {
@@ -1353,7 +1534,7 @@ spec:
           "description": "Mean over all syncs, not the last one \u2014 the counter pair carries no per-run value."
         },
         {
-          "id": 23,
+          "id": 26,
           "type": "timeseries",
           "title": "Postgres Recoverability Window",
           "datasource": "VictoriaMetrics",
@@ -1361,7 +1542,7 @@ spec:
             "h": 6,
             "w": 24,
             "x": 0,
-            "y": 40
+            "y": 48
           },
           "targets": [
             {

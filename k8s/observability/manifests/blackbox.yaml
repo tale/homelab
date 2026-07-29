@@ -1,0 +1,135 @@
+# Nothing in this cluster could answer "is the internet up" or "does grafana
+# actually respond over HTTPS" — every existing signal is measured from inside,
+# so a dead gateway and a dead ISP looked identical to a healthy cluster.
+#
+# Honest caveat: these probes run *in* the cluster. A tale.me target exercises
+# DNS, the gateway, its certificate and the backend, but the packet may never
+# leave the building, so this is not a true from-the-internet check. The
+# `internet` probes are the ones that fail when the WAN drops.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blackbox-exporter
+  namespace: observability-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: prometheus-blackbox-exporter
+      version: 11.16.0
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+  upgrade:
+    serverSideApply: enabled
+  rollback:
+    serverSideApply: enabled
+  values:
+    # The chart ships a ServiceMonitor of its own; the probes below drive the
+    # scraping instead, so leaving it on would double-count every target.
+    serviceMonitor:
+      enabled: false
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        memory: 64Mi
+    config:
+      modules:
+        http_2xx:
+          prober: http
+          timeout: 10s
+          http:
+            valid_status_codes: []
+            valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+            follow_redirects: true
+            preferred_ip_protocol: ip4
+            ip_protocol_fallback: false
+        # Separate module so a self-signed or expired cert on an internal
+        # endpoint fails loudly instead of being waved through.
+        http_2xx_insecure:
+          prober: http
+          timeout: 10s
+          http:
+            valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+            follow_redirects: true
+            preferred_ip_protocol: ip4
+            ip_protocol_fallback: false
+            tls_config:
+              insecure_skip_verify: true
+        tcp_connect:
+          prober: tcp
+          timeout: 5s
+          tcp:
+            preferred_ip_protocol: ip4
+            ip_protocol_fallback: false
+---
+# Services published through the gateway. probe_success here means DNS resolved,
+# the gateway routed, the certificate validated and the backend answered 2xx.
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMProbe
+metadata:
+  name: published-endpoints
+  namespace: observability-system
+spec:
+  jobName: blackbox-published
+  module: http_2xx
+  interval: 60s
+  vmProberSpec:
+    url: blackbox-exporter-prometheus-blackbox-exporter.observability-system.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      targets:
+        - https://grafana.tale.me
+        - https://auth.tale.me
+        - https://flux.tale.me
+        - https://git.tale.me
+        - https://home.tale.me
+        - https://pds.tale.me
+        - https://omada.tale.me
+        - https://wakatime.tale.me
+      labels:
+        probe_group: published
+---
+# WAN reachability. These are the targets that distinguish "my cluster is broken"
+# from "my internet is down".
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMProbe
+metadata:
+  name: internet
+  namespace: observability-system
+spec:
+  jobName: blackbox-internet
+  module: http_2xx
+  interval: 60s
+  vmProberSpec:
+    url: blackbox-exporter-prometheus-blackbox-exporter.observability-system.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      targets:
+        - https://one.one.one.one
+        - https://www.google.com
+      labels:
+        probe_group: internet
+---
+# The UPS Pi sits off-cluster on the node subnet with no HTTP surface worth
+# probing; a TCP connect to the NUT exporter is the cheapest liveness check that
+# does not depend on the metrics pipeline being healthy.
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMProbe
+metadata:
+  name: appliances
+  namespace: observability-system
+spec:
+  jobName: blackbox-appliances
+  module: tcp_connect
+  interval: 60s
+  vmProberSpec:
+    url: blackbox-exporter-prometheus-blackbox-exporter.observability-system.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      targets:
+        - 172.31.42.5:9199
+      labels:
+        probe_group: appliances

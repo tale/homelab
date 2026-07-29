@@ -40,14 +40,15 @@ spec:
       "links": [
         {
           "title": "Overview",
-          "type": "dashboards",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
           "url": "/d/homelab-overview",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         }
       ],
       "templating": {

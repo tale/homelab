@@ -5,7 +5,7 @@
 #
 # There are no per-pod network panels here on purpose:
 # `container_network_*_packets|errors|dropped` are dropped at scrape time, and
-# the byte counters that survive are already on the Cilium board with better
+# the byte counters that survive are already on the Network board with better
 # labels.
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
@@ -37,36 +37,39 @@ spec:
       "links": [
         {
           "title": "Overview",
-          "type": "dashboards",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
           "url": "/d/homelab-overview",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         },
         {
-          "title": "Nodes",
-          "type": "dashboards",
+          "title": "Network",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
-          "url": "/d/rYdddlPWk",
+          "url": "/d/homelab-network",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         },
         {
           "title": "Storage & Backups",
-          "type": "dashboards",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
           "url": "/d/homelab-storage",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         }
       ],
       "templating": {

@@ -1,0 +1,53 @@
+# Flux runs the cluster but was the one controller nobody was watching: not a
+# single Flux metric was collected, so a Kustomization that had stopped
+# reconciling looked exactly like one that had nothing to do.
+#
+# The useful signal comes from flux-operator, not the controllers. Modern Flux
+# dropped `gotk_reconcile_condition`; the controllers now only expose reconcile
+# timing. flux-operator's `flux_resource_info` carries one series per Flux object
+# with `ready`, `suspended` and `reason` as labels, which is the actual question.
+#
+# Both are pod scrapes because kustomize-controller and helm-controller have no
+# Service — only source- and notification-controller do, and theirs expose port
+# 80, not the metrics port.
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: flux-operator
+  namespace: flux-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: flux-operator
+  podMetricsEndpoints:
+    - port: http-metrics
+      path: /metrics
+      interval: 60s
+      metricRelabelConfigs:
+        # `revision` changes on every commit and chart bump, which would churn a
+        # fresh series per resource per deploy. `uid`/`url`/`ref`/`path`/
+        # `source_name` are identifiers nothing queries. kind + name +
+        # exported_namespace already identifies a resource uniquely.
+        - action: labeldrop
+          regex: revision|uid|url|ref|path|source_name
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMPodScrape
+metadata:
+  name: flux-controllers
+  namespace: flux-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: flux
+  podMetricsEndpoints:
+    - port: http-prom
+      path: /metrics
+      interval: 60s
+      # gotk_reconcile_duration_seconds is a 12-bucket histogram per resource
+      # across ~65 Flux objects. Dropping the buckets keeps _count and _sum, so
+      # reconcile rate and mean duration survive; nothing here needs quantiles.
+      metricRelabelConfigs:
+        - action: drop
+          source_labels: [__name__]
+          regex: gotk_reconcile_duration_seconds_bucket|gotk_event_http_.*_bucket

@@ -39,69 +39,63 @@ spec:
       "links": [
         {
           "title": "Kubernetes",
-          "type": "dashboards",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
           "url": "/d/homelab-kubernetes",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         },
         {
-          "title": "Ingress & DNS",
-          "type": "dashboards",
+          "title": "Network",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
-          "url": "/d/homelab-ingress",
+          "url": "/d/homelab-network",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         },
         {
           "title": "Storage & Backups",
-          "type": "dashboards",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
           "url": "/d/homelab-storage",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         },
         {
-          "title": "Cilium",
-          "type": "dashboards",
+          "title": "Postgres",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
-          "url": "/d/cilium",
+          "url": "/d/homelab-postgres",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
-        },
-        {
-          "title": "Nodes",
-          "type": "dashboards",
-          "asDropdown": false,
-          "tags": [],
-          "targetBlank": false,
-          "url": "/d/rYdddlPWk",
-          "keepTime": true,
-          "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         },
         {
           "title": "Monitoring",
-          "type": "dashboards",
+          "type": "link",
           "asDropdown": false,
           "tags": [],
           "targetBlank": false,
           "url": "/d/homelab-monitoring",
           "keepTime": true,
           "includeVars": false,
-          "icon": "external link"
+          "icon": "external link",
+          "tooltip": ""
         }
       ],
       "templating": {
@@ -610,6 +604,320 @@ spec:
         },
         {
           "id": 10,
+          "type": "stat",
+          "title": "Internet",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 0,
+            "y": 5
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "min(probe_success{probe_group=\"internet\"})",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "0": {
+                      "text": "DOWN",
+                      "color": "red",
+                      "index": 0
+                    },
+                    "1": {
+                      "text": "Up",
+                      "color": "green",
+                      "index": 1
+                    }
+                  }
+                }
+              ]
+            },
+            "overrides": []
+          },
+          "description": "Blackbox probe to a public endpoint \u2014 the one signal that separates 'my cluster broke' from 'my ISP broke'."
+        },
+        {
+          "id": 11,
+          "type": "stat",
+          "title": "Endpoints Reachable",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 3,
+            "y": 5
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(probe_success{probe_group=\"published\"}) / count(probe_success{probe_group=\"published\"}) * 100",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 99
+                  },
+                  {
+                    "color": "green",
+                    "value": 100
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "description": "Every hostname published through the gateway, probed end to end: DNS, routing, certificate, backend."
+        },
+        {
+          "id": 12,
+          "type": "stat",
+          "title": "Flux Not Ready",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 6,
+            "y": 5
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "count(flux_resource_info{ready=\"False\"}) or vector(0)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 1
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "description": "Flux objects failing to reconcile. Nonzero means the cluster no longer matches git."
+        },
+        {
+          "id": 13,
+          "type": "stat",
+          "title": "Flux Suspended",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 9,
+            "y": 5
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "count(flux_resource_info{suspended=\"True\"}) or vector(0)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 1
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "description": "Deliberately paused, so not an error \u2014 but a suspended resource that someone forgot about is indistinguishable from a working one."
+        },
+        {
+          "id": 14,
+          "type": "stat",
+          "title": "Workloads Degraded",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 12,
+            "y": 5
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "(sum(kube_deployment_status_replicas) - sum(kube_deployment_status_replicas_available)) + (sum(kube_statefulset_status_replicas) - sum(kube_statefulset_status_replicas_ready)) + sum(kube_daemonset_status_number_unavailable)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 1
+                  },
+                  {
+                    "color": "red",
+                    "value": 3
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "description": "Replicas owed across every Deployment, StatefulSet and DaemonSet."
+        },
+        {
+          "id": 15,
           "type": "row",
           "title": "Nodes",
           "collapsed": false,
@@ -617,12 +925,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 5
+            "y": 9
           },
           "panels": []
         },
         {
-          "id": 11,
+          "id": 16,
           "type": "timeseries",
           "title": "CPU Busy",
           "datasource": "VictoriaMetrics",
@@ -630,7 +938,7 @@ spec:
             "h": 6,
             "w": 6,
             "x": 0,
-            "y": 6
+            "y": 10
           },
           "targets": [
             {
@@ -693,7 +1001,7 @@ spec:
           }
         },
         {
-          "id": 12,
+          "id": 17,
           "type": "timeseries",
           "title": "Memory Used",
           "datasource": "VictoriaMetrics",
@@ -701,7 +1009,7 @@ spec:
             "h": 6,
             "w": 6,
             "x": 6,
-            "y": 6
+            "y": 10
           },
           "targets": [
             {
@@ -764,7 +1072,7 @@ spec:
           }
         },
         {
-          "id": 13,
+          "id": 18,
           "type": "timeseries",
           "title": "Load (1m)",
           "datasource": "VictoriaMetrics",
@@ -772,7 +1080,7 @@ spec:
             "h": 6,
             "w": 6,
             "x": 12,
-            "y": 6
+            "y": 10
           },
           "targets": [
             {
@@ -833,7 +1141,7 @@ spec:
           }
         },
         {
-          "id": 14,
+          "id": 19,
           "type": "timeseries",
           "title": "Hottest Sensor",
           "datasource": "VictoriaMetrics",
@@ -841,7 +1149,7 @@ spec:
             "h": 6,
             "w": 6,
             "x": 18,
-            "y": 6
+            "y": 10
           },
           "targets": [
             {
@@ -903,7 +1211,7 @@ spec:
           "description": "Highest reading of any hwmon sensor on the node \u2014 usually a CPU package."
         },
         {
-          "id": 15,
+          "id": 20,
           "type": "bargauge",
           "title": "Filesystem Used",
           "datasource": "VictoriaMetrics",
@@ -911,7 +1219,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 12
+            "y": 16
           },
           "targets": [
             {
@@ -973,7 +1281,7 @@ spec:
           }
         },
         {
-          "id": 16,
+          "id": 21,
           "type": "timeseries",
           "title": "Network",
           "datasource": "VictoriaMetrics",
@@ -981,7 +1289,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 12
+            "y": 16
           },
           "targets": [
             {
@@ -1050,15 +1358,15 @@ spec:
           "description": "Physical interfaces only; tx is drawn negative."
         },
         {
-          "id": 17,
+          "id": 22,
           "type": "timeseries",
           "title": "UPS Battery & Load",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 7,
-            "w": 8,
+            "w": 4,
             "x": 16,
-            "y": 12
+            "y": 16
           },
           "targets": [
             {
@@ -1129,7 +1437,375 @@ spec:
           }
         },
         {
-          "id": 18,
+          "id": 23,
+          "type": "timeseries",
+          "title": "UPS Input Voltage",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 4,
+            "x": 20,
+            "y": 16
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max(network_ups_tools_input_voltage)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true,
+              "legendFormat": "input V"
+            },
+            {
+              "refId": "B",
+              "expr": "max(network_ups_tools_battery_voltage)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true,
+              "legendFormat": "battery V"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true,
+              "calcs": []
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "volt",
+              "color": {
+                "mode": "palette-classic"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 1,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "lineWidth": 1,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true,
+                "pointSize": 5,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                },
+                "axisPlacement": "auto",
+                "gradientMode": "opacity"
+              }
+            },
+            "overrides": []
+          },
+          "description": "Line voltage as the UPS sees it. Sags and spikes here are the reason the BOOST and TRIM status flags exist. The exporter emits no runtime estimate or wattage, so battery percentage is the only depth gauge."
+        },
+        {
+          "id": 24,
+          "type": "row",
+          "title": "Services & GitOps",
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 23
+          },
+          "panels": []
+        },
+        {
+          "id": 25,
+          "type": "table",
+          "title": "Published Endpoints",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 24
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "probe_success{probe_group=\"published\"}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": false,
+              "format": "table",
+              "instant": true
+            },
+            {
+              "refId": "B",
+              "expr": "probe_duration_seconds",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": false,
+              "format": "table",
+              "instant": true
+            }
+          ],
+          "options": {
+            "showHeader": true,
+            "footer": {
+              "show": false
+            },
+            "cellHeight": "sm"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "filterable": false
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "up"
+                },
+                "properties": [
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-background"
+                    }
+                  },
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "type": "value",
+                        "options": {
+                          "0": {
+                            "text": "DOWN",
+                            "color": "red",
+                            "index": 0
+                          },
+                          "1": {
+                            "text": "up",
+                            "color": "green",
+                            "index": 1
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "thresholds",
+                    "value": {
+                      "mode": "absolute",
+                      "steps": [
+                        {
+                          "color": "red",
+                          "value": null
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "transformations": [
+            {
+              "id": "seriesToColumns",
+              "options": {
+                "byField": "instance"
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time 1": true,
+                  "Time 2": true,
+                  "job 1": true,
+                  "job 2": true,
+                  "__name__ 1": true,
+                  "__name__ 2": true,
+                  "cluster 1": true,
+                  "cluster 2": true,
+                  "prometheus 1": true,
+                  "prometheus 2": true,
+                  "probe_group 1": true,
+                  "probe_group 2": true
+                },
+                "renameByName": {
+                  "Value #A": "up",
+                  "Value #B": "seconds",
+                  "instance": "endpoint"
+                }
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "field": "up",
+                    "desc": false
+                  }
+                ]
+              }
+            }
+          ],
+          "description": "Failures sort to the top."
+        },
+        {
+          "id": 26,
+          "type": "table",
+          "title": "Flux Resources Not Ready",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 24
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "flux_resource_info{ready=\"False\"} or flux_resource_info{suspended=\"True\"}",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": false,
+              "format": "table",
+              "instant": true
+            }
+          ],
+          "options": {
+            "showHeader": true,
+            "footer": {
+              "show": false
+            },
+            "cellHeight": "sm"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "filterable": false
+              }
+            },
+            "overrides": []
+          },
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "__name__": true,
+                  "job": true,
+                  "cluster": true,
+                  "prometheus": true,
+                  "Value": true,
+                  "instance": true,
+                  "pod": true,
+                  "container": true,
+                  "endpoint": true,
+                  "namespace": true
+                },
+                "renameByName": {
+                  "exported_namespace": "namespace"
+                }
+              }
+            }
+          ],
+          "description": "Anything Flux cannot reconcile, plus anything deliberately suspended. Empty is the correct state."
+        },
+        {
+          "id": 27,
+          "type": "timeseries",
+          "title": "Flux Reconciliations",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 24
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (kind) (rate(gotk_reconcile_duration_seconds_count[5m]))",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true,
+              "legendFormat": "{{kind}}"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "calcs": [
+                "mean",
+                "max",
+                "lastNotNull"
+              ]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "palette-classic"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 3,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "lineWidth": 1,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true,
+                "pointSize": 5,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                },
+                "axisPlacement": "auto",
+                "gradientMode": "opacity"
+              }
+            },
+            "overrides": []
+          },
+          "description": "Reconcile rate per resource kind. A kind flatlining to zero means its controller has stopped working, which no readiness metric will show."
+        },
+        {
+          "id": 28,
           "type": "row",
           "title": "Ingress",
           "collapsed": false,
@@ -1137,12 +1813,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 19
+            "y": 32
           },
           "panels": []
         },
         {
-          "id": 19,
+          "id": 29,
           "type": "timeseries",
           "title": "Requests by Response Class",
           "datasource": "VictoriaMetrics",
@@ -1150,7 +1826,7 @@ spec:
             "h": 6,
             "w": 8,
             "x": 0,
-            "y": 20
+            "y": 33
           },
           "targets": [
             {
@@ -1211,7 +1887,7 @@ spec:
           }
         },
         {
-          "id": 20,
+          "id": 30,
           "type": "timeseries",
           "title": "Latency (downstream)",
           "datasource": "VictoriaMetrics",
@@ -1219,7 +1895,7 @@ spec:
             "h": 6,
             "w": 8,
             "x": 8,
-            "y": 20
+            "y": 33
           },
           "targets": [
             {
@@ -1288,7 +1964,7 @@ spec:
           }
         },
         {
-          "id": 21,
+          "id": 31,
           "type": "timeseries",
           "title": "Traffic by Route",
           "datasource": "VictoriaMetrics",
@@ -1296,7 +1972,7 @@ spec:
             "h": 6,
             "w": 8,
             "x": 16,
-            "y": 20
+            "y": 33
           },
           "targets": [
             {
@@ -1362,7 +2038,7 @@ spec:
           "description": "One series per HTTPRoute backing a service behind the gateway."
         },
         {
-          "id": 22,
+          "id": 32,
           "type": "row",
           "title": "Storage",
           "collapsed": false,
@@ -1370,12 +2046,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 26
+            "y": 39
           },
           "panels": []
         },
         {
-          "id": 23,
+          "id": 33,
           "type": "bargauge",
           "title": "OpenEBS Pool Used",
           "datasource": "VictoriaMetrics",
@@ -1383,7 +2059,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 27
+            "y": 40
           },
           "targets": [
             {
@@ -1445,7 +2121,7 @@ spec:
           }
         },
         {
-          "id": 24,
+          "id": 34,
           "type": "bargauge",
           "title": "PVC Used (top 12)",
           "datasource": "VictoriaMetrics",
@@ -1453,7 +2129,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 27
+            "y": 40
           },
           "targets": [
             {
@@ -1515,7 +2191,7 @@ spec:
           }
         },
         {
-          "id": 25,
+          "id": 35,
           "type": "timeseries",
           "title": "Pool IOPS",
           "datasource": "VictoriaMetrics",
@@ -1523,7 +2199,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 27
+            "y": 40
           },
           "targets": [
             {
@@ -1592,7 +2268,7 @@ spec:
           }
         },
         {
-          "id": 26,
+          "id": 36,
           "type": "row",
           "title": "Data & DNS",
           "collapsed": false,
@@ -1600,12 +2276,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 34
+            "y": 47
           },
           "panels": []
         },
         {
-          "id": 27,
+          "id": 37,
           "type": "stat",
           "title": "Postgres Up",
           "datasource": "VictoriaMetrics",
@@ -1613,7 +2289,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 0,
-            "y": 35
+            "y": 48
           },
           "targets": [
             {
@@ -1666,7 +2342,7 @@ spec:
           }
         },
         {
-          "id": 28,
+          "id": 38,
           "type": "timeseries",
           "title": "Replication Lag",
           "datasource": "VictoriaMetrics",
@@ -1674,7 +2350,7 @@ spec:
             "h": 5,
             "w": 8,
             "x": 4,
-            "y": 35
+            "y": 48
           },
           "targets": [
             {
@@ -1735,7 +2411,7 @@ spec:
           }
         },
         {
-          "id": 29,
+          "id": 39,
           "type": "timeseries",
           "title": "DNS Query Rate",
           "datasource": "VictoriaMetrics",
@@ -1743,7 +2419,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 12,
-            "y": 35
+            "y": 48
           },
           "targets": [
             {
@@ -1812,7 +2488,7 @@ spec:
           }
         },
         {
-          "id": 30,
+          "id": 40,
           "type": "stat",
           "title": "Blocky Cache Hit",
           "datasource": "VictoriaMetrics",
@@ -1820,7 +2496,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 18,
-            "y": 35
+            "y": 48
           },
           "targets": [
             {
@@ -1874,7 +2550,7 @@ spec:
           }
         },
         {
-          "id": 31,
+          "id": 41,
           "type": "row",
           "title": "Monitoring",
           "collapsed": false,
@@ -1882,12 +2558,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 40
+            "y": 53
           },
           "panels": []
         },
         {
-          "id": 32,
+          "id": 42,
           "type": "stat",
           "title": "Samples/s",
           "datasource": "VictoriaMetrics",
@@ -1895,7 +2571,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 0,
-            "y": 41
+            "y": 54
           },
           "targets": [
             {
@@ -1941,7 +2617,7 @@ spec:
           }
         },
         {
-          "id": 33,
+          "id": 43,
           "type": "stat",
           "title": "Active Series",
           "datasource": "VictoriaMetrics",
@@ -1949,7 +2625,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 4,
-            "y": 41
+            "y": 54
           },
           "targets": [
             {
@@ -1996,7 +2672,7 @@ spec:
           "description": "Hourly unique series. This is the cardinality number worth watching."
         },
         {
-          "id": 34,
+          "id": 44,
           "type": "stat",
           "title": "Metrics Disk Used",
           "datasource": "VictoriaMetrics",
@@ -2004,7 +2680,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 8,
-            "y": 41
+            "y": 54
           },
           "targets": [
             {
@@ -2062,7 +2738,7 @@ spec:
           }
         },
         {
-          "id": 35,
+          "id": 45,
           "type": "stat",
           "title": "Log Rows",
           "datasource": "VictoriaMetrics",
@@ -2070,7 +2746,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 12,
-            "y": 41
+            "y": 54
           },
           "targets": [
             {
@@ -2116,7 +2792,7 @@ spec:
           }
         },
         {
-          "id": 36,
+          "id": 46,
           "type": "stat",
           "title": "Scrape Targets Up",
           "datasource": "VictoriaMetrics",
@@ -2124,7 +2800,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 16,
-            "y": 41
+            "y": 54
           },
           "targets": [
             {
@@ -2170,7 +2846,7 @@ spec:
           }
         },
         {
-          "id": 37,
+          "id": 47,
           "type": "stat",
           "title": "Alerts Sent (24h)",
           "datasource": "VictoriaMetrics",
@@ -2178,7 +2854,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 20,
-            "y": 41
+            "y": 54
           },
           "targets": [
             {
@@ -2224,7 +2900,7 @@ spec:
           }
         },
         {
-          "id": 38,
+          "id": 48,
           "type": "timeseries",
           "title": "Log Errors by Namespace",
           "datasource": {
@@ -2235,7 +2911,7 @@ spec:
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 46
+            "y": 59
           },
           "targets": [
             {
