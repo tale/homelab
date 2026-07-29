@@ -20,7 +20,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "homelab"
-  folder: Infrastructure
+  folder: Homelab
   resyncPeriod: 10m
   json: |
     {
@@ -99,8 +99,8 @@ spec:
           "title": "Instances Up",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
+            "h": 5,
+            "w": 4,
             "x": 0,
             "y": 1
           },
@@ -124,7 +124,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -136,15 +140,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": null
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 1
                   },
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": 2
                   }
                 ]
@@ -161,18 +165,19 @@ spec:
           "title": "Primary",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 3,
+            "h": 5,
+            "w": 4,
+            "x": 4,
             "y": 1
           },
           "targets": [
             {
               "refId": "A",
-              "expr": "label_replace(max by (pod) (cnpg_pg_replication_in_recovery == 0), \"instance\", \"$1\", \"pod\", \"(.*)\")",
+              "expr": "max by (pod) (cnpg_pg_replication_in_recovery == 0)",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
-              "range": true
+              "range": true,
+              "legendFormat": "{{pod}}"
             }
           ],
           "options": {
@@ -186,7 +191,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "name",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -198,12 +207,13 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   }
                 ]
               },
-              "mappings": []
+              "mappings": [],
+              "noValue": "none"
             },
             "overrides": []
           },
@@ -215,9 +225,9 @@ spec:
           "title": "Streaming Replicas",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 6,
+            "h": 5,
+            "w": 4,
+            "x": 8,
             "y": 1
           },
           "targets": [
@@ -240,7 +250,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -252,11 +266,11 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": null
                   },
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": 1
                   }
                 ]
@@ -273,9 +287,9 @@ spec:
           "title": "Replication Slots Active",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 9,
+            "h": 5,
+            "w": 4,
+            "x": 12,
             "y": 1
           },
           "targets": [
@@ -298,7 +312,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -310,11 +328,11 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": null
                   },
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": 1
                   }
                 ]
@@ -332,9 +350,9 @@ spec:
           "title": "Switchover Required",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 12,
+            "h": 5,
+            "w": 4,
+            "x": 16,
             "y": 1
           },
           "targets": [
@@ -357,7 +375,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -369,7 +391,7 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   }
                 ]
@@ -380,12 +402,12 @@ spec:
                   "options": {
                     "0": {
                       "text": "No",
-                      "color": "green",
+                      "color": "#0ca30c",
                       "index": 0
                     },
                     "1": {
                       "text": "REQUIRED",
-                      "color": "red",
+                      "color": "#d03b3b",
                       "index": 1
                     }
                   }
@@ -401,9 +423,9 @@ spec:
           "title": "Fencing",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 15,
+            "h": 5,
+            "w": 4,
+            "x": 20,
             "y": 1
           },
           "targets": [
@@ -426,7 +448,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -438,7 +464,7 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   }
                 ]
@@ -449,12 +475,12 @@ spec:
                   "options": {
                     "0": {
                       "text": "Off",
-                      "color": "green",
+                      "color": "#0ca30c",
                       "index": 0
                     },
                     "1": {
                       "text": "FENCED",
-                      "color": "red",
+                      "color": "#d03b3b",
                       "index": 1
                     }
                   }
@@ -466,114 +492,6 @@ spec:
         },
         {
           "id": 8,
-          "type": "stat",
-          "title": "Uptime",
-          "datasource": "VictoriaMetrics",
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 18,
-            "y": 1
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "expr": "time() - max(cnpg_pg_postmaster_start_time)",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "value",
-            "graphMode": "none"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "color": {
-                "mode": "palette-classic"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "mappings": [],
-              "decimals": 0
-            },
-            "overrides": []
-          }
-        },
-        {
-          "id": 9,
-          "type": "stat",
-          "title": "Version",
-          "datasource": "VictoriaMetrics",
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 21,
-            "y": 1
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "expr": "max(cnpg_collector_postgres_version)",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "value",
-            "graphMode": "none"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "none",
-              "color": {
-                "mode": "palette-classic"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "mappings": [],
-              "decimals": 1
-            },
-            "overrides": []
-          }
-        },
-        {
-          "id": 10,
           "type": "row",
           "title": "Traffic",
           "collapsed": false,
@@ -581,12 +499,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 5
+            "y": 6
           },
           "panels": []
         },
         {
-          "id": 11,
+          "id": 9,
           "type": "timeseries",
           "title": "Transactions",
           "datasource": "VictoriaMetrics",
@@ -594,7 +512,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 6
+            "y": 7
           },
           "targets": [
             {
@@ -630,7 +548,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -646,25 +564,61 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "commit"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "rollback"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d95926"
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "description": "A rollback rate that tracks commits usually means an application is retrying, not that Postgres is unhealthy."
         },
         {
-          "id": 12,
+          "id": 10,
           "type": "timeseries",
           "title": "Connections",
           "datasource": "VictoriaMetrics",
@@ -672,7 +626,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 6
+            "y": 7
           },
           "targets": [
             {
@@ -708,7 +662,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -724,24 +678,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 13,
+          "id": 11,
           "type": "timeseries",
           "title": "Tuples",
           "datasource": "VictoriaMetrics",
@@ -749,7 +708,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 6
+            "y": 7
           },
           "targets": [
             {
@@ -809,7 +768,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -825,24 +784,105 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "fetched"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "returned"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d95926"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "inserted"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#199e70"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "updated"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#c98500"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "deleted"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d55181"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         },
         {
-          "id": 14,
+          "id": 12,
           "type": "stat",
           "title": "Cache Hit Ratio",
           "datasource": "VictoriaMetrics",
@@ -850,7 +890,7 @@ spec:
             "h": 6,
             "w": 6,
             "x": 0,
-            "y": 13
+            "y": 14
           },
           "targets": [
             {
@@ -872,7 +912,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "area"
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -884,15 +928,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": null
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 95
                   },
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": 99
                   }
                 ]
@@ -905,7 +949,7 @@ spec:
           "description": "Below ~99% on a working set this small means shared_buffers is undersized (currently 256MB, set in cluster.yaml)."
         },
         {
-          "id": 15,
+          "id": 13,
           "type": "timeseries",
           "title": "Block I/O",
           "datasource": "VictoriaMetrics",
@@ -913,7 +957,7 @@ spec:
             "h": 6,
             "w": 9,
             "x": 6,
-            "y": 13
+            "y": 14
           },
           "targets": [
             {
@@ -949,7 +993,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -965,24 +1009,60 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "cache hits"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "disk reads"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d95926"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         },
         {
-          "id": 16,
+          "id": 14,
           "type": "timeseries",
           "title": "I/O Time",
           "datasource": "VictoriaMetrics",
@@ -990,7 +1070,7 @@ spec:
             "h": 6,
             "w": 9,
             "x": 15,
-            "y": 13
+            "y": 14
           },
           "targets": [
             {
@@ -1026,7 +1106,7 @@ spec:
             "defaults": {
               "unit": "ms",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1042,24 +1122,60 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "read"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "write"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d95926"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         },
         {
-          "id": 17,
+          "id": 15,
           "type": "row",
           "title": "Contention",
           "collapsed": false,
@@ -1067,12 +1183,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 19
+            "y": 20
           },
           "panels": []
         },
         {
-          "id": 18,
+          "id": 16,
           "type": "stat",
           "title": "Waiting Backends",
           "datasource": "VictoriaMetrics",
@@ -1080,7 +1196,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 0,
-            "y": 20
+            "y": 21
           },
           "targets": [
             {
@@ -1102,7 +1218,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1114,15 +1234,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 1
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 5
                   }
                 ]
@@ -1135,7 +1255,7 @@ spec:
           "description": "Sessions blocked on a lock right now."
         },
         {
-          "id": 19,
+          "id": 17,
           "type": "stat",
           "title": "Longest Transaction",
           "datasource": "VictoriaMetrics",
@@ -1143,7 +1263,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 6,
-            "y": 20
+            "y": 21
           },
           "targets": [
             {
@@ -1165,7 +1285,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1177,15 +1301,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 300
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 3600
                   }
                 ]
@@ -1198,7 +1322,7 @@ spec:
           "description": "A long-running transaction holds back vacuum and pins WAL."
         },
         {
-          "id": 20,
+          "id": 18,
           "type": "timeseries",
           "title": "Deadlocks",
           "datasource": "VictoriaMetrics",
@@ -1206,7 +1330,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 12,
-            "y": 20
+            "y": 21
           },
           "targets": [
             {
@@ -1222,11 +1346,11 @@ spec:
             "legend": {
               "displayMode": "list",
               "placement": "bottom",
-              "showLegend": true,
+              "showLegend": false,
               "calcs": []
             },
             "tooltip": {
-              "mode": "multi",
+              "mode": "single",
               "sort": "desc"
             }
           },
@@ -1234,7 +1358,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1250,24 +1374,45 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "deadlocks/s"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         },
         {
-          "id": 21,
+          "id": 19,
           "type": "timeseries",
           "title": "Temp Files",
           "datasource": "VictoriaMetrics",
@@ -1275,7 +1420,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 18,
-            "y": 20
+            "y": 21
           },
           "targets": [
             {
@@ -1291,11 +1436,11 @@ spec:
             "legend": {
               "displayMode": "list",
               "placement": "bottom",
-              "showLegend": true,
+              "showLegend": false,
               "calcs": []
             },
             "tooltip": {
-              "mode": "multi",
+              "mode": "single",
               "sort": "desc"
             }
           },
@@ -1303,7 +1448,7 @@ spec:
             "defaults": {
               "unit": "Bps",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1318,25 +1463,46 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "temp bytes/s"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "description": "Queries spilling to disk because work_mem was too small for them."
         },
         {
-          "id": 22,
+          "id": 20,
           "type": "row",
           "title": "Replication",
           "collapsed": false,
@@ -1344,12 +1510,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 25
+            "y": 26
           },
           "panels": []
         },
         {
-          "id": 23,
+          "id": 21,
           "type": "timeseries",
           "title": "Replication Lag",
           "datasource": "VictoriaMetrics",
@@ -1357,7 +1523,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 26
+            "y": 27
           },
           "targets": [
             {
@@ -1385,7 +1551,7 @@ spec:
             "defaults": {
               "unit": "s",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1401,24 +1567,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 24,
+          "id": 22,
           "type": "timeseries",
           "title": "Lag Stages",
           "datasource": "VictoriaMetrics",
@@ -1426,7 +1597,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 26
+            "y": 27
           },
           "targets": [
             {
@@ -1470,7 +1641,7 @@ spec:
             "defaults": {
               "unit": "s",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1486,17 +1657,22 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
@@ -1504,7 +1680,7 @@ spec:
           "description": "Write reached the replica, flush hit its disk, replay applied it. Replay lagging alone points at a busy standby, not a slow network."
         },
         {
-          "id": 25,
+          "id": 23,
           "type": "timeseries",
           "title": "Replication Byte Lag",
           "datasource": "VictoriaMetrics",
@@ -1512,7 +1688,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 26
+            "y": 27
           },
           "targets": [
             {
@@ -1548,7 +1724,7 @@ spec:
             "defaults": {
               "unit": "bytes",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1563,24 +1739,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 26,
+          "id": 24,
           "type": "row",
           "title": "WAL & Backups",
           "collapsed": false,
@@ -1588,12 +1769,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 33
+            "y": 34
           },
           "panels": []
         },
         {
-          "id": 27,
+          "id": 25,
           "type": "stat",
           "title": "Last Base Backup",
           "datasource": "VictoriaMetrics",
@@ -1601,7 +1782,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 0,
-            "y": 34
+            "y": 35
           },
           "targets": [
             {
@@ -1623,7 +1804,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1635,15 +1820,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 86400
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 172800
                   }
                 ]
@@ -1654,7 +1839,7 @@ spec:
           }
         },
         {
-          "id": 28,
+          "id": 26,
           "type": "stat",
           "title": "Recoverability Window",
           "datasource": "VictoriaMetrics",
@@ -1662,7 +1847,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 4,
-            "y": 34
+            "y": 35
           },
           "targets": [
             {
@@ -1684,7 +1869,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1696,15 +1885,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 86400
                   },
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": 604800
                   }
                 ]
@@ -1716,7 +1905,7 @@ spec:
           "description": "Span between the oldest restorable point and the newest base backup, both from the Wasabi object store."
         },
         {
-          "id": 29,
+          "id": 27,
           "type": "stat",
           "title": "Seconds Since Archival",
           "datasource": "VictoriaMetrics",
@@ -1724,7 +1913,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 8,
-            "y": 34
+            "y": 35
           },
           "targets": [
             {
@@ -1746,7 +1935,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1758,15 +1951,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 900
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 3600
                   }
                 ]
@@ -1778,7 +1971,7 @@ spec:
           }
         },
         {
-          "id": 30,
+          "id": 28,
           "type": "stat",
           "title": "Archiver Failures",
           "datasource": "VictoriaMetrics",
@@ -1786,7 +1979,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 12,
-            "y": 34
+            "y": 35
           },
           "targets": [
             {
@@ -1808,7 +2001,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1820,11 +2017,11 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 1
                   }
                 ]
@@ -1837,7 +2034,7 @@ spec:
           "description": "Cumulative since the last stats reset, so a nonzero value that is not climbing is old news. Watch the slope, not the number."
         },
         {
-          "id": 31,
+          "id": 29,
           "type": "stat",
           "title": "WAL Files Pending",
           "datasource": "VictoriaMetrics",
@@ -1845,7 +2042,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 16,
-            "y": 34
+            "y": 35
           },
           "targets": [
             {
@@ -1867,7 +2064,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1879,15 +2080,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 50
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 200
                   }
                 ]
@@ -1900,7 +2101,7 @@ spec:
           "description": "WAL waiting to ship to Wasabi. A climbing number means archiving is stalled and the data directory is filling."
         },
         {
-          "id": 32,
+          "id": 30,
           "type": "stat",
           "title": "XID Age",
           "datasource": "VictoriaMetrics",
@@ -1908,7 +2109,7 @@ spec:
             "h": 5,
             "w": 4,
             "x": 20,
-            "y": 34
+            "y": 35
           },
           "targets": [
             {
@@ -1930,7 +2131,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1942,15 +2147,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 150000000
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 1000000000
                   }
                 ]
@@ -1963,15 +2168,15 @@ spec:
           "description": "Transaction ID age. Autovacuum keeps this flat; a steady climb ends in a forced shutdown at 2 billion."
         },
         {
-          "id": 33,
+          "id": 31,
           "type": "timeseries",
-          "title": "WAL Generation",
+          "title": "WAL Throughput",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 39
+            "y": 40
           },
           "targets": [
             {
@@ -1980,34 +2185,26 @@ spec:
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
               "range": true,
-              "legendFormat": "bytes/s"
-            },
-            {
-              "refId": "B",
-              "expr": "sum(rate(cnpg_collector_wal_records[5m]))",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true,
-              "legendFormat": "records/s"
+              "legendFormat": "WAL written"
             }
           ],
           "options": {
             "legend": {
               "displayMode": "list",
               "placement": "bottom",
-              "showLegend": true,
+              "showLegend": false,
               "calcs": []
             },
             "tooltip": {
-              "mode": "multi",
+              "mode": "single",
               "sort": "desc"
             }
           },
           "fieldConfig": {
             "defaults": {
-              "unit": "short",
+              "unit": "Bps",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -2023,32 +2220,144 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "WAL written"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         },
         {
-          "id": 34,
+          "id": 32,
+          "type": "timeseries",
+          "title": "WAL Records",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 8,
+            "y": 40
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(rate(cnpg_collector_wal_records[5m]))",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true,
+              "legendFormat": "records"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false,
+              "calcs": []
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "palette-classic-by-name"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 1,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true,
+                "pointSize": 8,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                },
+                "axisPlacement": "auto",
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "records"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "description": "Split from WAL throughput on purpose \u2014 bytes/s and records/s differ by orders of magnitude, and sharing one axis would invent a relationship between them."
+        },
+        {
+          "id": 33,
           "type": "timeseries",
           "title": "Archiver Throughput",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 7,
             "w": 8,
-            "x": 8,
-            "y": 39
+            "x": 16,
+            "y": 40
           },
           "targets": [
             {
@@ -2084,7 +2393,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -2100,32 +2409,68 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "archived/s"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "failed/s"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d95926"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         },
         {
-          "id": 35,
+          "id": 34,
           "type": "timeseries",
           "title": "Checkpoints",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 7,
-            "w": 8,
-            "x": 16,
-            "y": 39
+            "w": 24,
+            "x": 0,
+            "y": 47
           },
           "targets": [
             {
@@ -2161,7 +2506,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -2177,25 +2522,61 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "timed"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "requested"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d95926"
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "description": "Requested checkpoints outpacing timed ones means max_wal_size is too small for the write volume."
         },
         {
-          "id": 36,
+          "id": 35,
           "type": "row",
           "title": "Databases",
           "collapsed": false,
@@ -2203,12 +2584,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 46
+            "y": 54
           },
           "panels": []
         },
         {
-          "id": 37,
+          "id": 36,
           "type": "bargauge",
           "title": "Database Size",
           "datasource": "VictoriaMetrics",
@@ -2216,7 +2597,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 47
+            "y": 55
           },
           "targets": [
             {
@@ -2240,7 +2621,10 @@ spec:
             "displayMode": "basic",
             "showUnfilled": true,
             "minVizWidth": 8,
-            "minVizHeight": 10
+            "minVizHeight": 16,
+            "valueMode": "color",
+            "namePlacement": "auto",
+            "sizing": "auto"
           },
           "fieldConfig": {
             "defaults": {
@@ -2252,7 +2636,7 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   }
                 ]
@@ -2265,7 +2649,7 @@ spec:
           }
         },
         {
-          "id": 38,
+          "id": 37,
           "type": "timeseries",
           "title": "Database Growth",
           "datasource": "VictoriaMetrics",
@@ -2273,7 +2657,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 47
+            "y": 55
           },
           "targets": [
             {
@@ -2305,7 +2689,7 @@ spec:
             "defaults": {
               "unit": "bytes",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -2320,17 +2704,22 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []

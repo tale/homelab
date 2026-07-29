@@ -19,7 +19,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "homelab"
-  folder: Monitoring
+  folder: Homelab
   resyncPeriod: 10m
   json: |
     {
@@ -74,8 +74,8 @@ spec:
           "title": "Targets Up",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
+            "h": 5,
+            "w": 4,
             "x": 0,
             "y": 1
           },
@@ -99,13 +99,17 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "value",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
               "unit": "none",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -128,9 +132,9 @@ spec:
           "title": "Targets Down",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 3,
+            "h": 5,
+            "w": 4,
+            "x": 4,
             "y": 1
           },
           "targets": [
@@ -153,7 +157,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -165,11 +173,11 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 1
                   }
                 ]
@@ -186,9 +194,9 @@ spec:
           "title": "Samples/s",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 6,
+            "h": 5,
+            "w": 4,
+            "x": 8,
             "y": 1
           },
           "targets": [
@@ -211,13 +219,17 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "value",
-            "graphMode": "area"
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -240,9 +252,9 @@ spec:
           "title": "Active Series",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 9,
+            "h": 5,
+            "w": 4,
+            "x": 12,
             "y": 1
           },
           "targets": [
@@ -265,13 +277,17 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "value",
-            "graphMode": "area"
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -295,9 +311,9 @@ spec:
           "title": "New Series/s",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 12,
+            "h": 5,
+            "w": 4,
+            "x": 16,
             "y": 1
           },
           "targets": [
@@ -320,13 +336,17 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "value",
-            "graphMode": "area"
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -350,9 +370,9 @@ spec:
           "title": "Metrics Disk Used",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 15,
+            "h": 5,
+            "w": 4,
+            "x": 20,
             "y": 1
           },
           "targets": [
@@ -375,7 +395,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -387,19 +411,19 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 70
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 85
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 93
                   }
                 ]
@@ -412,143 +436,39 @@ spec:
         },
         {
           "id": 8,
-          "type": "stat",
-          "title": "Log Rows",
-          "datasource": "VictoriaMetrics",
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 18,
-            "y": 1
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "expr": "sum(vl_storage_rows)",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "value",
-            "graphMode": "area"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "short",
-              "color": {
-                "mode": "palette-classic"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "mappings": [],
-              "decimals": 0
-            },
-            "overrides": []
-          }
-        },
-        {
-          "id": 9,
-          "type": "stat",
-          "title": "Log Ingest/s",
-          "datasource": "VictoriaMetrics",
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 21,
-            "y": 1
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "expr": "sum(rate(vl_rows_ingested_total[5m]))",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "value",
-            "graphMode": "area"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "short",
-              "color": {
-                "mode": "palette-classic"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "mappings": [],
-              "decimals": 1
-            },
-            "overrides": []
-          }
-        },
-        {
-          "id": 10,
           "type": "timeseries",
-          "title": "Scrape Targets by Job",
+          "title": "Scrape Targets",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 5
+            "y": 6
           },
           "targets": [
             {
               "refId": "A",
-              "expr": "count by (job) (up == 1)",
+              "expr": "count(up == 1)",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
               "range": true,
-              "legendFormat": "{{job}}"
+              "legendFormat": "up"
+            },
+            {
+              "refId": "B",
+              "expr": "count(up == 0) or vector(0)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true,
+              "legendFormat": "down"
             }
           ],
           "options": {
             "legend": {
-              "displayMode": "table",
+              "displayMode": "list",
               "placement": "bottom",
               "showLegend": true,
-              "calcs": [
-                "mean",
-                "max",
-                "lastNotNull"
-              ]
+              "calcs": []
             },
             "tooltip": {
               "mode": "multi",
@@ -559,7 +479,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -575,37 +495,74 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 40,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "normal",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
-          }
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "up"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "down"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d03b3b"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "description": "Deliberately not split by job: there are thirty-odd scrape jobs, which would cycle the eight-hue palette four times over and answer a question nobody asks. Which job is down is on the table below."
         },
         {
-          "id": 11,
+          "id": 9,
           "type": "timeseries",
-          "title": "Scrape Duration p99 by Job",
+          "title": "Slowest Scrapes",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 5
+            "y": 6
           },
           "targets": [
             {
               "refId": "A",
-              "expr": "max by (job) (scrape_duration_seconds)",
+              "expr": "topk(8, max by (job) (scrape_duration_seconds))",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
               "range": true,
@@ -632,7 +589,7 @@ spec:
             "defaults": {
               "unit": "s",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -648,25 +605,30 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           },
-          "description": "Anything approaching the 10s timeout is about to start flapping."
+          "description": "Top eight only, so no hue is ever reused. Anything approaching the 10s timeout is about to start flapping."
         },
         {
-          "id": 12,
+          "id": 10,
           "type": "timeseries",
           "title": "Ingestion Rate",
           "datasource": "VictoriaMetrics",
@@ -674,7 +636,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 13
+            "y": 14
           },
           "targets": [
             {
@@ -690,11 +652,11 @@ spec:
             "legend": {
               "displayMode": "list",
               "placement": "bottom",
-              "showLegend": true,
+              "showLegend": false,
               "calcs": []
             },
             "tooltip": {
-              "mode": "multi",
+              "mode": "single",
               "sort": "desc"
             }
           },
@@ -702,7 +664,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -718,24 +680,45 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "samples/s"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         },
         {
-          "id": 13,
+          "id": 11,
           "type": "timeseries",
           "title": "Series Churn",
           "datasource": "VictoriaMetrics",
@@ -743,7 +726,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 13
+            "y": 14
           },
           "targets": [
             {
@@ -759,11 +742,11 @@ spec:
             "legend": {
               "displayMode": "list",
               "placement": "bottom",
-              "showLegend": true,
+              "showLegend": false,
               "calcs": []
             },
             "tooltip": {
-              "mode": "multi",
+              "mode": "single",
               "sort": "desc"
             }
           },
@@ -771,7 +754,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -787,24 +770,45 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "new series/s"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         },
         {
-          "id": 14,
+          "id": 12,
           "type": "timeseries",
           "title": "Samples Dropped",
           "datasource": "VictoriaMetrics",
@@ -812,7 +816,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 13
+            "y": 14
           },
           "targets": [
             {
@@ -848,7 +852,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -864,25 +868,61 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "remote write"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "ignored rows"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d95926"
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "description": "Should sit flat at zero. Anything else is data you think you have and don't."
         },
         {
-          "id": 15,
+          "id": 13,
           "type": "row",
           "title": "Storage",
           "collapsed": false,
@@ -890,12 +930,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 20
+            "y": 21
           },
           "panels": []
         },
         {
-          "id": 16,
+          "id": 14,
           "type": "timeseries",
           "title": "Metrics Disk",
           "datasource": "VictoriaMetrics",
@@ -903,7 +943,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 21
+            "y": 22
           },
           "targets": [
             {
@@ -939,7 +979,7 @@ spec:
             "defaults": {
               "unit": "bytes",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -954,33 +994,69 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 30,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "normal",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "used"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "free"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d95926"
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "description": "90d retention on 150Gi. If used overtakes free, retention gets cut before the disk does it for you."
         },
         {
-          "id": 17,
+          "id": 15,
           "type": "timeseries",
-          "title": "Log Storage",
+          "title": "Log Rows Stored",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 7,
-            "w": 12,
+            "w": 6,
             "x": 12,
-            "y": 21
+            "y": 22
           },
           "targets": [
             {
@@ -990,9 +1066,90 @@ spec:
               "editorMode": "code",
               "range": true,
               "legendFormat": "rows"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false,
+              "calcs": []
             },
+            "tooltip": {
+              "mode": "single",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "palette-classic-by-name"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [],
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true,
+                "pointSize": 8,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                },
+                "axisPlacement": "auto",
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "rows"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 16,
+          "type": "timeseries",
+          "title": "Log Disk Used",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 22
+          },
+          "targets": [
             {
-              "refId": "B",
+              "refId": "A",
               "expr": "sum(vl_data_size_bytes) or vector(0)",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
@@ -1004,19 +1161,19 @@ spec:
             "legend": {
               "displayMode": "list",
               "placement": "bottom",
-              "showLegend": true,
+              "showLegend": false,
               "calcs": []
             },
             "tooltip": {
-              "mode": "multi",
+              "mode": "single",
               "sort": "desc"
             }
           },
           "fieldConfig": {
             "defaults": {
-              "unit": "short",
+              "unit": "bytes",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1031,24 +1188,46 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
-          }
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "bytes on disk"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "description": "Separate from the row count: 80-odd million rows and a few gigabytes on one axis would make the smaller series a flat line at zero."
         },
         {
-          "id": 18,
+          "id": 17,
           "type": "timeseries",
           "title": "Cardinality by Job",
           "datasource": "VictoriaMetrics",
@@ -1056,12 +1235,12 @@ spec:
             "h": 8,
             "w": 24,
             "x": 0,
-            "y": 28
+            "y": 29
           },
           "targets": [
             {
               "refId": "A",
-              "expr": "topk(10, count by (job) ({__name__!=\"\"}))",
+              "expr": "topk(8, count by (job) ({__name__!=\"\"}))",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
               "range": true,
@@ -1088,7 +1267,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1104,17 +1283,22 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
@@ -1122,7 +1306,7 @@ spec:
           "description": "Which scrape target is actually spending the series budget. This query is expensive \u2014 it is here because the answer is worth the cost when something doubles overnight."
         },
         {
-          "id": 19,
+          "id": 18,
           "type": "row",
           "title": "Alerting",
           "collapsed": false,
@@ -1130,20 +1314,20 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 36
+            "y": 37
           },
           "panels": []
         },
         {
-          "id": 20,
+          "id": 19,
           "type": "stat",
           "title": "Firing",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
+            "h": 5,
             "w": 4,
             "x": 0,
-            "y": 37
+            "y": 38
           },
           "targets": [
             {
@@ -1165,7 +1349,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1177,15 +1365,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 1
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 5
                   }
                 ]
@@ -1197,15 +1385,15 @@ spec:
           }
         },
         {
-          "id": 21,
+          "id": 20,
           "type": "stat",
           "title": "Pending",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
+            "h": 5,
             "w": 4,
             "x": 4,
-            "y": 37
+            "y": 38
           },
           "targets": [
             {
@@ -1227,13 +1415,17 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "value",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
               "unit": "none",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1251,15 +1443,15 @@ spec:
           }
         },
         {
-          "id": 22,
+          "id": 21,
           "type": "stat",
           "title": "Rule Errors",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
+            "h": 5,
             "w": 4,
             "x": 8,
-            "y": 37
+            "y": 38
           },
           "targets": [
             {
@@ -1281,7 +1473,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1293,11 +1489,11 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 1
                   }
                 ]
@@ -1310,15 +1506,15 @@ spec:
           "description": "A rule that cannot evaluate is a rule that will never page you."
         },
         {
-          "id": 23,
+          "id": 22,
           "type": "stat",
           "title": "Send Errors (24h)",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
+            "h": 5,
             "w": 4,
             "x": 12,
-            "y": 37
+            "y": 38
           },
           "targets": [
             {
@@ -1340,7 +1536,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1352,11 +1552,11 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 1
                   }
                 ]
@@ -1369,15 +1569,15 @@ spec:
           "description": "Alerts vmalert could not hand to Alertmanager."
         },
         {
-          "id": 24,
+          "id": 23,
           "type": "stat",
           "title": "Config Reload",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
+            "h": 5,
             "w": 4,
             "x": 16,
-            "y": 37
+            "y": 38
           },
           "targets": [
             {
@@ -1399,7 +1599,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1411,7 +1615,7 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": null
                   }
                 ]
@@ -1422,12 +1626,12 @@ spec:
                   "options": {
                     "0": {
                       "text": "FAILED",
-                      "color": "red",
+                      "color": "#d03b3b",
                       "index": 0
                     },
                     "1": {
                       "text": "OK",
-                      "color": "green",
+                      "color": "#0ca30c",
                       "index": 1
                     }
                   }
@@ -1438,15 +1642,15 @@ spec:
           }
         },
         {
-          "id": 25,
+          "id": 24,
           "type": "stat",
           "title": "Notifications (24h)",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
+            "h": 5,
             "w": 4,
             "x": 20,
-            "y": 37
+            "y": 38
           },
           "targets": [
             {
@@ -1468,13 +1672,17 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "value",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
               "unit": "none",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1493,7 +1701,7 @@ spec:
           "description": "Messages Alertmanager actually delivered. Most alerts route to blackhole by design, so this stays far below the firing count."
         },
         {
-          "id": 26,
+          "id": 25,
           "type": "timeseries",
           "title": "Alerts Firing",
           "datasource": "VictoriaMetrics",
@@ -1501,7 +1709,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 41
+            "y": 43
           },
           "targets": [
             {
@@ -1529,7 +1737,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1545,24 +1753,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 40,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "normal",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 27,
+          "id": 26,
           "type": "timeseries",
           "title": "Alertmanager Notifications",
           "datasource": "VictoriaMetrics",
@@ -1570,7 +1783,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 41
+            "y": 43
           },
           "targets": [
             {
@@ -1606,7 +1819,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1622,24 +1835,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 28,
+          "id": 27,
           "type": "timeseries",
           "title": "Rule Evaluation Duration",
           "datasource": "VictoriaMetrics",
@@ -1647,7 +1865,7 @@ spec:
             "h": 6,
             "w": 24,
             "x": 0,
-            "y": 48
+            "y": 50
           },
           "targets": [
             {
@@ -1675,7 +1893,7 @@ spec:
             "defaults": {
               "unit": "s",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1691,17 +1909,22 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []

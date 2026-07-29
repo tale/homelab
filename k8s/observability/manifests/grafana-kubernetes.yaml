@@ -16,7 +16,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "homelab"
-  folder: Kubernetes
+  folder: Homelab
   resyncPeriod: 10m
   json: |
     {
@@ -120,8 +120,8 @@ spec:
           "title": "Nodes Ready",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
+            "h": 5,
+            "w": 4,
             "x": 0,
             "y": 1
           },
@@ -145,7 +145,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -157,15 +161,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": null
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 2
                   },
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": 3
                   }
                 ]
@@ -181,9 +185,9 @@ spec:
           "title": "Running Pods",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 3,
+            "h": 5,
+            "w": 4,
+            "x": 4,
             "y": 1
           },
           "targets": [
@@ -206,13 +210,17 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "value",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
               "unit": "none",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -235,9 +243,9 @@ spec:
           "title": "Not Running",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 6,
+            "h": 5,
+            "w": 4,
+            "x": 8,
             "y": 1
           },
           "targets": [
@@ -260,7 +268,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -272,15 +284,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 1
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 4
                   }
                 ]
@@ -296,9 +308,9 @@ spec:
           "title": "Unavailable Replicas",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 9,
+            "h": 5,
+            "w": 4,
+            "x": 12,
             "y": 1
           },
           "targets": [
@@ -321,7 +333,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -333,15 +349,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 1
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 3
                   }
                 ]
@@ -358,9 +374,9 @@ spec:
           "title": "Restarts (1h)",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 12,
+            "h": 5,
+            "w": 4,
+            "x": 16,
             "y": 1
           },
           "targets": [
@@ -383,7 +399,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -395,15 +415,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 1
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 10
                   }
                 ]
@@ -420,9 +440,9 @@ spec:
           "title": "OOMKilled",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 15,
+            "h": 5,
+            "w": 4,
+            "x": 20,
             "y": 1
           },
           "targets": [
@@ -445,7 +465,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -457,11 +481,11 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 1
                   }
                 ]
@@ -474,139 +498,6 @@ spec:
         },
         {
           "id": 8,
-          "type": "stat",
-          "title": "CPU Requested",
-          "datasource": "VictoriaMetrics",
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 18,
-            "y": 1
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\"}) / sum(kube_node_status_allocatable{resource=\"cpu\"}) * 100",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "background",
-            "graphMode": "none"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "percent",
-              "color": {
-                "mode": "thresholds"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "yellow",
-                    "value": 70
-                  },
-                  {
-                    "color": "orange",
-                    "value": 85
-                  },
-                  {
-                    "color": "red",
-                    "value": 93
-                  }
-                ]
-              },
-              "mappings": [],
-              "decimals": 0
-            },
-            "overrides": []
-          },
-          "description": "Committed, not used. Above ~90% the scheduler starts refusing pods."
-        },
-        {
-          "id": 9,
-          "type": "stat",
-          "title": "Memory Requested",
-          "datasource": "VictoriaMetrics",
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 21,
-            "y": 1
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\"}) / sum(kube_node_status_allocatable{resource=\"memory\"}) * 100",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "background",
-            "graphMode": "none"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "percent",
-              "color": {
-                "mode": "thresholds"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "yellow",
-                    "value": 70
-                  },
-                  {
-                    "color": "orange",
-                    "value": 85
-                  },
-                  {
-                    "color": "red",
-                    "value": 93
-                  }
-                ]
-              },
-              "mappings": [],
-              "decimals": 0
-            },
-            "overrides": []
-          }
-        },
-        {
-          "id": 10,
           "type": "row",
           "title": "Workloads",
           "collapsed": false,
@@ -614,12 +505,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 5
+            "y": 6
           },
           "panels": []
         },
         {
-          "id": 11,
+          "id": 9,
           "type": "timeseries",
           "title": "CPU by Namespace",
           "datasource": "VictoriaMetrics",
@@ -627,12 +518,12 @@ spec:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 6
+            "y": 7
           },
           "targets": [
             {
               "refId": "A",
-              "expr": "sum by (namespace) (rate(container_cpu_usage_seconds_total{container!=\"\",namespace=~\"$namespace\"}[5m]))",
+              "expr": "topk(8, sum by (namespace) (rate(container_cpu_usage_seconds_total{container!=\"\",namespace=~\"$namespace\"}[5m])))",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
               "range": true,
@@ -659,7 +550,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -675,24 +566,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 40,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "normal",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 12,
+          "id": 10,
           "type": "timeseries",
           "title": "Memory by Namespace",
           "datasource": "VictoriaMetrics",
@@ -700,12 +596,12 @@ spec:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 6
+            "y": 7
           },
           "targets": [
             {
               "refId": "A",
-              "expr": "sum by (namespace) (container_memory_working_set_bytes{container!=\"\",namespace=~\"$namespace\"})",
+              "expr": "topk(8, sum by (namespace) (container_memory_working_set_bytes{container!=\"\",namespace=~\"$namespace\"}))",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
               "range": true,
@@ -732,7 +628,7 @@ spec:
             "defaults": {
               "unit": "bytes",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -747,24 +643,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 40,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "normal",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 13,
+          "id": 11,
           "type": "timeseries",
           "title": "Top Pods by CPU",
           "datasource": "VictoriaMetrics",
@@ -772,7 +673,7 @@ spec:
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 14
+            "y": 15
           },
           "targets": [
             {
@@ -804,7 +705,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -820,24 +721,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 14,
+          "id": 12,
           "type": "timeseries",
           "title": "Top Pods by Memory",
           "datasource": "VictoriaMetrics",
@@ -845,7 +751,7 @@ spec:
             "h": 8,
             "w": 12,
             "x": 12,
-            "y": 14
+            "y": 15
           },
           "targets": [
             {
@@ -877,7 +783,7 @@ spec:
             "defaults": {
               "unit": "bytes",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -892,24 +798,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 15,
+          "id": 13,
           "type": "timeseries",
           "title": "CPU Throttling",
           "datasource": "VictoriaMetrics",
@@ -917,7 +828,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 22
+            "y": 23
           },
           "targets": [
             {
@@ -949,7 +860,7 @@ spec:
             "defaults": {
               "unit": "short",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -965,17 +876,22 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
@@ -983,7 +899,7 @@ spec:
           "description": "Seconds per second a container spent frozen against its CPU limit."
         },
         {
-          "id": 16,
+          "id": 14,
           "type": "table",
           "title": "Restarting Containers (24h)",
           "datasource": "VictoriaMetrics",
@@ -991,7 +907,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 22
+            "y": 23
           },
           "targets": [
             {
@@ -1015,8 +931,10 @@ spec:
             "defaults": {
               "custom": {
                 "align": "auto",
-                "filterable": false
-              }
+                "filterable": false,
+                "minWidth": 130
+              },
+              "noValue": "No container restarts in 24h"
             },
             "overrides": []
           },
@@ -1049,7 +967,7 @@ spec:
           "description": "Empty is the correct state."
         },
         {
-          "id": 17,
+          "id": 15,
           "type": "row",
           "title": "Capacity",
           "collapsed": false,
@@ -1057,12 +975,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 29
+            "y": 30
           },
           "panels": []
         },
         {
-          "id": 18,
+          "id": 16,
           "type": "bargauge",
           "title": "Pod Slots Used per Node",
           "datasource": "VictoriaMetrics",
@@ -1070,7 +988,7 @@ spec:
             "h": 6,
             "w": 8,
             "x": 0,
-            "y": 30
+            "y": 31
           },
           "targets": [
             {
@@ -1094,7 +1012,10 @@ spec:
             "displayMode": "lcd",
             "showUnfilled": true,
             "minVizWidth": 8,
-            "minVizHeight": 10
+            "minVizHeight": 16,
+            "valueMode": "color",
+            "namePlacement": "auto",
+            "sizing": "auto"
           },
           "fieldConfig": {
             "defaults": {
@@ -1106,19 +1027,19 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 70
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 85
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 93
                   }
                 ]
@@ -1132,7 +1053,7 @@ spec:
           }
         },
         {
-          "id": 19,
+          "id": 17,
           "type": "bargauge",
           "title": "CPU Requests per Node",
           "datasource": "VictoriaMetrics",
@@ -1140,7 +1061,7 @@ spec:
             "h": 6,
             "w": 8,
             "x": 8,
-            "y": 30
+            "y": 31
           },
           "targets": [
             {
@@ -1164,7 +1085,10 @@ spec:
             "displayMode": "lcd",
             "showUnfilled": true,
             "minVizWidth": 8,
-            "minVizHeight": 10
+            "minVizHeight": 16,
+            "valueMode": "color",
+            "namePlacement": "auto",
+            "sizing": "auto"
           },
           "fieldConfig": {
             "defaults": {
@@ -1176,19 +1100,19 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 70
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 85
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 93
                   }
                 ]
@@ -1202,7 +1126,7 @@ spec:
           }
         },
         {
-          "id": 20,
+          "id": 18,
           "type": "bargauge",
           "title": "Memory Requests per Node",
           "datasource": "VictoriaMetrics",
@@ -1210,7 +1134,7 @@ spec:
             "h": 6,
             "w": 8,
             "x": 16,
-            "y": 30
+            "y": 31
           },
           "targets": [
             {
@@ -1234,7 +1158,10 @@ spec:
             "displayMode": "lcd",
             "showUnfilled": true,
             "minVizWidth": 8,
-            "minVizHeight": 10
+            "minVizHeight": 16,
+            "valueMode": "color",
+            "namePlacement": "auto",
+            "sizing": "auto"
           },
           "fieldConfig": {
             "defaults": {
@@ -1246,19 +1173,19 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 70
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 85
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 93
                   }
                 ]

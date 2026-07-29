@@ -21,7 +21,7 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "homelab"
-  folder: Infrastructure
+  folder: Homelab
   resyncPeriod: 10m
   json: |
     {
@@ -100,8 +100,8 @@ spec:
           "title": "Pools Online",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
+            "h": 5,
+            "w": 4,
             "x": 0,
             "y": 1
           },
@@ -125,7 +125,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -137,15 +141,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": null
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 2
                   },
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": 3
                   }
                 ]
@@ -162,9 +166,9 @@ spec:
           "title": "Mayastor Nodes",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 3,
+            "h": 5,
+            "w": 4,
+            "x": 4,
             "y": 1
           },
           "targets": [
@@ -187,7 +191,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -199,15 +207,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": null
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 2
                   },
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": 3
                   }
                 ]
@@ -225,9 +233,9 @@ spec:
           "title": "Pool I/O Errors",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 6,
+            "h": 5,
+            "w": 4,
+            "x": 8,
             "y": 1
           },
           "targets": [
@@ -250,7 +258,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -262,11 +274,11 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 1
                   }
                 ]
@@ -281,65 +293,11 @@ spec:
         {
           "id": 5,
           "type": "stat",
-          "title": "Volumes",
-          "datasource": "VictoriaMetrics",
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 9,
-            "y": 1
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "expr": "max(volume_manager_total_volumes)",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "value",
-            "graphMode": "none"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "none",
-              "color": {
-                "mode": "palette-classic"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "mappings": [],
-              "decimals": 0
-            },
-            "overrides": []
-          }
-        },
-        {
-          "id": 6,
-          "type": "stat",
           "title": "Pool Capacity",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
+            "h": 5,
+            "w": 4,
             "x": 12,
             "y": 1
           },
@@ -363,13 +321,17 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "value",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
               "unit": "bytes",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -386,67 +348,14 @@ spec:
           }
         },
         {
-          "id": 7,
-          "type": "stat",
-          "title": "Pool Used",
-          "datasource": "VictoriaMetrics",
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 15,
-            "y": 1
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "expr": "sum(max by (node, name) (diskpool_used_size_bytes))",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "value",
-            "graphMode": "none"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "bytes",
-              "color": {
-                "mode": "palette-classic"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "mappings": []
-            },
-            "overrides": []
-          }
-        },
-        {
-          "id": 8,
+          "id": 6,
           "type": "stat",
           "title": "Fullest Pool",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 18,
+            "h": 5,
+            "w": 4,
+            "x": 16,
             "y": 1
           },
           "targets": [
@@ -469,7 +378,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -481,19 +394,19 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 70
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 85
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 93
                   }
                 ]
@@ -505,69 +418,15 @@ spec:
           }
         },
         {
-          "id": 9,
-          "type": "stat",
-          "title": "PVCs Bound",
-          "datasource": "VictoriaMetrics",
-          "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 21,
-            "y": 1
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "expr": "count(kube_persistentvolumeclaim_status_phase{phase=\"Bound\"} == 1)",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "value",
-            "graphMode": "none"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "none",
-              "color": {
-                "mode": "palette-classic"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "text",
-                    "value": null
-                  }
-                ]
-              },
-              "mappings": [],
-              "decimals": 0
-            },
-            "overrides": []
-          }
-        },
-        {
-          "id": 10,
+          "id": 7,
           "type": "stat",
           "title": "Fullest PVC",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 4,
-            "w": 3,
-            "x": 0,
-            "y": 5
+            "h": 5,
+            "w": 4,
+            "x": 20,
+            "y": 1
           },
           "targets": [
             {
@@ -589,7 +448,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -601,19 +464,19 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 70
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 85
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 93
                   }
                 ]
@@ -625,15 +488,15 @@ spec:
           }
         },
         {
-          "id": 11,
+          "id": 8,
           "type": "bargauge",
           "title": "OpenEBS Pool Used",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 8,
             "w": 12,
-            "x": 3,
-            "y": 5
+            "x": 0,
+            "y": 6
           },
           "targets": [
             {
@@ -657,7 +520,10 @@ spec:
             "displayMode": "lcd",
             "showUnfilled": true,
             "minVizWidth": 8,
-            "minVizHeight": 10
+            "minVizHeight": 16,
+            "valueMode": "color",
+            "namePlacement": "auto",
+            "sizing": "auto"
           },
           "fieldConfig": {
             "defaults": {
@@ -669,19 +535,19 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 70
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 85
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 93
                   }
                 ]
@@ -695,15 +561,15 @@ spec:
           }
         },
         {
-          "id": 12,
+          "id": 9,
           "type": "bargauge",
           "title": "PVC Used",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 8,
             "w": 12,
-            "x": 0,
-            "y": 13
+            "x": 12,
+            "y": 6
           },
           "targets": [
             {
@@ -727,7 +593,10 @@ spec:
             "displayMode": "lcd",
             "showUnfilled": true,
             "minVizWidth": 8,
-            "minVizHeight": 10
+            "minVizHeight": 16,
+            "valueMode": "color",
+            "namePlacement": "auto",
+            "sizing": "auto"
           },
           "fieldConfig": {
             "defaults": {
@@ -739,19 +608,19 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 70
                   },
                   {
-                    "color": "orange",
+                    "color": "#ec835a",
                     "value": 85
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 93
                   }
                 ]
@@ -765,7 +634,7 @@ spec:
           }
         },
         {
-          "id": 13,
+          "id": 10,
           "type": "row",
           "title": "Throughput",
           "collapsed": false,
@@ -773,12 +642,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 21
+            "y": 14
           },
           "panels": []
         },
         {
-          "id": 14,
+          "id": 11,
           "type": "timeseries",
           "title": "Pool IOPS",
           "datasource": "VictoriaMetrics",
@@ -786,7 +655,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 0,
-            "y": 22
+            "y": 15
           },
           "targets": [
             {
@@ -822,7 +691,7 @@ spec:
             "defaults": {
               "unit": "iops",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -838,17 +707,22 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
@@ -856,7 +730,7 @@ spec:
           "description": "diskpool_* counters are declared gauge but are cumulative, hence rate()."
         },
         {
-          "id": 15,
+          "id": 12,
           "type": "timeseries",
           "title": "Pool Throughput",
           "datasource": "VictoriaMetrics",
@@ -864,7 +738,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 8,
-            "y": 22
+            "y": 15
           },
           "targets": [
             {
@@ -900,7 +774,7 @@ spec:
             "defaults": {
               "unit": "Bps",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -915,24 +789,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 16,
+          "id": 13,
           "type": "timeseries",
           "title": "Pool Latency",
           "datasource": "VictoriaMetrics",
@@ -940,7 +819,7 @@ spec:
             "h": 7,
             "w": 8,
             "x": 16,
-            "y": 22
+            "y": 15
           },
           "targets": [
             {
@@ -976,7 +855,7 @@ spec:
             "defaults": {
               "unit": "\u00b5s",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -992,24 +871,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 17,
+          "id": 14,
           "type": "timeseries",
           "title": "Volume IOPS (top 10)",
           "datasource": "VictoriaMetrics",
@@ -1017,7 +901,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 29
+            "y": 22
           },
           "targets": [
             {
@@ -1049,7 +933,7 @@ spec:
             "defaults": {
               "unit": "iops",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1065,24 +949,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 18,
+          "id": 15,
           "type": "timeseries",
           "title": "Volume Latency (top 10)",
           "datasource": "VictoriaMetrics",
@@ -1090,7 +979,7 @@ spec:
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 29
+            "y": 22
           },
           "targets": [
             {
@@ -1122,7 +1011,7 @@ spec:
             "defaults": {
               "unit": "\u00b5s",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1138,24 +1027,29 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
           }
         },
         {
-          "id": 19,
+          "id": 16,
           "type": "row",
           "title": "Backups",
           "collapsed": false,
@@ -1163,12 +1057,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 36
+            "y": 29
           },
           "panels": []
         },
         {
-          "id": 20,
+          "id": 17,
           "type": "stat",
           "title": "Postgres Backup Age",
           "datasource": "VictoriaMetrics",
@@ -1176,7 +1070,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 0,
-            "y": 37
+            "y": 30
           },
           "targets": [
             {
@@ -1198,7 +1092,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1210,15 +1108,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 86400
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 172800
                   }
                 ]
@@ -1229,7 +1127,7 @@ spec:
           }
         },
         {
-          "id": 21,
+          "id": 18,
           "type": "stat",
           "title": "Failed Backups",
           "datasource": "VictoriaMetrics",
@@ -1237,7 +1135,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 6,
-            "y": 37
+            "y": 30
           },
           "targets": [
             {
@@ -1259,7 +1157,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1271,11 +1173,11 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 1
                   }
                 ]
@@ -1288,7 +1190,7 @@ spec:
           "description": "A failure that landed after the last success. Non-zero means the backup chain is broken, not merely stale."
         },
         {
-          "id": 22,
+          "id": 19,
           "type": "stat",
           "title": "VolSync Out of Sync",
           "datasource": "VictoriaMetrics",
@@ -1296,7 +1198,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 12,
-            "y": 37
+            "y": 30
           },
           "targets": [
             {
@@ -1318,7 +1220,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1330,11 +1236,11 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 1
                   }
                 ]
@@ -1346,7 +1252,7 @@ spec:
           }
         },
         {
-          "id": 23,
+          "id": 20,
           "type": "stat",
           "title": "VolSync Missed (24h)",
           "datasource": "VictoriaMetrics",
@@ -1354,7 +1260,7 @@ spec:
             "h": 5,
             "w": 6,
             "x": 18,
-            "y": 37
+            "y": 30
           },
           "targets": [
             {
@@ -1376,7 +1282,11 @@ spec:
             "orientation": "horizontal",
             "textMode": "auto",
             "colorMode": "background",
-            "graphMode": "none"
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "wideLayout": true,
+            "percentChangeColorMode": "standard",
+            "showPercentChange": false
           },
           "fieldConfig": {
             "defaults": {
@@ -1388,15 +1298,15 @@ spec:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "#0ca30c",
                     "value": null
                   },
                   {
-                    "color": "yellow",
+                    "color": "#fab219",
                     "value": 1
                   },
                   {
-                    "color": "red",
+                    "color": "#d03b3b",
                     "value": 3
                   }
                 ]
@@ -1408,7 +1318,7 @@ spec:
           }
         },
         {
-          "id": 24,
+          "id": 21,
           "type": "table",
           "title": "Replication Sources",
           "datasource": "VictoriaMetrics",
@@ -1416,7 +1326,7 @@ spec:
             "h": 6,
             "w": 12,
             "x": 0,
-            "y": 42
+            "y": 35
           },
           "targets": [
             {
@@ -1440,7 +1350,8 @@ spec:
             "defaults": {
               "custom": {
                 "align": "auto",
-                "filterable": false
+                "filterable": false,
+                "minWidth": 130
               }
             },
             "overrides": []
@@ -1464,7 +1375,7 @@ spec:
           "description": "Only Postgres and bluesky-pds are replicated today; everything else on this cluster is reproducible from git."
         },
         {
-          "id": 25,
+          "id": 22,
           "type": "timeseries",
           "title": "VolSync Sync Duration",
           "datasource": "VictoriaMetrics",
@@ -1472,7 +1383,7 @@ spec:
             "h": 6,
             "w": 12,
             "x": 12,
-            "y": 42
+            "y": 35
           },
           "targets": [
             {
@@ -1500,7 +1411,7 @@ spec:
             "defaults": {
               "unit": "s",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1516,17 +1427,22 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
             "overrides": []
@@ -1534,7 +1450,7 @@ spec:
           "description": "Mean over all syncs, not the last one \u2014 the counter pair carries no per-run value."
         },
         {
-          "id": 26,
+          "id": 23,
           "type": "timeseries",
           "title": "Postgres Recoverability Window",
           "datasource": "VictoriaMetrics",
@@ -1542,7 +1458,7 @@ spec:
             "h": 6,
             "w": 24,
             "x": 0,
-            "y": 48
+            "y": 41
           },
           "targets": [
             {
@@ -1578,7 +1494,7 @@ spec:
             "defaults": {
               "unit": "s",
               "color": {
-                "mode": "palette-classic"
+                "mode": "palette-classic-by-name"
               },
               "thresholds": {
                 "mode": "absolute",
@@ -1593,20 +1509,56 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 1,
+                "lineWidth": 2,
                 "fillOpacity": 8,
                 "showPoints": "never",
                 "spanNulls": true,
-                "pointSize": 5,
+                "pointSize": 8,
                 "stacking": {
                   "mode": "none",
                   "group": "A"
                 },
                 "axisPlacement": "auto",
-                "gradientMode": "opacity"
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
               }
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "oldest restorable point"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#3987e5"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "newest backup"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "#d95926"
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "description": "How far back a restore can reach, and how fresh the newest base backup is. The gap between them is the retention window."
         }

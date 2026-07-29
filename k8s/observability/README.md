@@ -50,14 +50,17 @@ then a dead monitoring stack looks exactly like a healthy cluster.
 Every dashboard is a hand-written `GrafanaDashboard` CR. There are no community
 imports left.
 
-| Folder | Dashboard | Covers |
-|---|---|---|
-| Homelab | Homelab Overview | is anything wrong, and where |
-| Kubernetes | Kubernetes | workloads, capacity, restarts |
-| Infrastructure | Network | gateway, DNS, reachability, Cilium |
-| Infrastructure | Storage & Backups | pools, PVCs, OpenEBS, backup freshness |
-| Infrastructure | Postgres | CNPG traffic, replication, WAL, archiver |
-| Monitoring | Monitoring Health | the metrics pipeline watching itself |
+All six live in one `Homelab` folder. Six dashboards do not need a folder tree —
+the folders were only ever grouping things that were always opened together.
+
+| Dashboard | Covers |
+|---|---|
+| Homelab Overview | is anything wrong, and where |
+| Kubernetes | workloads, capacity, restarts |
+| Network | gateway, DNS, reachability, Cilium |
+| Storage & Backups | pools, PVCs, OpenEBS, backup freshness |
+| Postgres | CNPG traffic, replication, WAL, archiver |
+| Monitoring Health | the metrics pipeline watching itself |
 
 The imports all went the same way: written for clusters that look nothing like
 this one, and mostly empty. Alertmanager assumed a gossip cluster, the Kubernetes
@@ -84,6 +87,43 @@ through Grafana's `/api/ds/query` rather than straight to VictoriaMetrics:
 querying VM directly validates the PromQL but not the panel's datasource
 reference, which is exactly how 103 broken CloudNativePG panels once passed an
 audit. The bar is zero empty panels.
+
+### Panel design
+
+The look is a design system, not per-panel taste, so it is applied by the
+generator rather than remembered:
+
+- **Categorical palette** — eight fixed hues assigned in slot order, never
+  cycled. Validated against Grafana's dark panel surface (`#181b1f`): worst
+  adjacent CVD ΔE 8.4, worst adjacent normal-vision ΔE 19.3, all eight clear 3:1
+  contrast. A panel that would need a ninth colour gets a `topk(8, …)` cap
+  instead — that is why the namespace panels are capped.
+- **Colour follows the entity, not its rank.** Dynamic panels use
+  `palette-classic-by-name`, so filtering a series out never repaints the
+  survivors. Fixed-series panels pin each name to its slot explicitly.
+- **Status colours are reserved** — good `#0ca30c`, warning `#fab219`, serious
+  `#ec835a`, critical `#d03b3b`. They mean state, never identity, and never
+  double as a series colour.
+- **One measure per axis.** Never two scales on one plot: bytes/s and records/s
+  became separate WAL panels, and log rows and log bytes separate storage
+  panels, because sharing an axis invents a relationship between them.
+- **2px lines, no legend on a single series** (the title already names it),
+  recessive axes, a 2px gap between stacked bands.
+- **Stat tiles are 4 or 6 columns wide** and never stretch past 8 — a number
+  spanning half the screen reads as a mistake. Every row band sums to exactly
+  24 columns, enforced by a layout pass, so there is no ragged gutter.
+
+Geometry and colour are both checked by script before publishing. That catches
+overlaps, ragged bands and unvalidated hues — but it does not catch everything,
+and a round of real screenshots turned up four things no lint would have found:
+a join that invented null table rows and painted them red, a stat tile printing
+its whole label set instead of a pod name, response classes coloured from the
+categorical ramp so 3xx read as red and 5xx as a pale tint, and "No data" on
+panels whose empty state is the *good* one. Those now have `noValue` text.
+
+Grafana's `/render` endpoint returns HTTP 200 with an error card when the
+image-renderer plugin is absent, so it cannot currently screenshot a board for
+review — the plugin would have to be installed for that.
 
 ### Scrape dependencies
 
