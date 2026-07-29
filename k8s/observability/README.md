@@ -127,9 +127,40 @@ its whole label set instead of a pod name, response classes coloured from the
 categorical ramp so 3xx read as red and 5xx as a pale tint, and "No data" on
 panels whose empty state is the *good* one. Those now have `noValue` text.
 
-Grafana's `/render` endpoint returns HTTP 200 with an error card when the
-image-renderer plugin is absent, so it cannot currently screenshot a board for
-review — the plugin would have to be installed for that.
+### The public board
+
+`homelab-public` is the one dashboard meant for strangers. It is linked from the
+repo README and published through Grafana's public-dashboard feature, which means
+anonymous visitors execute its queries against VictoriaMetrics on every page load.
+Three rules follow from that, and they are written into the manifest's header:
+aggregates only, cheap queries only, and no template variables (public dashboards
+do not support them, and an unresolved variable renders the board empty).
+
+Publishing is **not declarative** — the Grafana operator has no field for it, so
+the share was created once through the API:
+
+```sh
+curl -u "$creds" -X POST \
+  "$GRAFANA/api/dashboards/uid/homelab-public/public-dashboards" \
+  -H 'Content-Type: application/json' \
+  -d '{"isEnabled":true,"annotationsEnabled":false,"timeSelectionEnabled":true,"share":"public"}'
+```
+
+The returned `accessToken` is what the README links to. Rebuilding this cluster
+means re-publishing and updating that link.
+
+The image in the README is served from `https://grafana.tale.me/live/homelab.png`
+by [`manifests/grafana-live-image.yaml`](manifests/grafana-live-image.yaml): an
+nginx and a sidecar that re-renders the public board every five minutes. The
+sidecar holds no Grafana credentials — it renders the public URL, which needs no
+auth — and it validates the PNG magic bytes rather than the status code, because
+the renderer will happily return HTTP 200 with a PDF, an error card, or a
+truncated file.
+
+The `/live/` path is a second rule on the existing HTTPRoute rather than a new
+hostname, so it needs no extra certificate or DNS record. Gateway API matches the
+longest prefix first, so it wins over the catch-all that sends everything else to
+Grafana behind Authentik.
 
 ### Scrape dependencies
 

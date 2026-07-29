@@ -566,8 +566,8 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "fillOpacity": 40,
+                "lineWidth": 0,
+                "fillOpacity": 55,
                 "showPoints": "never",
                 "spanNulls": true,
                 "pointSize": 8,
@@ -643,8 +643,8 @@ spec:
               "custom": {
                 "drawStyle": "line",
                 "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "fillOpacity": 40,
+                "lineWidth": 0,
+                "fillOpacity": 55,
                 "showPoints": "never",
                 "spanNulls": true,
                 "pointSize": 8,

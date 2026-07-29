@@ -54,6 +54,14 @@ spec:
               value: "3"
             - name: RENDERING_VERBOSE_LOGGING
               value: "false"
+            # Without this the renderer only accepts calls carrying a render key
+            # Grafana itself signed. The live-image refresher calls it directly,
+            # so it needs a token of its own.
+            - name: AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-renderer-token
+                  key: token
           resources:
             requests:
               cpu: 50m

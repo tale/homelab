@@ -4,6 +4,10 @@ Configuration for my homelab mini-cluster running on
 [Talos Linux](https://www.talos.dev/). All Kubernetes deployments are managed with
 [Flux](https://fluxcd.io/), using SOPS for secrets and Kustomize for templating.
 
+[![Homelab](https://grafana.tale.me/live/homelab.png)](https://grafana.tale.me/public-dashboards/563f2abe05d04534af2b73694fc89f0e)
+
+> GitHub caches images, click the picture for the live board!
+
 ## What's Running
 
 **Infrastructure** (`k8s/infra/`)
