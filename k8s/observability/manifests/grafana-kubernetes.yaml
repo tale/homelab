@@ -1009,7 +1009,7 @@ spec:
               "values": false
             },
             "orientation": "horizontal",
-            "displayMode": "lcd",
+            "displayMode": "basic",
             "showUnfilled": true,
             "minVizWidth": 8,
             "minVizHeight": 16,
@@ -1082,7 +1082,7 @@ spec:
               "values": false
             },
             "orientation": "horizontal",
-            "displayMode": "lcd",
+            "displayMode": "basic",
             "showUnfilled": true,
             "minVizWidth": 8,
             "minVizHeight": 16,
@@ -1155,7 +1155,7 @@ spec:
               "values": false
             },
             "orientation": "horizontal",
-            "displayMode": "lcd",
+            "displayMode": "basic",
             "showUnfilled": true,
             "minVizWidth": 8,
             "minVizHeight": 16,

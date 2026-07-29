@@ -12,6 +12,7 @@ resources:
   - manifests/vmagent-rbac.yaml
   - manifests/vlogs.yaml
   - manifests/grafana.yaml
+  - manifests/grafana-renderer.yaml
   - manifests/grafana-datasources.yaml
   - manifests/grafana-overview.yaml
   - manifests/grafana-kubernetes.yaml

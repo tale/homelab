@@ -1,0 +1,111 @@
+# Grafana renders panels to PNG by driving a headless Chromium, which it will not
+# do in-process. Without this, `/render` still answers HTTP 200 — it just returns
+# an image of an error card, which is a good way to believe a screenshot worked
+# when it did not.
+#
+# Two things it buys: shareable panel images, and screenshots attached to
+# Pushover alerts (Alertmanager can only include an image if something can render
+# one).
+#
+# There is no Helm chart for the standalone renderer, hence a plain Deployment.
+# Deliberately ClusterIP with no HTTPRoute: it will render any URL it is handed,
+# so it is not something to expose.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-image-renderer
+  namespace: observability-system
+  labels:
+    app.kubernetes.io/name: grafana-image-renderer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grafana-image-renderer
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: grafana-image-renderer
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 472
+        fsGroup: 472
+      containers:
+        - name: renderer
+          image: grafana/grafana-image-renderer:v5.10.3
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8081
+          env:
+            - name: HTTP_PORT
+              value: "8081"
+            - name: ENABLE_METRICS
+              value: "true"
+            - name: RENDERING_MODE
+              value: clustered
+            # One browser, several tabs. `default` mode serialises every render
+            # behind a single tab, which times out as soon as two panels are
+            # requested at once.
+            - name: RENDERING_CLUSTERING_MODE
+              value: browser
+            - name: RENDERING_CLUSTERING_MAX_CONCURRENCY
+              value: "3"
+            - name: RENDERING_VERBOSE_LOGGING
+              value: "false"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 256Mi
+            limits:
+              # Chromium is the whole cost here. 1Gi is enough for a full-page
+              # dashboard render at 1600px; below ~512Mi it starts OOMing midway
+              # and returns a blank image rather than an error.
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-image-renderer
+  namespace: observability-system
+  labels:
+    app.kubernetes.io/name: grafana-image-renderer
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: grafana-image-renderer
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: grafana-image-renderer
+  namespace: observability-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grafana-image-renderer
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 60s

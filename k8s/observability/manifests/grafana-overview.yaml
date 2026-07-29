@@ -1233,11 +1233,11 @@ spec:
           "targets": [
             {
               "refId": "A",
-              "expr": "100 - (max by (node, mountpoint) (node_filesystem_avail_bytes{fstype!~\"tmpfs|ramfs|overlay\"}) / max by (node, mountpoint) (node_filesystem_size_bytes{fstype!~\"tmpfs|ramfs|overlay\"}) * 100)",
+              "expr": "100 - (max by (node) (node_filesystem_avail_bytes{mountpoint=\"/var\"}) / max by (node) (node_filesystem_size_bytes{mountpoint=\"/var\"}) * 100)",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
               "range": true,
-              "legendFormat": "{{node}} {{mountpoint}}"
+              "legendFormat": "{{node}}"
             }
           ],
           "options": {
@@ -1249,7 +1249,7 @@ spec:
               "values": false
             },
             "orientation": "horizontal",
-            "displayMode": "lcd",
+            "displayMode": "basic",
             "showUnfilled": true,
             "minVizWidth": 8,
             "minVizHeight": 16,
@@ -1290,7 +1290,8 @@ spec:
               "max": 100
             },
             "overrides": []
-          }
+          },
+          "description": "Only /var. Talos bind-mounts /.extra and /etc/extensions.yaml off the same device, so showing every mountpoint listed the same disk three times per node at a meaningless 0.8%."
         },
         {
           "id": 20,
@@ -2227,7 +2228,7 @@ spec:
               "values": false
             },
             "orientation": "horizontal",
-            "displayMode": "lcd",
+            "displayMode": "basic",
             "showUnfilled": true,
             "minVizWidth": 8,
             "minVizHeight": 16,
@@ -2300,7 +2301,7 @@ spec:
               "values": false
             },
             "orientation": "horizontal",
-            "displayMode": "lcd",
+            "displayMode": "basic",
             "showUnfilled": true,
             "minVizWidth": 8,
             "minVizHeight": 16,

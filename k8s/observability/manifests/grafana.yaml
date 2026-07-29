@@ -9,6 +9,13 @@ spec:
   config:
     server:
       root_url: "https://grafana.tale.me"
+    rendering:
+      server_url: http://grafana-image-renderer.observability-system.svc.cluster.local:8081/render
+      # The renderer loads the dashboard as a browser would, so it needs a URL it
+      # can actually reach. `root_url` points at the public hostname, which
+      # resolves out through the gateway and back — the in-cluster Service is the
+      # short path and does not depend on ingress being healthy.
+      callback_url: http://grafana-service.observability-system.svc.cluster.local:3000/
     database:
       type: postgres
       host: central-postgres-rw.cnpg-system.svc.cluster.local:5432

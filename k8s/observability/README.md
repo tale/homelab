@@ -97,10 +97,16 @@ generator rather than remembered:
   cycled. Validated against Grafana's dark panel surface (`#181b1f`): worst
   adjacent CVD ΔE 8.4, worst adjacent normal-vision ΔE 19.3, all eight clear 3:1
   contrast. A panel that would need a ninth colour gets a `topk(8, …)` cap
-  instead — that is why the namespace panels are capped.
-- **Colour follows the entity, not its rank.** Dynamic panels use
-  `palette-classic-by-name`, so filtering a series out never repaints the
-  survivors. Fixed-series panels pin each name to its slot explicitly.
+  instead — that is why the namespace and route panels are capped.
+- **Colour follows the entity, not its rank.** Panels whose series are known up
+  front pin each name to a slot explicitly (28 panels). Panels whose series are
+  discovered at query time — `{{node}}`, `{{namespace}}`, `{{job}}` — use
+  `palette-classic-by-name` (72 panels), so a series keeps its colour when the
+  set changes. Note the trade-off: by-name draws from *Grafana's* classic
+  palette, not the validated one above, because there is no way to hand Grafana
+  a custom palette for series it has not seen yet. Stable identity was judged
+  worth more than the validated hexes; the validated palette governs the
+  fixed-series panels and every status colour.
 - **Status colours are reserved** — good `#0ca30c`, warning `#fab219`, serious
   `#ec835a`, critical `#d03b3b`. They mean state, never identity, and never
   double as a series colour.
