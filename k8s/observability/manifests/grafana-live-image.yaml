@@ -6,6 +6,13 @@
 # a purge. A five-minute refresh is already finer-grained than camo will honour;
 # it is that often only so the file is never very stale when camo does revalidate.
 #
+# 2200x805 is a deliberate crop, not a whole-board capture. Grafana's grid is
+# proportional, so rendering wider does not change what is shown — it just makes
+# a squat, banner-shaped image instead of a tall one that swallows the README.
+# 805px lands just above the Ingress row header: the twelve stat tiles and the
+# four graphs below them, with no panel sliced in half. Changing the row order on
+# the public board means re-measuring this.
+#
 # What is deliberately *not* here: no Grafana credentials. The refresher renders
 # the public dashboard, which needs no auth to load, so the only secret involved
 # is the renderer's own token — and the renderer is ClusterIP with no route
@@ -111,7 +118,7 @@ spec:
               while true; do
                 code=$(curl -s -o /tmp/next.png -w '%{http_code}' \
                   -H "X-Auth-Token: ${AUTH_TOKEN}" \
-                  "${RENDERER}/render?url=${TARGET}&encoding=png&width=1600&height=1400&deviceScaleFactor=1&timezone=UTC&renderKey=live&domain=grafana-service.observability-system.svc.cluster.local")
+                  "${RENDERER}/render?url=${TARGET}&encoding=png&width=2200&height=805&deviceScaleFactor=1&timezone=UTC&renderKey=live&domain=grafana-service.observability-system.svc.cluster.local")
                 size=$(wc -c < /tmp/next.png)
                 magic=$(head -c 4 /tmp/next.png | od -A n -t x1 | tr -d ' \n')
                 # Three ways this "succeeds" while being wrong: the renderer

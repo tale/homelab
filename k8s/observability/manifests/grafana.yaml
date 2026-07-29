@@ -55,6 +55,15 @@ spec:
                     secretKeyRef:
                       name: grafana-db-credentials
                       key: password
+                # The renderer requires a token because the live-image refresher
+                # calls it directly. Grafana must present the same one or it
+                # reports "no image renderer found/installed" — which looks like
+                # the renderer is missing rather than rejecting it.
+                - name: GF_RENDERING_RENDERER_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-renderer-token
+                      key: token
               volumeMounts:
                 - name: grafana-oidc
                   mountPath: /etc/secrets/auth_generic_oauth

@@ -157,6 +157,18 @@ auth — and it validates the PNG magic bytes rather than the status code, becau
 the renderer will happily return HTTP 200 with a PDF, an error card, or a
 truncated file.
 
+It renders 2200x805 rather than the whole board. Grafana's grid is proportional,
+so a wider render does not show more — it just produces a banner instead of a
+tall block that swallows the README. 805px lands immediately above the Ingress
+row header, so nothing is sliced in half; reordering the public board's rows
+means re-measuring it.
+
+One trap worth knowing: setting `AUTH_TOKEN` on the renderer so the sidecar can
+call it directly also stops *Grafana* rendering, and Grafana reports it as
+"no image renderer found/installed" rather than as an auth failure. Both sides
+read the same secret — see `GF_RENDERING_RENDERER_TOKEN` in
+[`manifests/grafana.yaml`](manifests/grafana.yaml).
+
 The `/live/` path is a second rule on the existing HTTPRoute rather than a new
 hostname, so it needs no extra certificate or DNS record. Gateway API matches the
 longest prefix first, so it wins over the catch-all that sends everything else to
