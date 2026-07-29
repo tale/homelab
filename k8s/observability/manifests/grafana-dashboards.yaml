@@ -1,16 +1,19 @@
-# The two community imports still worth keeping. Both are pinned to a revision
-# so an upstream edit cannot quietly rewrite the panels.
+# The last community import, pinned to a revision so an upstream edit cannot
+# quietly rewrite the panels.
 #
 # Node Exporter Full carries roughly a dozen panels that will never fill on
 # Talos — systemd units and sockets, hwmon fan speed, IRQ detail, TCP socket
 # state, swap. Those collectors do not exist on this OS. It stays because the
-# 110 panels that do work are the deepest per-node view available and it costs
-# nothing to maintain.
+# 110 panels that do work are the deepest per-node view available, it costs
+# nothing to maintain, and it dodges the failure mode that killed the others: it
+# selects its datasource through a `datasource`-type template variable rather
+# than a hardcoded uid, so nothing has to line up by name.
 #
 # Everything else that used to live in this file was replaced by a hand-written
 # board: the VictoriaMetrics/VictoriaLogs quartet by Monitoring Health, the
-# Kubernetes Views pair by Kubernetes, cert-manager and NUT by panels on the
-# Overview, and Alertmanager by the Alerting row on Monitoring Health.
+# Kubernetes Views pair by Kubernetes, CloudNativePG by Postgres, cert-manager
+# and NUT by panels on the Overview, and Alertmanager by the Alerting row on
+# Monitoring Health.
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
@@ -24,23 +27,6 @@ spec:
   grafanaCom:
     id: 1860
     revision: 45
-  datasources:
-    - inputName: "DS_PROMETHEUS"
-      datasourceName: "VictoriaMetrics"
----
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaDashboard
-metadata:
-  name: cloudnative-pg
-  namespace: observability-system
-spec:
-  instanceSelector:
-    matchLabels:
-      dashboards: "homelab"
-  folder: Infrastructure
-  grafanaCom:
-    id: 20417
-    revision: 4
   datasources:
     - inputName: "DS_PROMETHEUS"
       datasourceName: "VictoriaMetrics"

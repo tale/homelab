@@ -18,6 +18,7 @@ resources:
   - manifests/grafana-kubernetes.yaml
   - manifests/grafana-ingress.yaml
   - manifests/grafana-storage.yaml
+  - manifests/grafana-postgres.yaml
   - manifests/grafana-monitoring.yaml
   - manifests/grafana-openebs.yaml
   - manifests/grafana-cilium.yaml

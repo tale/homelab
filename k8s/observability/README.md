@@ -56,10 +56,9 @@ pinned to a revision so an upstream edit can't quietly rewrite the panels.
 | Infrastructure | Storage & Backups | hand-written |
 | Infrastructure | Cilium | hand-written |
 | Infrastructure | OpenEBS / Mayastor | hand-written |
+| Infrastructure | Postgres | hand-written |
 | Infrastructure | Node Exporter Full | grafana.com 1860 |
-| Infrastructure | CloudNativePG | grafana.com 20417 |
 | Monitoring | Monitoring Health | hand-written |
-| Applications | Blocky | grafana.com 17996 (in `k8s/blocky/`) |
 
 Most community boards were written for clusters that look nothing like this one
 and rendered mostly empty — Alertmanager assumed a gossip cluster, the Kubernetes
@@ -67,10 +66,23 @@ Views pair leaned on `windows_*` metrics and recording rules `defaultRules`
 turned off, and the VictoriaMetrics quartet spent 44 panels on Kafka and
 persistent queues. All were replaced by the hand-written boards above.
 
-Every hand-written panel is checked against live data before it lands; the bar
-is zero empty panels. The two imports that survived are the exception — Node
-Exporter Full keeps about a dozen blank panels for collectors Talos doesn't
-have, which is the price of not maintaining 288 queries by hand.
+CloudNativePG went the same way for a subtler reason worth remembering: its
+`$cluster` variable regex-extracts `cluster="..."` from series text, expecting
+the Postgres cluster name, but vmagent's `cluster: homelab` external label
+displaces the exporter's own to `exported_cluster`. Relabelling it back doesn't
+help — external labels are applied after metric relabeling and always win. Any
+import keyed on a `cluster` label meaning something other than "this Kubernetes
+cluster" will fail here the same way.
+
+Every hand-written panel is checked against live data before it lands, and the
+check has to go through Grafana's `/api/ds/query`, not straight to
+VictoriaMetrics — querying VM directly validates the PromQL but not the panel's
+datasource reference, which is exactly how 103 broken CloudNativePG panels once
+passed an audit. The bar is zero empty panels.
+
+Node Exporter Full is the sole exception: about a dozen of its panels stay blank
+for collectors Talos doesn't ship, which is the price of not maintaining 288
+queries by hand.
 
 Overview panels assume the `node` label exists on node-exporter series; see the
 `prometheus-node-exporter` block in [`helmrelease.yaml`](helmrelease.yaml).

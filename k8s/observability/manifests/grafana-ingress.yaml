@@ -14,6 +14,12 @@
 #
 # Blocky is the LAN resolver and CoreDNS is the cluster one. They answer
 # different questions and are deliberately not summed together.
+#
+# The DNS row absorbed the community Blocky board (grafana.com 17996), which
+# queried blocky's Postgres query log over SQL. Everything it showed except
+# top-domains is already in `blocky_response_total` and `blocky_query_total`,
+# including the per-client breakdown — so this reads the same Prometheus
+# datasource as the rest of the board instead of a second one.
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
@@ -1029,23 +1035,384 @@ spec:
         },
         {
           "id": 18,
-          "type": "timeseries",
-          "title": "Blocky Query Rate by Type",
+          "type": "stat",
+          "title": "Blocking Enabled",
           "datasource": "VictoriaMetrics",
           "gridPos": {
-            "h": 7,
-            "w": 8,
+            "h": 4,
+            "w": 4,
             "x": 0,
             "y": 29
           },
           "targets": [
             {
               "refId": "A",
-              "expr": "sum by (type) (rate(blocky_query_total[5m]))",
+              "expr": "min(blocky_blocking_enabled)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "0": {
+                      "text": "DISABLED",
+                      "color": "red",
+                      "index": 0
+                    },
+                    "1": {
+                      "text": "Enabled",
+                      "color": "green",
+                      "index": 1
+                    }
+                  }
+                }
+              ]
+            },
+            "overrides": []
+          },
+          "description": "Blocking can be paused at runtime through blocky's API. This is the panel that explains a sudden drop in the blocked ratio."
+        },
+        {
+          "id": 19,
+          "type": "stat",
+          "title": "Blocked",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 4,
+            "y": 29
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(rate(blocky_response_total{response_type=\"BLOCKED\"}[5m])) / clamp_min(sum(rate(blocky_response_total[5m])), 0.001) * 100",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "area"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "color": {
+                "mode": "palette-classic"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 1
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 20,
+          "type": "stat",
+          "title": "Denylist Entries",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 8,
+            "y": 29
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(blocky_denylist_cache_entries)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "palette-classic"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "description": "Domains currently blocked. A collapse to zero means a list refresh failed."
+        },
+        {
+          "id": 21,
+          "type": "stat",
+          "title": "List Refresh Age",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 12,
+            "y": 29
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "time() - max(blocky_last_list_group_refresh_timestamp_seconds)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 172800
+                  },
+                  {
+                    "color": "red",
+                    "value": 604800
+                  }
+                ]
+              },
+              "mappings": []
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 22,
+          "type": "stat",
+          "title": "Failed Downloads (24h)",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 16,
+            "y": 29
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum(increase(blocky_failed_downloads_total[24h])) or vector(0)",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 1
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "description": "A denylist source blocky could not fetch. The old list stays loaded, so this fails quietly."
+        },
+        {
+          "id": 23,
+          "type": "stat",
+          "title": "Blocky p99",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 4,
+            "w": 4,
+            "x": 20,
+            "y": 29
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "histogram_quantile(0.99, sum by (le) (rate(blocky_request_duration_seconds_bucket[5m])))",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 0.1
+                  },
+                  {
+                    "color": "red",
+                    "value": 0.5
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 3
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 24,
+          "type": "timeseries",
+          "title": "Blocky Responses by Type",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 0,
+            "y": 33
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (response_type) (rate(blocky_response_total[5m]))",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
               "range": true,
-              "legendFormat": "{{type}}"
+              "legendFormat": "{{response_type}}"
             }
           ],
           "options": {
@@ -1095,18 +1462,162 @@ spec:
             },
             "overrides": []
           },
-          "description": "LAN-facing resolver. `client` is deliberately not aggregated here \u2014 per-client breakdown lives on the Blocky board."
+          "description": "BLOCKED / CACHED / RESOLVED / SPECIAL. The shape of this stack is the single best read on whether blocky is doing its job."
         },
         {
-          "id": 19,
+          "id": 25,
+          "type": "timeseries",
+          "title": "Queries by Client",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 8,
+            "y": 33
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "topk(10, sum by (client) (rate(blocky_query_total[5m])))",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true,
+              "legendFormat": "{{client}}"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "calcs": [
+                "mean",
+                "max",
+                "lastNotNull"
+              ]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "color": {
+                "mode": "palette-classic"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 2,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "lineWidth": 1,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true,
+                "pointSize": 5,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                },
+                "axisPlacement": "auto",
+                "gradientMode": "opacity"
+              }
+            },
+            "overrides": []
+          },
+          "description": "Which device on the LAN is actually asking. 25 clients are tracked; this shows the busiest ten."
+        },
+        {
+          "id": 26,
+          "type": "timeseries",
+          "title": "Upstream Resolvers",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 16,
+            "y": 33
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "sum by (reason) (rate(blocky_response_total{response_type=\"RESOLVED\"}[5m]))",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true,
+              "legendFormat": "{{reason}}"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true,
+              "calcs": []
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "color": {
+                "mode": "palette-classic"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 2,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "lineWidth": 1,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": true,
+                "pointSize": 5,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                },
+                "axisPlacement": "auto",
+                "gradientMode": "opacity"
+              }
+            },
+            "overrides": []
+          },
+          "description": "Which upstream answered. `reason` carries the resolver address, so an upstream going dark shows up as its series flatlining."
+        },
+        {
+          "id": 27,
           "type": "timeseries",
           "title": "Blocky Cache",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 7,
             "w": 8,
-            "x": 8,
-            "y": 29
+            "x": 0,
+            "y": 40
           },
           "targets": [
             {
@@ -1183,41 +1694,41 @@ spec:
           }
         },
         {
-          "id": 20,
-          "type": "stat",
-          "title": "Blocky Denylist Entries",
+          "id": 28,
+          "type": "timeseries",
+          "title": "Blocky Query Types",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 7,
-            "w": 4,
-            "x": 16,
-            "y": 29
+            "w": 8,
+            "x": 8,
+            "y": 40
           },
           "targets": [
             {
               "refId": "A",
-              "expr": "sum(blocky_denylist_cache_entries)",
+              "expr": "sum by (type) (rate(blocky_query_total[5m]))",
               "datasource": "VictoriaMetrics",
               "editorMode": "code",
-              "range": true
+              "range": true,
+              "legendFormat": "{{type}}"
             }
           ],
           "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true,
+              "calcs": []
             },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "value",
-            "graphMode": "none"
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
           },
           "fieldConfig": {
             "defaults": {
-              "unit": "short",
+              "unit": "reqps",
               "color": {
                 "mode": "palette-classic"
               },
@@ -1231,83 +1742,37 @@ spec:
                 ]
               },
               "mappings": [],
-              "decimals": 0
+              "decimals": 2,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "smooth",
+                "lineWidth": 1,
+                "fillOpacity": 40,
+                "showPoints": "never",
+                "spanNulls": true,
+                "pointSize": 5,
+                "stacking": {
+                  "mode": "normal",
+                  "group": "A"
+                },
+                "axisPlacement": "auto",
+                "gradientMode": "opacity"
+              }
             },
             "overrides": []
           },
-          "description": "Domains currently blocked. A collapse to zero means a list refresh failed."
+          "description": "A/AAAA/HTTPS/PTR and friends."
         },
         {
-          "id": 21,
-          "type": "stat",
-          "title": "List Refresh Age",
-          "datasource": "VictoriaMetrics",
-          "gridPos": {
-            "h": 7,
-            "w": 4,
-            "x": 20,
-            "y": 29
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "expr": "time() - max(blocky_last_list_group_refresh_timestamp_seconds)",
-              "datasource": "VictoriaMetrics",
-              "editorMode": "code",
-              "range": true
-            }
-          ],
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "orientation": "horizontal",
-            "textMode": "auto",
-            "colorMode": "background",
-            "graphMode": "none"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "unit": "s",
-              "color": {
-                "mode": "thresholds"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "yellow",
-                    "value": 172800
-                  },
-                  {
-                    "color": "red",
-                    "value": 604800
-                  }
-                ]
-              },
-              "mappings": []
-            },
-            "overrides": []
-          }
-        },
-        {
-          "id": 22,
+          "id": 29,
           "type": "timeseries",
           "title": "CoreDNS Request Rate",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 7,
             "w": 8,
-            "x": 0,
-            "y": 36
+            "x": 16,
+            "y": 40
           },
           "targets": [
             {
@@ -1369,15 +1834,15 @@ spec:
           "description": "Cluster-internal resolver, not the LAN one."
         },
         {
-          "id": 23,
+          "id": 30,
           "type": "timeseries",
           "title": "CoreDNS Responses by Rcode",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 7,
             "w": 8,
-            "x": 8,
-            "y": 36
+            "x": 0,
+            "y": 47
           },
           "targets": [
             {
@@ -1439,15 +1904,15 @@ spec:
           "description": "Sustained NXDOMAIN usually means something is resolving a name that no longer exists."
         },
         {
-          "id": 24,
+          "id": 31,
           "type": "timeseries",
           "title": "CoreDNS Latency",
           "datasource": "VictoriaMetrics",
           "gridPos": {
             "h": 7,
             "w": 8,
-            "x": 16,
-            "y": 36
+            "x": 8,
+            "y": 47
           },
           "targets": [
             {
@@ -1516,7 +1981,7 @@ spec:
           }
         },
         {
-          "id": 25,
+          "id": 32,
           "type": "row",
           "title": "Load Balancer",
           "collapsed": false,
@@ -1524,12 +1989,12 @@ spec:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 43
+            "y": 54
           },
           "panels": []
         },
         {
-          "id": 26,
+          "id": 33,
           "type": "bargauge",
           "title": "MetalLB Pool Used",
           "datasource": "VictoriaMetrics",
@@ -1537,7 +2002,7 @@ spec:
             "h": 6,
             "w": 8,
             "x": 0,
-            "y": 44
+            "y": 55
           },
           "targets": [
             {
@@ -1599,7 +2064,7 @@ spec:
           }
         },
         {
-          "id": 27,
+          "id": 34,
           "type": "stat",
           "title": "Addresses In Use",
           "datasource": "VictoriaMetrics",
@@ -1607,7 +2072,7 @@ spec:
             "h": 6,
             "w": 4,
             "x": 8,
-            "y": 44
+            "y": 55
           },
           "targets": [
             {
@@ -1653,7 +2118,7 @@ spec:
           }
         },
         {
-          "id": 28,
+          "id": 35,
           "type": "stat",
           "title": "Addresses Free",
           "datasource": "VictoriaMetrics",
@@ -1661,7 +2126,7 @@ spec:
             "h": 6,
             "w": 4,
             "x": 12,
-            "y": 44
+            "y": 55
           },
           "targets": [
             {
@@ -1715,7 +2180,7 @@ spec:
           }
         },
         {
-          "id": 29,
+          "id": 36,
           "type": "timeseries",
           "title": "Layer 2 Announcements",
           "datasource": "VictoriaMetrics",
@@ -1723,7 +2188,7 @@ spec:
             "h": 6,
             "w": 8,
             "x": 16,
-            "y": 44
+            "y": 55
           },
           "targets": [
             {
