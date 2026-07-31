@@ -1,9 +1,3 @@
-# The snapshot CRDs and both controller sidecars ship with the openebs chart, but
-# no VolumeSnapshotClass is created, so nothing could actually take a snapshot.
-# VolSync needs one to get a point-in-time copy instead of reading a live volume.
-#
-# Delete, not Retain: the snapshots here exist for the seconds it takes a mover to
-# read them. Retain would silently accumulate orphaned VolumeSnapshotContents.
 apiVersion: snapshot.storage.k8s.io/v1
 kind: VolumeSnapshotClass
 metadata:

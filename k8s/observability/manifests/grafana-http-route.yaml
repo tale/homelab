@@ -11,13 +11,6 @@ spec:
   hostnames:
     - grafana.tale.me
   rules:
-    # `/live/homelab.png` is the image embedded in the repo README, so it has to
-    # answer without Authentik in front of it. It is a rendered PNG of the public
-    # dashboard and nothing else — the nginx behind it serves that one directory
-    # and 404s everything else.
-    #
-    # Gateway API resolves the longest matching prefix first, so this wins over
-    # the catch-all below regardless of the order they appear in.
     - matches:
         - path:
             type: PathPrefix

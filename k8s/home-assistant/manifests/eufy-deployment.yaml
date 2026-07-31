@@ -26,9 +26,6 @@ spec:
           envFrom:
             - secretRef:
                 name: eufy-ws-secrets
-          # env:
-          #   - name: DEBUG
-          #     value: "true"
           volumeMounts:
             - name: data
               mountPath: /data

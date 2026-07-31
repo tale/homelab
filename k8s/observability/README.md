@@ -127,6 +127,23 @@ its whole label set instead of a pod name, response classes coloured from the
 categorical ramp so 3xx read as red and 5xx as a pale tint, and "No data" on
 panels whose empty state is the *good* one. Those now have `noValue` text.
 
+### Logs
+
+VictoriaLogs panels have one sharp edge worth writing down: a **grouped** LogsQL
+stats query only buckets over ranges up to an hour. Past that it silently
+collapses to a single value, which Grafana then draws as one bar jammed against
+the right edge of the panel. Ungrouped stats bucket correctly at any range.
+
+That is why the overview carries two log panels rather than one. `Log Error Rate`
+is ungrouped, so it can be a real time series over any window. `Log Errors by
+Namespace` is an instant query rendered as a bar gauge, sorted and capped at
+eight, because grouping is exactly what breaks the range form.
+
+Note also that the filter is a whole-word match on `error OR panic OR fatal`, not
+a structured severity level — LogsQL word-matching means it will not fire on
+`errorless`, but it will happily count an application logging the word "error" in
+normal operation.
+
 ### The public board
 
 `homelab-public` is the one dashboard meant for strangers. It is linked from the

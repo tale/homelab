@@ -50,10 +50,6 @@ spec:
             secretKeyRef:
               name: authentik-secrets
               key: ses-password
-        # Consumed by `!Env` in the oidc-providers blueprint. Rotating any of
-        # these means updating the relying party too — for headplane and
-        # home-assistant that side is not in this repo, so they cannot be
-        # rotated from here alone.
         - name: AUTHENTIK_OIDC_SECRET_FLUX
           valueFrom:
             secretKeyRef:
@@ -108,10 +104,6 @@ spec:
     redis:
       enabled: true
     server:
-      # Must be Recreate: the data PVC is RWO, so a rolling update deadlocks —
-      # the new pod cannot attach the volume until the old one releases it, and
-      # the old one is not torn down until the new one is ready. The chart key
-      # is `deploymentStrategy`; a plain `strategy` block is silently ignored.
       deploymentStrategy:
         type: Recreate
       initContainers:

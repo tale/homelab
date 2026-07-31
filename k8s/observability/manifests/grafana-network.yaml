@@ -1,27 +1,3 @@
-# Hand-written, merging what were three boards: Ingress & DNS, Cilium, and the
-# reachability probes. They all answer one question — did the packet get where it
-# was going — and splitting them meant checking three screens to rule out the
-# network.
-#
-# Gateway panels read the Envoy Gateway *data plane*, scraped by the VMPodScrape
-# in k8s/infra/configs/envoy/service-monitor.yaml. Two details the metric names
-# do not give away:
-#
-#   - `https-10443` is the only conn_manager prefix carrying real traffic. The
-#     others (`admin`, `eg-ready-http`, `eg-stats-http`) are Envoy's own
-#     endpoints and would triple every rate if left in.
-#   - `envoy_cluster_name` is `httproute/<namespace>/<route>/rule/<n>`, so
-#     grouping by it gives one series per service behind the gateway.
-#
-# Blocky is the LAN resolver, CoreDNS is the cluster one. They answer different
-# questions and are deliberately not summed. The DNS row also absorbed the
-# community Blocky board (grafana.com 17996), which read blocky's Postgres query
-# log over SQL — everything it showed except top-domains is already in
-# `blocky_response_total` and `blocky_query_total`, per-client breakdown
-# included.
-#
-# Reachability comes from blackbox-exporter via VMProbe; see manifests/
-# blackbox.yaml for why an in-cluster probe is not a true external check.
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:

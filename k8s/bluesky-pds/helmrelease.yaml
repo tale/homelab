@@ -37,7 +37,6 @@ spec:
         emailFromAddress: noreply@tale.me
         secrets:
           existingSecret: pds-secrets
-        # Hide noisy startup banner; PDS already logs JSON to stdout.
         logEnabled: "true"
       dataStorage:
         size: 25Gi
@@ -50,9 +49,6 @@ spec:
         memory: 256Mi
       limits:
         memory: 1Gi
-  # The chart hard-codes its env block and doesn't expose
-  # PDS_SERVICE_HANDLE_DOMAINS — patch it in so we can register `*.tale.me`
-  # handles directly through the PDS instead of only via DNS verification.
   postRenderers:
     - kustomize:
         patches:

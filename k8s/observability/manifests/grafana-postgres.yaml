@@ -1,16 +1,3 @@
-# Hand-written, replacing the CloudNativePG import (grafana.com 20417). That
-# board could not work here for a reason no amount of panel-fixing addresses:
-# its `$cluster` variable regex-extracts `cluster="..."` from the series text,
-# expecting the CNPG cluster name. vmagent stamps `cluster: homelab` on every
-# series as an external label, which displaces the exporter's own `cluster` to
-# `exported_cluster`. So `$cluster` resolved to `homelab`, `$instances` then
-# matched `homelab-([1-9][0-9]*)` — nothing — and all 103 panels rendered empty.
-#
-# Relabelling `exported_cluster` back over `cluster` on the scrape does not fix
-# it: vmagent applies external labels after metric relabeling, so `homelab` wins
-# regardless. The only other lever is dropping the global `cluster` label, which
-# exists precisely so ecosystem dashboards have one. Hence: hand-written, keyed
-# on `pod` and `datname`, which are unambiguous.
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:

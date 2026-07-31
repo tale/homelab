@@ -6,16 +6,11 @@ metadata:
 spec:
   jobName: nut-exporter
   targetEndpoints:
-    # The Pi is off-cluster on the node subnet, so it needs a static target.
-    # nut_exporter serves UPS data on /ups_metrics — /metrics is only the
-    # exporter's own Go runtime stats.
     - targets:
         - 172.31.42.5:9199
       path: /ups_metrics
       scheme: http
       interval: 30s
       labels:
-        # The exporter emits no `ups` label and offers no flag to add one, but
-        # the dashboard keys its variable on it. Only one UPS is attached.
         ups: cyberpower
         instance: nut

@@ -39,16 +39,10 @@ spec:
       spec:
         scrapeInterval: 30s
         selectAllByDefault: true
-        # Dashboards and rules from the wider ecosystem assume a cluster label
-        # exists; without one every `cluster` template variable renders empty.
         externalLabels:
           cluster: homelab
         extraArgs:
           promscrape.streamParse: "true"
-        # Three nodes were producing 487k active series, 69% of it apiserver
-        # and kubelet histogram buckets nobody queries. Dropping `_bucket`
-        # keeps `_count` and `_sum`, so rates and averages still work — only
-        # quantile estimation is lost.
         globalScrapeMetricRelabelConfigs:
           - action: drop
             source_labels: [__name__]
@@ -58,9 +52,6 @@ spec:
             source_labels: [__name__]
             regex: >-
               (rest_client_request_duration_seconds|rest_client_rate_limiter_duration_seconds|workqueue_queue_duration_seconds|workqueue_work_duration_seconds|controller_runtime_reconcile_time_seconds|prober_probe_duration_seconds)_bucket
-          # Per-pod, per-interface counters. Bytes are kept for the traffic
-          # graphs; packet, error and drop variants are six more series each
-          # and have never once been the thing that answered a question.
           - action: drop
             source_labels: [__name__]
             regex: >-
@@ -94,9 +85,6 @@ spec:
                   storage: 1Gi
       config:
         route:
-          # Anything matching no child route lands here, so this has to be the
-          # drop target — naming pushover made the severity matcher below a
-          # no-op and paged every info-level alert.
           receiver: blackhole
           group_by: ["alertname", "cluster"]
           group_wait: 1m
@@ -108,8 +96,6 @@ spec:
                 - severity = "critical"
               group_wait: 30s
               repeat_interval: 4h
-            # Warnings collapse into a single digest message and stay quiet
-            # overnight — none of them are worth waking up for.
             - receiver: pushover-notify
               matchers:
                 - severity = "warning"
@@ -129,9 +115,6 @@ spec:
                   - start_time: "00:00"
                     end_time: "08:00"
         inhibit_rules:
-          # A dead node cascades into every pod-level warning in the cluster;
-          # this is what turned one flapping node into 65 notifications. With
-          # three nodes, suppressing warnings globally is the right call.
           - source_matchers:
               - alertname =~ "NodeDown|NodeNotReady"
             target_matchers:
@@ -159,13 +142,6 @@ spec:
                 title: "{{ .Alerts.Firing | len }} warning(s)"
                 message: '{{ range .Alerts }}{{ .Labels.alertname }}: {{ .Annotations.summary }}{{ "\n" }}{{ end }}'
                 url: https://grafana.tale.me
-    # kube-prometheus' ruleset is written for a multi-tenant production fleet.
-    # On three nodes it produced 79 simultaneous alerts and four rounds of
-    # per-rule patching that never converged. Everything worth paging on is
-    # hand-written in manifests/vmrules.yaml instead.
-    #
-    # This also drops the chart's recording rules, which the Kubernetes Views
-    # dashboards depend on. Those are already broken and get replaced.
     defaultRules:
       enabled: false
     victoria-metrics-operator:
@@ -173,26 +149,13 @@ spec:
         enabled: false
         plain: false
       operator:
-        # Charts render ServiceMonitor/PodMonitor; the converter turns those into
-        # VMServiceScrape/VMPodScrape so chart upgrades carry their own scrape
-        # config instead of silently breaking a hand-written CR.
         disable_prometheus_converter: false
-        # Owner-reference converted objects to their source, so deleting a
-        # ServiceMonitor garbage-collects the VMServiceScrape it produced. Set
-        # through the chart's own key — adding the equivalent env var by hand
-        # collides with the one the chart already renders and SSA rejects the
-        # whole Deployment.
         enable_converter_ownership: true
       env:
-        # The ScrapeConfig CRD is deliberately not installed.
         - name: VM_ENABLEDPROMETHEUSCONVERTER_SCRAPECONFIG
           value: "false"
     prometheus-node-exporter:
       enabled: true
-      # Node Exporter Full has a Processes row that stays blank without this;
-      # the collector is off by default and costs a handful of series per node.
-      # `interrupts` would fill two more panels but is per-CPU per-IRQ, which is
-      # exactly the cardinality this stack just spent an afternoon shedding.
       extraArgs:
         - --collector.processes
       vmScrape:
@@ -201,11 +164,6 @@ spec:
           selector:
             matchLabels:
               app.kubernetes.io/name: prometheus-node-exporter
-          # node-exporter was the only node-scoped job without a `node` label —
-          # kubelet, kube-state-metrics and the OpenEBS exporter all carry one.
-          # Without it node metrics key on `instance` (an IP:port) and join
-          # nothing. Overriding `endpoints` replaces the chart's list wholesale,
-          # so its mountpoint drop is repeated here.
           endpoints:
             - port: metrics
               relabelConfigs:
@@ -218,11 +176,6 @@ spec:
                   regex: "/var/lib/kubelet/pods.+"
     kube-state-metrics:
       enabled: true
-      # kube_*_labels only exist for resources named here, and the Kubernetes
-      # Views dashboards join on them for nearly half their panels. Scoped to
-      # cluster-level objects — roughly 90 in total, so one series each. Pods
-      # are deliberately excluded: 555 of them times every label is the
-      # cardinality blowup the chart docs warn about.
       metricLabelsAllowlist:
         - namespaces=[*]
         - nodes=[*]

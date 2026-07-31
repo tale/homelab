@@ -1,12 +1,3 @@
-# Hand-written, replacing the Kubernetes Views boards (grafana.com 15757/15760).
-# Those spent half their panels on `windows_*` metrics this cluster will never
-# emit, and keyed the rest on kube-prometheus recording rules that vanished when
-# `defaultRules` was turned off in helmrelease.yaml.
-#
-# There are no per-pod network panels here on purpose:
-# `container_network_*_packets|errors|dropped` are dropped at scrape time, and
-# the byte counters that survive are already on the Network board with better
-# labels.
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:

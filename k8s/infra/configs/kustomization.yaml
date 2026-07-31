@@ -2,14 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # cert-manager
   - cert-manager/test-issuer.yaml
   - cert-manager/prod-issuer.yaml
 
-  # cilium (scrape config only; the CNI itself is bootstrapped via Talos)
   - cilium/service-monitor.yaml
 
-  # cloudnative-pg
   - cloudnative-pg/cluster.yaml
   - cloudnative-pg/blocky-database.yaml
   - cloudnative-pg/forgejo-database.yaml
@@ -20,13 +17,11 @@ resources:
   - cloudnative-pg/wasabi-credentials.sops.yaml
   - cloudnative-pg/scheduled-backup.yaml
 
-  # metallb
   - metallb/omada-pool.yaml
   - metallb/blocky-pool.yaml
   - metallb/samba-pool.yaml
   - metallb/minecraft-pool.yaml
 
-  # envoy
   - envoy/metallb.yaml
   - envoy/gateway-class.yaml
   - envoy/gateway.yaml
@@ -34,10 +29,8 @@ resources:
   - envoy/fallback-page.yaml
   - envoy/service-monitor.yaml
 
-  # flux-operator
   - flux-operator/instance.yaml
 
-  # openebs
   - openebs/disk-pools.yaml
   - openebs/storage-class.yaml
   - openebs/snapshot-class.yaml

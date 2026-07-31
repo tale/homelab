@@ -41,7 +41,6 @@ spec:
         storageClassName: cluster-nvmf
         size: 10Gi
       logs:
-        # Seems like a bug, they named it wrong?
         storageClass: cluster-nvmf
         size: 1Gi
     resources:

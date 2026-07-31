@@ -18,16 +18,10 @@ spec:
     serverSideApply: enabled
   values:
     prometheus:
-      # The metrics endpoint is HTTPS and authenticates, so the chart's own
-      # ServiceMonitor carries the bearer token and TLS config. rbacPrometheus
-      # grants the named ServiceAccount access to metallb's namespace.
       rbacPrometheus: true
       serviceAccount: vmagent-victoria-metrics-k8s-stack
       namespace: observability-system
       serviceMonitor:
         enabled: true
-    # 0.16 makes frr-k8s the default BGP backend and ships it as a DaemonSet on
-    # every node. We advertise over L2 only and have no BGP peers, so it is
-    # dead weight.
     frrk8s:
       enabled: false

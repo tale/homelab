@@ -5,8 +5,6 @@ metadata:
   namespace: observability-system
 spec:
   groups:
-    # Pushover priority 1, ignores the overnight mute. The bar is "this is
-    # losing data, or it will be broken by morning if nobody moves".
     - name: homelab-page
       rules:
         - alert: NodeDown
@@ -25,7 +23,6 @@ spec:
           annotations:
             summary: "Node {{ $labels.node }} is NotReady"
 
-        # Mayastor pool states: 0 unknown, 1 online, 2 degraded, 3 faulted.
         - alert: StoragePoolDegraded
           expr: diskpool_status != 1
           for: 5m
@@ -43,10 +40,6 @@ spec:
           annotations:
             summary: "OpenEBS pool {{ $labels.name }} has stalled I/O"
 
-        # The exporter runs beside the io-engine, so a pool whose node is down
-        # stops reporting entirely rather than reporting a bad status —
-        # StoragePoolDegraded cannot see that. Compare against an hour ago so a
-        # vanished pool still pages without hardcoding the pool count.
         - alert: StoragePoolMissing
           expr: >-
             count by (name) (diskpool_status offset 1h)
@@ -66,8 +59,6 @@ spec:
           annotations:
             summary: "CNPG instance {{ $labels.pod }} is down"
 
-        # Only the primary reports a meaningful replica count, so gate on the
-        # instance that is not in recovery.
         - alert: PostgresReplicaLost
           expr: >-
             cnpg_pg_replication_streaming_replicas == 0
@@ -101,8 +92,6 @@ spec:
           annotations:
             summary: "UPS {{ $labels.ups }} battery is low — shutdown imminent"
 
-        # predict_linear alone fires on any transient downward slope, so pair
-        # it with an absolute floor. Both must hold for an hour.
         - alert: FilesystemWillFillIn24h
           expr: >-
             predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay"}[6h], 24 * 3600) < 0
@@ -114,9 +103,6 @@ spec:
             summary: "{{ $labels.instance }}:{{ $labels.mountpoint }} fills within 24h"
             description: "{{ $value | humanize1024 }}B free and trending to zero."
 
-        # A full map stops accepting inserts, so new endpoints and connections
-        # fail with nothing obviously broken. `unless` the node is already gone,
-        # which NodeDown covers and which drives pressure up on its own.
         - alert: CiliumBPFMapPressure
           expr: >-
             cilium_bpf_map_pressure > 0.9
@@ -148,12 +134,8 @@ spec:
           annotations:
             summary: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} fills within 24h"
 
-    # Pushover priority -1, batched into one digest, silent 23:00–08:00.
-    # Things to deal with this week, not tonight.
     - name: homelab-notify
       rules:
-        # One rule instead of a per-component Down alert for every exporter.
-        # 30m rides out node reboots and Helm upgrades.
         - alert: ScrapeTargetDown
           expr: up == 0
           for: 30m
@@ -194,7 +176,6 @@ spec:
           annotations:
             summary: "Job {{ $labels.namespace }}/{{ $labels.job_name }} failed"
 
-        # Replicas report 0 until they are promoted, so ignore the unset value.
         - alert: PostgresBackupStale
           expr: >-
             cnpg_collector_last_available_backup_timestamp > 0
@@ -205,8 +186,6 @@ spec:
           annotations:
             summary: "CNPG backup for {{ $labels.pod }} is over 48h old"
 
-        # No CiliumAgentDown rule: ScrapeTargetDown already covers a dead agent.
-        # These catch the agent that is up but not converging.
         - alert: CiliumEndpointsNotReady
           expr: sum by (endpoint_state) (cilium_endpoint_state{endpoint_state!="ready"}) > 0
           for: 15m
@@ -232,8 +211,6 @@ spec:
             summary: "{{ $value }} pod(s) have no Cilium endpoint"
             description: "They have no connectivity and no policy enforcement."
 
-        # The Hubble UI used to answer "denied between whom". The drop metric now
-        # carries workload context, so the alert can name both ends itself.
         - alert: CiliumPolicyDropsSpiking
           expr: >-
             sum by (source_namespace, source, destination_namespace, destination)
@@ -254,9 +231,6 @@ spec:
 
     - name: homelab-watchdog
       rules:
-        # Always firing, currently routed to blackhole. Pointing it at an
-        # external ping endpoint is what makes silence mean "healthy" rather
-        # than "the monitoring stack is dead"; until then it does nothing.
         - alert: Watchdog
           expr: vector(1)
           labels:

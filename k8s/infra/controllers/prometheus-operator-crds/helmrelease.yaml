@@ -1,10 +1,3 @@
-# Charts only ever render ServiceMonitor/PodMonitor, so tracking their scrape
-# config means installing those two CRDs. The VM operator's converter turns them
-# into VMServiceScrape/VMPodScrape; nothing here runs prometheus-operator itself.
-#
-# Only the two kinds the converter consumes are installed — the other eight
-# (Prometheus, Alertmanager, ThanosRuler, ...) would be pure API surface for
-# controllers that do not exist in this cluster.
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:

@@ -17,8 +17,6 @@ spec:
       labels:
         app.kubernetes.io/name: wakapi
     spec:
-      # Wakapi reads WAKAPI_PORT from its own config; disable Kubernetes'
-      # service env var injection to avoid the "wakapi" Service shadowing it.
       enableServiceLinks: false
       securityContext:
         runAsNonRoot: true

@@ -13,10 +13,6 @@ spec:
       path: /metrics
       interval: 30s
 ---
-# The control-plane scrape above says nothing about traffic. Every request that
-# enters the cluster passes through the proxy pods, and until this existed none
-# of it was visible: no request rate, no 5xx, no latency for anything behind the
-# gateway. The proxy already serves stats on 19001, it just had no scrape.
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMPodScrape
 metadata:
@@ -35,10 +31,6 @@ spec:
         - action: replace
           source_labels: [__meta_kubernetes_pod_label_gateway_envoyproxy_io_owning_gateway_name]
           target_label: gateway
-      # Envoy publishes several thousand stats per listener and cluster. This is
-      # a keep-list, not a drop-list: everything the Ingress dashboard asks for,
-      # nothing else. Inverting it would let a gateway config change quietly add
-      # a few thousand series.
       metricRelabelConfigs:
         - action: keep
           source_labels: [__name__]

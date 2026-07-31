@@ -4,10 +4,6 @@ metadata:
   name: pds-http-route
   namespace: bluesky-pds
   annotations:
-    # Proxy through Cloudflare to hide the homelab's public IP. CF supports
-    # WebSockets (subscribeRepos firehose) and preserves the Host header.
-    # Blob uploads are capped at 50MB below, well under CF's 100MB Free body
-    # limit, so this is safe.
     external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
 spec:
   parentRefs:

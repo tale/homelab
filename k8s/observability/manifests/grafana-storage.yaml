@@ -1,17 +1,3 @@
-# Hand-written: storage and the backups protecting it lived in different places,
-# so "is this volume full" and "is it recoverable" were never on one screen.
-#
-# This also absorbed the separate OpenEBS / Mayastor board, which was ~80% the same panels against the same metrics — pool status, usage, IOPS, throughput and
-# latency were on both, so "is this volume full" and "is the pool healthy" meant
-# opening two screens.
-#
-# Pool and volume panels aggregate `max by (...)`: the io-engine exporter
-# re-registers under a new pod on every node reboot, so raw series carry a stale
-# generation alongside the live one.
-#
-# The latency panels divide a cumulative microsecond counter by its op counter,
-# which yields mean-per-op. Mayastor exposes no histogram, so there is no p99
-# available here.
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:

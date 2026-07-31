@@ -5,24 +5,6 @@ metadata:
   namespace: authentik
 data:
   oidc-providers.yaml: |
-    # Every OAuth2 provider + application, adopted from objects originally
-    # created through the admin UI.
-    #
-    # Providers are keyed on `client_id`, not `name` — both are unique, but
-    # client_id is what each relying party is pinned to, so it never changes
-    # casually. Keying on it makes `name` a free-form attribute that renames in
-    # place. Change a client_id here and you fork the object: a second provider
-    # appears, the application stays bound to the original, and nothing errors.
-    #
-    # `client_secret` comes from `!Env`, wired in helmrelease.yaml out of the
-    # `authentik-oidc-secrets` sops secret. Values were seeded from what was
-    # already live, so this declares the running state rather than replacing it.
-    #
-    # Rotating one means updating the relying party in the same change. Five of
-    # these have their client config in this repo and rotate cleanly. headplane
-    # (deployed elsewhere) and home-assistant (config in `.storage` on its PVC)
-    # do not — change their secret here and you must update the far side by hand
-    # or the integration breaks.
     version: 1
     metadata:
       name: Tale - OIDC Providers
@@ -77,7 +59,6 @@ data:
             - matching_mode: strict
               url: http://localhost:3000/login/generic_oauth
 
-      # Explicit consent, unlike every other provider here.
       - model: authentik_providers_oauth2.oauth2provider
         id: headplane-provider
         identifiers:
@@ -162,7 +143,6 @@ data:
     metadata:
       name: Tale - Passkey Authentication Flow
     entries:
-      # Passkey validation stage (WebAuthn only)
       - model: authentik_stages_authenticator_validate.authenticatorvalidatestage
         id: passkey-validation
         identifiers:
@@ -172,7 +152,6 @@ data:
             - webauthn
           not_configured_action: skip
 
-      # Password stage (fallback)
       - model: authentik_stages_password.passwordstage
         id: password-stage
         identifiers:
@@ -182,7 +161,6 @@ data:
             - authentik.core.auth.InbuiltBackend
             - authentik.core.auth.TokenBackend
 
-      # Identification stage with passkey autofill
       - model: authentik_stages_identification.identificationstage
         id: identification
         identifiers:
@@ -193,13 +171,11 @@ data:
             - username
           webauthn_stage: !KeyOf passkey-validation
 
-      # Login stage
       - model: authentik_stages_user_login.userloginstage
         id: login
         identifiers:
           name: tale-authentication-login
 
-      # Flow
       - model: authentik_flows.flow
         id: flow
         identifiers:
@@ -210,8 +186,6 @@ data:
           designation: authentication
           authentication: none
 
-      # Stage bindings
-      # 1. Identification (with passkey autofill)
       - model: authentik_flows.flowstagebinding
         id: binding-identification
         identifiers:
@@ -219,7 +193,6 @@ data:
           stage: !KeyOf identification
           target: !KeyOf flow
 
-      # 2. Password (conditional — skipped if passkey was used)
       - model: authentik_flows.flowstagebinding
         id: binding-password
         identifiers:
@@ -229,7 +202,6 @@ data:
         attrs:
           re_evaluate_policies: true
 
-      # 3. MFA validation (conditional — skipped if passkey was used)
       - model: authentik_flows.flowstagebinding
         id: binding-mfa
         identifiers:
@@ -239,14 +211,12 @@ data:
         attrs:
           re_evaluate_policies: true
 
-      # 4. Login
       - model: authentik_flows.flowstagebinding
         identifiers:
           order: 100
           stage: !KeyOf login
           target: !KeyOf flow
 
-      # Policy: skip password when passkey was used
       - model: authentik_policies_expression.expressionpolicy
         id: policy-skip-password
         identifiers:
@@ -258,7 +228,6 @@ data:
                 return True
             return not hasattr(flow_plan.context.get("pending_user"), "backend")
 
-      # Policy: skip MFA when passkey was used
       - model: authentik_policies_expression.expressionpolicy
         id: policy-skip-mfa
         identifiers:
@@ -270,7 +239,6 @@ data:
                 return True
             return not (flow_plan.context.get("auth_method") == "auth_webauthn_pwl")
 
-      # Bind policies to stages
       - model: authentik_policies.policybinding
         identifiers:
           order: 10
@@ -288,25 +256,10 @@ data:
           failure_result: true
 
   brand-theme.yaml: |
-    # rev: 3 — bump this to invalidate worker's last_applied_hash and force re-apply
     version: 1
     metadata:
       name: Tale - Brand & Theme
     entries:
-      # Default brand: dark theme + custom CSS
-      # The CSS is Pocket ID-inspired for the login flow and a refined
-      # monochrome dark theme for the user/admin interface.
-      #
-      # `state: present` makes the importer UPDATE the existing default brand
-      # (matched by domain). Without an explicit state the importer also defaults
-      # to `present`, but we set it explicitly so it can never be confused with
-      # the system's `default-brand.yaml`, which uses `state: created` (= no-op
-      # if the brand already exists).
-      #
-      # NOTE: `attributes` is a JSONField — the importer REPLACES it whole on
-      # apply, it does not deep-merge. We're OK because the default brand ships
-      # with empty attributes; if you later add other settings via the UI, fold
-      # them into this blueprint or they will be wiped on the next apply.
       - model: authentik_brands.brand
         state: present
         identifiers:

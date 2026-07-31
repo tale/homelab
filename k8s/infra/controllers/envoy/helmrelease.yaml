@@ -16,9 +16,6 @@ spec:
     createNamespace: true
   upgrade:
     serverSideApply: enabled
-    # 1.8 requires the Gateway API CRDs at v1.5.1 and the chart ships them in a
-    # crds/ directory, which Helm ignores on upgrade. Without this they stay at
-    # v1.4.1 and the controller watches ListenerSet against the wrong schema.
     crds: CreateReplace
   rollback:
     serverSideApply: enabled

@@ -11,10 +11,6 @@ spec:
       root_url: "https://grafana.tale.me"
     rendering:
       server_url: http://grafana-image-renderer.observability-system.svc.cluster.local:8081/render
-      # The renderer loads the dashboard as a browser would, so it needs a URL it
-      # can actually reach. `root_url` points at the public hostname, which
-      # resolves out through the gateway and back — the in-cluster Service is the
-      # short path and does not depend on ingress being healthy.
       callback_url: http://grafana-service.observability-system.svc.cluster.local:3000/
     database:
       type: postgres
@@ -55,10 +51,6 @@ spec:
                     secretKeyRef:
                       name: grafana-db-credentials
                       key: password
-                # The renderer requires a token because the live-image refresher
-                # calls it directly. Grafana must present the same one or it
-                # reports "no image renderer found/installed" — which looks like
-                # the renderer is missing rather than rejecting it.
                 - name: GF_RENDERING_RENDERER_TOKEN
                   valueFrom:
                     secretKeyRef:

@@ -1,15 +1,3 @@
-# Hand-written: the one screen that answers "is anything wrong, and where".
-# Everything here is either a number that should never move (nodes ready, certs,
-# backups) or the first place a real problem shows up. Depth lives in the boards
-# linked across the top — this one deliberately does not scroll far.
-#
-# Node panels aggregate `by (node)`. That label only exists on node-exporter
-# because helmrelease.yaml relabels it in; without it these panels key on an
-# IP:port and join nothing else in the cluster.
-#
-# Ingress panels read the Envoy Gateway *data plane*, scraped by the VMPodScrape
-# in k8s/infra/configs/envoy/service-monitor.yaml. `https-10443` is the real
-# listener; the other conn_manager prefixes are Envoy's own admin endpoints.
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
@@ -3165,14 +3153,14 @@ spec:
         {
           "id": 47,
           "type": "timeseries",
-          "title": "Log Errors by Namespace",
+          "title": "Log Error Rate",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
           "gridPos": {
             "h": 8,
-            "w": 24,
+            "w": 12,
             "x": 0,
             "y": 61
           },
@@ -3183,28 +3171,31 @@ spec:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "_time:$__range (error OR panic OR fatal) | stats by (kubernetes.pod_namespace) count() logs",
-              "queryType": "stats",
-              "step": "5m"
+              "expr": "(error OR panic OR fatal) | stats count() errors",
+              "queryType": "statsRange",
+              "maxDataPoints": 300,
+              "legendFormat": "errors"
             }
           ],
           "options": {
             "legend": {
-              "displayMode": "table",
-              "placement": "right",
-              "showLegend": true,
-              "calcs": [
-                "sum"
-              ]
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false,
+              "calcs": []
             },
             "tooltip": {
-              "mode": "multi",
+              "mode": "single",
               "sort": "desc"
             }
           },
           "fieldConfig": {
             "defaults": {
               "unit": "short",
+              "color": {
+                "mode": "fixed",
+                "fixedColor": "#d95926"
+              },
               "custom": {
                 "drawStyle": "bars",
                 "fillOpacity": 80,
@@ -3212,17 +3203,69 @@ spec:
                 "barAlignment": 0,
                 "axisBorderShow": false,
                 "stacking": {
-                  "mode": "normal",
+                  "mode": "none",
                   "group": "A"
                 }
+              }
+            },
+            "overrides": []
+          },
+          "description": "Whole-cluster error lines over time. LogsQL matches whole words, so this does not fire on `errorless` or a pod named `fatal-worker`. Deliberately ungrouped \u2014 VictoriaLogs only buckets ungrouped stats over ranges wider than an hour."
+        },
+        {
+          "id": 48,
+          "type": "bargauge",
+          "title": "Log Errors by Namespace",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 61
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
               },
+              "expr": "(error OR panic OR fatal) | stats by (kubernetes.pod_namespace) count() errors | sort by (errors desc) | limit 8",
+              "queryType": "stats",
+              "maxDataPoints": 300,
+              "legendFormat": "{{kubernetes.pod_namespace}}"
+            }
+          ],
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "orientation": "horizontal",
+            "displayMode": "basic",
+            "showUnfilled": true,
+            "minVizWidth": 8,
+            "minVizHeight": 16,
+            "valueMode": "color",
+            "namePlacement": "auto",
+            "sizing": "auto"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
               "color": {
                 "mode": "palette-classic-by-name"
               }
             },
             "overrides": []
           },
-          "description": "LogsQL matches whole words, so this does not fire on `errorless` or a pod named `fatal-worker`. Bucketed by namespace to show which corner of the cluster is unhappy."
+          "description": "Totals over the selected range, not a time series: a grouped LogsQL stats query collapses to a single bucket past an hour, so the breakdown is an instant query and the panel beside it carries the shape over time."
         }
       ]
     }

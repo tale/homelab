@@ -1,7 +1,3 @@
-# Cilium is bootstrapped as a Talos inline manifest, applied long before any
-# CRD exists — so the chart cannot ship its own ServiceMonitors and these are
-# hand-written. `k8s-app: cilium` is shared with hubble-peer, hence the more
-# specific selector on the agent and the operator.
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:

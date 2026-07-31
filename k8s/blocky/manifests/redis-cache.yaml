@@ -19,6 +19,7 @@ spec:
       containers:
         - name: blocky-redis
           image: redis:7
+          args: ["--save", "", "--appendonly", "no"]
           ports:
             - containerPort: 6379
           securityContext:

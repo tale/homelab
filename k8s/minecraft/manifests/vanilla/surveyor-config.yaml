@@ -7,19 +7,6 @@ metadata:
   labels:
     app.kubernetes.io/name: "vanilla"
 data:
-  # itzg patch-set applied (via PATCH_DEFINITIONS) to the surveyor.toml the mod
-  # writes under /data/config on first launch. Runs before the JVM starts, so
-  # the modified values are in effect when Surveyor loads its config.
-  #
-  # terrain/structures/landmarks/waypoints=SERVER send *server-known* data — the
-  # full map the server ever recorded — so a solo login gets everything, even
-  # when everyone else is offline (GROUP, the default, only sends what the share
-  # group knows). globalSharing=true keeps the whole server as one share group,
-  # and positions=GROUP shares group members' last-known location while offline
-  # instead of SERVER, which only broadcasts players currently online.
-  # Files under a PATCH_DEFINITIONS directory are single patch *definitions*
-  # ({file, ops}); the {patches:[...]} patch-set wrapper is only valid when
-  # PATCH_DEFINITIONS points directly at one file.
   surveyor.json: |
     {
       "file": "/data/config/surveyor.toml",

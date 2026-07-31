@@ -1,15 +1,3 @@
-# Grafana renders panels to PNG by driving a headless Chromium, which it will not
-# do in-process. Without this, `/render` still answers HTTP 200 — it just returns
-# an image of an error card, which is a good way to believe a screenshot worked
-# when it did not.
-#
-# Two things it buys: shareable panel images, and screenshots attached to
-# Pushover alerts (Alertmanager can only include an image if something can render
-# one).
-#
-# There is no Helm chart for the standalone renderer, hence a plain Deployment.
-# Deliberately ClusterIP with no HTTPRoute: it will render any URL it is handed,
-# so it is not something to expose.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,18 +33,12 @@ spec:
               value: "true"
             - name: RENDERING_MODE
               value: clustered
-            # One browser, several tabs. `default` mode serialises every render
-            # behind a single tab, which times out as soon as two panels are
-            # requested at once.
             - name: RENDERING_CLUSTERING_MODE
               value: browser
             - name: RENDERING_CLUSTERING_MAX_CONCURRENCY
               value: "3"
             - name: RENDERING_VERBOSE_LOGGING
               value: "false"
-            # Without this the renderer only accepts calls carrying a render key
-            # Grafana itself signed. The live-image refresher calls it directly,
-            # so it needs a token of its own.
             - name: AUTH_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -67,9 +49,6 @@ spec:
               cpu: 50m
               memory: 256Mi
             limits:
-              # Chromium is the whole cost here. 1Gi is enough for a full-page
-              # dashboard render at 1600px; below ~512Mi it starts OOMing midway
-              # and returns a blank image rather than an error.
               memory: 1Gi
           securityContext:
             allowPrivilegeEscalation: false
