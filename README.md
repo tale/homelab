@@ -74,8 +74,8 @@ The `dependsOn` chain handles ordering: controllers → configs → apps.
 
 ## Adding a New App
 
-1. Create `k8s/<name>/` with `kustomization.yaml`, `flux.yaml`, and `manifests/`
-2. Add `<name>/flux.yaml` to `k8s/kustomization.yaml`
+1. Create `k8s/<name>/` with `kustomization.yaml` and `manifests/`
+2. Add a Flux `Kustomization` doc for `<name>` to `k8s/flux.yaml`
 3. Push
 
 ## Hardware

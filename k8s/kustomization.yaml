@@ -2,14 +2,4 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - infra/flux.yaml
-  - observability/flux.yaml
-  - blocky/flux.yaml
-  - omada-controller/flux.yaml
-  - samba/flux.yaml
-  - forgejo/flux.yaml
-  - authentik/flux.yaml
-  - bluesky-pds/flux.yaml
-  - home-assistant/flux.yaml
-  - wakapi/flux.yaml
-  - minecraft/flux.yaml
+  - flux.yaml

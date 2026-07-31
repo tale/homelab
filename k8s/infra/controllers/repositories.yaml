@@ -1,0 +1,106 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: jetstack
+  namespace: cert-manager
+spec:
+  type: oci
+  url: oci://quay.io/jetstack/charts
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: cloudnative-pg
+  namespace: cnpg-system
+spec:
+  url: https://cloudnative-pg.github.io/charts
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: envoy-gateway
+  namespace: envoy-gateway-system
+spec:
+  type: oci
+  url: oci://docker.io/envoyproxy
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: external-dns
+  namespace: cert-manager
+spec:
+  url: https://kubernetes-sigs.github.io/external-dns/
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: flux-operator
+  namespace: flux-system
+spec:
+  type: oci
+  url: oci://ghcr.io/controlplaneio-fluxcd/charts
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: grafana-operator
+  namespace: observability-system
+spec:
+  type: oci
+  url: oci://ghcr.io/grafana/helm-charts
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: metallb
+  namespace: metallb-system
+spec:
+  type: oci
+  url: oci://quay.io/metallb/chart
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: openebs
+  namespace: openebs
+spec:
+  url: https://openebs.github.io/openebs
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: prometheus-community
+  namespace: observability-system
+spec:
+  type: default
+  url: https://prometheus-community.github.io/helm-charts
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: victoriametrics
+  namespace: observability-system
+spec:
+  type: oci
+  url: oci://ghcr.io/victoriametrics/helm-charts
+  interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: backube
+  namespace: volsync-system
+spec:
+  type: default
+  url: https://backube.github.io/helm-charts
+  interval: 1h
