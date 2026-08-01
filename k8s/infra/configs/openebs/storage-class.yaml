@@ -9,3 +9,4 @@ parameters:
   protocol: "nvmf"
   repl: "3"
 provisioner: "io.openebs.csi-mayastor"
+reclaimPolicy: "Retain"
