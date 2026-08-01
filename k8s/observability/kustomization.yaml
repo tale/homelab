@@ -3,7 +3,6 @@ kind: Kustomization
 
 resources:
   - helmrelease.yaml
-  - manifests/namespace.yaml
   - manifests/grafana-oidc.sops.yaml
   - manifests/grafana-renderer-token.sops.yaml
   - manifests/grafana-http-route.yaml

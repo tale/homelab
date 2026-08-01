@@ -34,208 +34,39 @@ spec:
     secretRef:
       name: sops-age
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSet
 metadata:
-  name: authentik
+  name: apps
   namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
-  dependsOn:
-    - name: infra-configs
-  interval: 1h
-  path: ./k8s/authentik
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: blocky
-  namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-spec:
-  dependsOn:
-    - name: infra-configs
-  interval: 1h
-  path: ./k8s/blocky
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: bluesky-pds
-  namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-spec:
-  dependsOn:
-    - name: infra-configs
-  interval: 1h
-  path: ./k8s/bluesky-pds
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: forgejo
-  namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-spec:
-  dependsOn:
-    - name: infra-configs
-  interval: 1h
-  path: ./k8s/forgejo
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: home-assistant
-  namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-spec:
-  dependsOn:
-    - name: infra-configs
-  interval: 1h
-  path: ./k8s/home-assistant
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: minecraft
-  namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-spec:
-  dependsOn:
-    - name: infra-configs
-  interval: 1h
-  path: ./k8s/minecraft
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: observability
-  namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-spec:
-  dependsOn:
-    - name: infra-configs
-  interval: 1h
-  path: ./k8s/observability
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: omada-controller
-  namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-spec:
-  dependsOn:
-    - name: infra-configs
-  interval: 1h
-  path: ./k8s/omada-controller
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: samba
-  namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-spec:
-  dependsOn:
-    - name: infra-configs
-  interval: 1h
-  path: ./k8s/samba
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: wakapi
-  namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-spec:
-  dependsOn:
-    - name: infra-configs
-  interval: 1h
-  path: ./k8s/wakapi
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
+  inputs:
+    - app: authentik
+    - app: blocky
+    - app: bluesky-pds
+    - app: forgejo
+    - app: home-assistant
+    - app: minecraft
+    - app: observability
+    - app: omada-controller
+    - app: samba
+    - app: wakapi
+  resources:
+    - apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      metadata:
+        name: << inputs.app >>
+        namespace: flux-system
+      spec:
+        dependsOn:
+          - name: infra-configs
+        interval: 1h
+        path: ./k8s/<< inputs.app >>
+        prune: true
+        sourceRef:
+          kind: GitRepository
+          name: flux-system
+        decryption:
+          provider: sops
+          secretRef:
+            name: sops-age
