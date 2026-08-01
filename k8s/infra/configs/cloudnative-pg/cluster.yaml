@@ -14,8 +14,27 @@ spec:
     size: 50Gi
   monitoring:
     enablePodMonitor: true
+  bootstrap:
+    recovery:
+      source: central-postgres-archive
+  externalClusters:
+    - name: central-postgres-archive
+      barmanObjectStore:
+        serverName: central-postgres
+        destinationPath: s3://tale-home/cnpg/
+        endpointURL: https://s3.wasabisys.com
+        s3Credentials:
+          accessKeyId:
+            name: cnpg-wasabi-credentials
+            key: ACCESS_KEY_ID
+          secretAccessKey:
+            name: cnpg-wasabi-credentials
+            key: ACCESS_SECRET_KEY
+        wal:
+          compression: gzip
   backup:
     barmanObjectStore:
+      serverName: central-postgres-r1
       destinationPath: s3://tale-home/cnpg/
       endpointURL: https://s3.wasabisys.com
       s3Credentials:
