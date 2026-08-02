@@ -4,7 +4,7 @@ metadata:
   name: central-postgres-backup
   namespace: cnpg-system
 spec:
-  schedule: "0 4 * * *"
+  schedule: "0 0 4 * * *"
   backupOwnerReference: self
   cluster:
     name: central-postgres
