@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: omada-mongodb-dump
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: cluster-nvmf
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: omada-mongodb-dump
+  namespace: default
+spec:
+  schedule: "0 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: mongodump
+              image: mongo:8
+              command:
+                - sh
+                - -c
+                - >-
+                  mongodump
+                  --host=omada-mongodb
+                  --username=root
+                  --password="$MONGO_ROOT_PASSWORD"
+                  --authenticationDatabase=admin
+                  --db=omada
+                  --gzip
+                  --archive=/dump/omada.archive.gz.tmp
+                  && mv -f /dump/omada.archive.gz.tmp /dump/omada.archive.gz
+                  && ls -l /dump/omada.archive.gz
+              env:
+                - name: MONGO_ROOT_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: omada-db-secret
+                      key: mongodb-root-password
+              volumeMounts:
+                - name: dump
+                  mountPath: /dump
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
+          volumes:
+            - name: dump
+              persistentVolumeClaim:
+                claimName: omada-mongodb-dump
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: omada-mongodb
+  namespace: default
+spec:
+  sourcePVC: omada-mongodb-dump
+  trigger:
+    schedule: "30 2 * * *"
+  restic:
+    repository: omada-mongodb-restic
+    cacheCapacity: 1Gi
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: omada-controller-data
+  namespace: default
+spec:
+  sourcePVC: data-omada-controller-0
+  trigger:
+    schedule: "45 2 * * *"
+  restic:
+    repository: omada-controller-restic
+    cacheCapacity: 2Gi
