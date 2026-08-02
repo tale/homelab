@@ -70,6 +70,11 @@ spec:
               value: "Aerum,semsclub"
             - name: "PAUSE_WHEN_EMPTY_SECONDS"
               value: "60"
+            - name: "RCON_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "vanilla-rcon"
+                  key: "password"
           ports:
             - name: "minecraft"
               containerPort: 25565
@@ -116,10 +121,58 @@ spec:
                 - "ALL"
             seccompProfile:
               type: "RuntimeDefault"
+        - name: "backup"
+          image: "itzg/mc-backup:2026.7.3"
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: "BACKUP_INTERVAL"
+              value: "6h"
+            - name: "INITIAL_DELAY"
+              value: "5m"
+            - name: "PRUNE_BACKUPS_DAYS"
+              value: "1"
+            - name: "BACKUP_NAME"
+              value: "vanilla"
+            - name: "SRC_DIR"
+              value: "/data"
+            - name: "DEST_DIR"
+              value: "/backups"
+            - name: "TZ"
+              value: "America/New_York"
+            - name: "RCON_HOST"
+              value: "localhost"
+            - name: "RCON_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "vanilla-rcon"
+                  key: "password"
+          volumeMounts:
+            - name: "data"
+              mountPath: "/data"
+              readOnly: true
+            - name: "backups"
+              mountPath: "/backups"
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              memory: "256Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - "ALL"
+            seccompProfile:
+              type: "RuntimeDefault"
       volumes:
         - name: "data"
           persistentVolumeClaim:
             claimName: "vanilla-data"
+        - name: "backups"
+          persistentVolumeClaim:
+            claimName: "vanilla-backups"
         - name: "surveyor-patch"
           configMap:
             name: "vanilla-surveyor-patch"

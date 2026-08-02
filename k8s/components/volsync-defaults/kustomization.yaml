@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+patches:
+  - target:
+      group: volsync.backube
+      kind: ReplicationSource
+    patch: |
+      - op: add
+        path: /spec/restic/copyMethod
+        value: Snapshot
+      - op: add
+        path: /spec/restic/volumeSnapshotClassName
+        value: cluster-nvmf-snapshot
+      - op: add
+        path: /spec/restic/storageClassName
+        value: cluster-nvmf
+      - op: add
+        path: /spec/restic/cacheStorageClassName
+        value: cluster-nvmf
+      - op: add
+        path: /spec/restic/pruneIntervalDays
+        value: 14
+      - op: add
+        path: /spec/restic/retain
+        value:
+          daily: 7
+          weekly: 5
+          monthly: 6

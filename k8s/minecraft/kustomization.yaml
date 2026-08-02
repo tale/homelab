@@ -6,5 +6,11 @@ resources:
 
   - manifests/vanilla/pvc.yaml
   - manifests/vanilla/surveyor-config.yaml
+  - manifests/vanilla/rcon-secret.sops.yaml
+  - manifests/vanilla/restic-credentials.sops.yaml
   - manifests/vanilla/deployment.yaml
   - manifests/vanilla/service.yaml
+  - manifests/vanilla/backup.yaml
+
+components:
+  - ../components/volsync-defaults

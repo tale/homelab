@@ -7,3 +7,6 @@ resources:
   - manifests/restic-credentials.sops.yaml
   - manifests/backup.yaml
   - helmrelease.yaml
+
+components:
+  - ../components/volsync-defaults

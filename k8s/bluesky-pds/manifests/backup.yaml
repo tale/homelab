@@ -9,13 +9,4 @@ spec:
     schedule: "0 3 * * *"
   restic:
     repository: bluesky-pds-restic
-    copyMethod: Snapshot
-    volumeSnapshotClassName: cluster-nvmf-snapshot
-    storageClassName: cluster-nvmf
     cacheCapacity: 1Gi
-    cacheStorageClassName: cluster-nvmf
-    pruneIntervalDays: 14
-    retain:
-      daily: 7
-      weekly: 5
-      monthly: 6
