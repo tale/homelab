@@ -104,3 +104,13 @@ spec:
   type: default
   url: https://backube.github.io/helm-charts
   interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: bjw-s
+  namespace: flux-system
+spec:
+  type: oci
+  url: oci://ghcr.io/bjw-s-labs/helm
+  interval: 1h
