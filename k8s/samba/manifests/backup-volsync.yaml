@@ -12,7 +12,7 @@ spec:
     repository: "smb-store-restic"
     copyMethod: "Direct"
     cacheCapacity: "4Gi"
-    cacheStorageClassName: "cluster-nvmf"
+    cacheStorageClassName: "cluster-nvmf-ephemeral"
     pruneIntervalDays: 14
     retain:
       daily: 7

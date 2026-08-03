@@ -21,8 +21,8 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: eufy-security-ws
-          image: ghcr.io/tale/eufy-security-ws:mqtt-lock
-          imagePullPolicy: Always
+          image: bropat/eufy-security-ws:3.1.0
+          imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:
                 name: eufy-ws-secrets

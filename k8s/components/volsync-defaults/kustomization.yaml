@@ -14,10 +14,10 @@ patches:
         value: cluster-nvmf-snapshot
       - op: add
         path: /spec/restic/storageClassName
-        value: cluster-nvmf
+        value: cluster-nvmf-ephemeral
       - op: add
         path: /spec/restic/cacheStorageClassName
-        value: cluster-nvmf
+        value: cluster-nvmf-ephemeral
       - op: add
         path: /spec/restic/pruneIntervalDays
         value: 14

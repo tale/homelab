@@ -1,0 +1,34 @@
+default_config:
+
+homeassistant:
+  name: Home
+  country: US
+  currency: USD
+  time_zone: America/New_York
+  unit_system: us_customary
+  external_url: https://home.tale.me
+  internal_url: https://home.tale.me
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+    - 10.244.0.0/16
+    - 172.31.42.0/24
+
+recorder:
+  db_url: !secret recorder_db_url
+  purge_keep_days: 30
+
+homekit:
+  - name: Home Assistant Bridge
+    port: 21063
+    filter:
+      include_domains:
+        - alarm_control_panel
+        - binary_sensor
+        - lock
+
+automation: !include automations.yaml
+scene: !include scenes.yaml
+script: !include scripts.yaml
