@@ -46,15 +46,44 @@ metadata:
 spec:
   inputs:
     - app: authentik
+      path: ./k8s/authentik
+      dependsOn: [{ "name": "infra-configs" }]
     - app: blocky
+      path: ./k8s/blocky
+      dependsOn: [{ "name": "infra-configs" }]
     - app: bluesky-pds
+      path: ./k8s/bluesky-pds
+      dependsOn: [{ "name": "infra-configs" }]
     - app: forgejo
-    - app: home-assistant
+      path: ./k8s/forgejo
+      dependsOn: [{ "name": "infra-configs" }]
     - app: minecraft
+      path: ./k8s/minecraft
+      dependsOn: [{ "name": "infra-configs" }]
     - app: observability
+      path: ./k8s/observability
+      dependsOn: [{ "name": "infra-configs" }]
     - app: omada-controller
-    - app: samba
+      path: ./k8s/omada-controller
+      dependsOn: [{ "name": "infra-configs" }]
     - app: wakapi
+      path: ./k8s/wakapi
+      dependsOn: [{ "name": "infra-configs" }]
+    - app: home-automation
+      path: ./k8s/home-automation
+      dependsOn: [{ "name": "infra-configs" }]
+    - app: home-assistant
+      path: ./k8s/home-automation/home-assistant
+      dependsOn: [{ "name": "infra-configs" }, { "name": "home-automation" }]
+    - app: eufy-security-ws
+      path: ./k8s/home-automation/eufy-security-ws
+      dependsOn: [{ "name": "infra-configs" }, { "name": "home-automation" }]
+    - app: scrypted
+      path: ./k8s/home-automation/scrypted
+      dependsOn: [{ "name": "infra-configs" }, { "name": "home-automation" }]
+    - app: samba
+      path: ./k8s/home-automation/samba
+      dependsOn: [{ "name": "infra-configs" }, { "name": "home-automation" }]
   resources:
     - apiVersion: kustomize.toolkit.fluxcd.io/v1
       kind: Kustomization
@@ -62,10 +91,9 @@ spec:
         name: << inputs.app >>
         namespace: flux-system
       spec:
-        dependsOn:
-          - name: infra-configs
+        dependsOn: << inputs.dependsOn | toJson >>
         interval: 1h
-        path: ./k8s/<< inputs.app >>
+        path: << inputs.path >>
         prune: true
         sourceRef:
           kind: GitRepository

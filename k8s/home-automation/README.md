@@ -1,4 +1,31 @@
-# Home Assistant
+# Home automation
+
+One Flux Kustomization per package, all in the `home-automation` namespace:
+
+| Package | Path | Contents |
+| --- | --- | --- |
+| `home-automation` | `.` | the namespace and the `bjw-s` HelmRepository |
+| `home-assistant` | `home-assistant/` | the hub |
+| `eufy-security-ws` | `eufy-security-ws/` | the Eufy locks |
+| `scrypted` | `scrypted/` | the Ring camera |
+| `samba` | `samba/` | the SMB share |
+
+The shared resources sit at the directory root rather than in a subdirectory.
+The root `kustomization.yaml` lists only them, and kustomize includes only what
+a kustomization lists — the app subdirectories beneath it are not swept in. That
+holds only because the file exists; a Kustomization pointing at a path *without*
+one absorbs everything below it recursively.
+
+The four app packages `dependsOn` the `home-automation` Kustomization, which is
+named for the namespace rather than the directory.
+
+The namespace carries `kustomize.toolkit.fluxcd.io/prune: disabled`. Deleting a
+namespace cascades to everything inside it, and a namespace that moves between
+Kustomizations is exactly when an unguarded prune would fire.
+
+Packages are flat — `kustomization.yaml`, `helmrelease.yaml`, and at most one
+`secret.sops.yaml`. Directories only appear where files are mounted as a unit,
+like Home Assistant's `config/`.
 
 [Home Assistant](https://home-assistant.io) is a nice home automation platform.
 I prefer it over something like Homebridge because its a lot more mature,

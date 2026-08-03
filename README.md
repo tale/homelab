@@ -27,11 +27,11 @@ Configuration for my homelab mini-cluster running on
 - [Blocky](./k8s/blocky/) — DNS proxy and ad-blocker
 - [Bluesky PDS](./k8s/bluesky-pds/) — Personal Data Server for atproto
 - [Forgejo](./k8s/forgejo/) — Git server with GitHub mirroring via Gickup
-- [Home Assistant](./k8s/home-assistant/) — Home automation, with Eufy WS and Scrypted
+- [Home Assistant](./k8s/home-automation/) — Home automation, with Eufy WS and Scrypted
 - [Minecraft](./k8s/minecraft/) — Vanilla survival server, exposed on the LAN via MetalLB
 - [Observability](./k8s/observability/) — VictoriaMetrics, Grafana, alerting
 - [Omada Controller](./k8s/omada-controller/) — TP-Link network management
-- [Samba](./k8s/samba/) — Network file shares
+- [Samba](./k8s/home-automation/samba/) — Network file shares
 - [Wakapi](./k8s/wakapi/) — Self-hosted WakaTime-compatible coding stats
 
 ## Dependency Graph

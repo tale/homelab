@@ -1,0 +1,9 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: bjw-s
+  namespace: home-automation
+spec:
+  type: oci
+  url: oci://ghcr.io/bjw-s-labs/helm
+  interval: 1h
