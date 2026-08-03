@@ -6,5 +6,5 @@ resources:
   - manifests/config.sops.yaml
   - manifests/deployment.yaml
   - manifests/service.yaml
-  - manifests/restic-credentials.sops.yaml
+  - manifests/restic-credentials.yaml
   - manifests/backup-volsync.yaml

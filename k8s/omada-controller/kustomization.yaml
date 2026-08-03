@@ -8,7 +8,7 @@ resources:
   - manifests/omada-mongodb-uri.sops.yaml
   - manifests/mongodb.yaml
   - manifests/mongodb-init.yaml
-  - manifests/restic-credentials.sops.yaml
+  - manifests/restic-credentials.yaml
   - manifests/backup.yaml
 
 components:

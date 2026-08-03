@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - manifests/pds-secrets.sops.yaml
   - manifests/pds-http-route.yaml
-  - manifests/restic-credentials.sops.yaml
+  - manifests/restic-credentials.yaml
   - manifests/backup.yaml
   - helmrelease.yaml
 

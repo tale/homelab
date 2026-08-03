@@ -51,49 +51,13 @@ the two restore into different situations: the dump restores into an identical
 controller, while the `.cfg` is the only officially supported path into a fresh
 one.
 
-#### Bootstrap
+Credentials come from the shared `volsync-b2` secret — see
+[`k8s/infra/configs/volsync/`](../infra/configs/volsync/). `manifests/restic-credentials.yaml`
+holds only the repository paths; the endpoint, bucket, keys, and password are
+substituted by Flux at apply time.
 
-The Kustomization will not build without the repository secrets. This reuses the
-Wasabi keys already in the cluster, so no credential is copied by hand:
-
-```bash
-cat > k8s/omada-controller/manifests/restic-credentials.sops.yaml <<EOF
-apiVersion: v1
-kind: Secret
-metadata:
-  name: omada-controller-restic
-  namespace: default
-stringData:
-  RESTIC_REPOSITORY: s3:https://s3.wasabisys.com/tale-home/volsync/omada-controller
-  RESTIC_PASSWORD: $(openssl rand -base64 32)
-  AWS_ACCESS_KEY_ID: $(kubectl -n cnpg-system get secret cnpg-wasabi-credentials \
-    -o jsonpath='{.data.ACCESS_KEY_ID}' | base64 -d)
-  AWS_SECRET_ACCESS_KEY: $(kubectl -n cnpg-system get secret cnpg-wasabi-credentials \
-    -o jsonpath='{.data.ACCESS_SECRET_KEY}' | base64 -d)
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: omada-mongodb-restic
-  namespace: default
-stringData:
-  RESTIC_REPOSITORY: s3:https://s3.wasabisys.com/tale-home/volsync/omada-mongodb
-  RESTIC_PASSWORD: $(openssl rand -base64 32)
-  AWS_ACCESS_KEY_ID: $(kubectl -n cnpg-system get secret cnpg-wasabi-credentials \
-    -o jsonpath='{.data.ACCESS_KEY_ID}' | base64 -d)
-  AWS_SECRET_ACCESS_KEY: $(kubectl -n cnpg-system get secret cnpg-wasabi-credentials \
-    -o jsonpath='{.data.ACCESS_SECRET_KEY}' | base64 -d)
-EOF
-
-sops -e -i k8s/omada-controller/manifests/restic-credentials.sops.yaml
-```
-
-The two sources use separate repositories so their prunes never contend for the
-same restic lock.
-
-> `RESTIC_PASSWORD` is the only thing that can decrypt these backups, and it
-> lives in this repo under SOPS — keep a copy of the age key somewhere that does
-> not depend on this cluster.
+The two sources use separate repository paths so their prunes never contend for
+the same restic lock.
 
 Verify the first runs:
 

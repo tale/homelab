@@ -28,30 +28,10 @@ transactional store, and unacceptable for anything database-shaped.
 Because the PVC is `ReadWriteOnce` and already attached to the Samba pod, the
 mover schedules onto that same node.
 
-Only ~66Gi of the 500Gi is in use, so neither job is expensive.
+Only ~66Gi of the 500Gi is in use, so the job is not expensive.
 
-#### Bootstrap
-
-The Kustomization will not build without the repository secret:
-
-```bash
-cat > k8s/samba/manifests/restic-credentials.sops.yaml <<EOF
-apiVersion: v1
-kind: Secret
-metadata:
-  name: smb-store-restic
-  namespace: home-automation
-stringData:
-  RESTIC_REPOSITORY: s3:https://s3.wasabisys.com/tale-home/volsync/smb-store
-  RESTIC_PASSWORD: $(openssl rand -base64 32)
-  AWS_ACCESS_KEY_ID: $(kubectl -n cnpg-system get secret cnpg-wasabi-credentials \
-    -o jsonpath='{.data.ACCESS_KEY_ID}' | base64 -d)
-  AWS_SECRET_ACCESS_KEY: $(kubectl -n cnpg-system get secret cnpg-wasabi-credentials \
-    -o jsonpath='{.data.ACCESS_SECRET_KEY}' | base64 -d)
-EOF
-
-sops -e -i k8s/samba/manifests/restic-credentials.sops.yaml
-```
+Credentials come from the shared `volsync-b2` secret — see
+[`k8s/infra/configs/volsync/`](../infra/configs/volsync/).
 
 The first sync moves ~66Gi and will take considerably longer than the nightly
 runs that follow. Verify before trusting it:
