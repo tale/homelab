@@ -26,6 +26,7 @@ homekit:
     filter:
       include_domains:
         - binary_sensor
+        - light
         - lock
       include_entities:
         - lock.front_door

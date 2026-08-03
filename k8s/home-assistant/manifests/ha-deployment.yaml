@@ -35,14 +35,30 @@ spec:
         - name: bootstrap-config
           image: alpine:3.22
           env:
-            - name: EUFY_SECURITY_VERSION
-              value: "8.2.4"
+            - name: EUFY_SECURITY_TAG
+              value: "v8.2.4"
+            - name: TUYA_LOCAL_TAG
+              value: "2026.7.2"
           command:
             - sh
             - -eu
             - -c
             - |
-              installed=/config/custom_components/eufy_security/.installed_version
+              install_component() {
+                repo=$$1
+                component=$$2
+                tag=$$3
+                installed=/config/custom_components/$${component}/.installed_version
+
+                if [ "$$(cat "$${installed}" 2>/dev/null)" != "$${tag}" ]; then
+                  rm -rf /tmp/src
+                  mkdir -p /tmp/src
+                  wget -qO- "https://github.com/$${repo}/archive/refs/tags/$${tag}.tar.gz" | tar xz -C /tmp/src
+                  rm -rf "/config/custom_components/$${component}"
+                  mv "/tmp/src/$$(basename "$${repo}")-$${tag#v}/custom_components/$${component}" /config/custom_components/
+                  echo "$${tag}" > "$${installed}"
+                fi
+              }
 
               for file in automations.yaml scenes.yaml scripts.yaml; do
                 [ -e "/config/$${file}" ] || : > "/config/$${file}"
@@ -50,14 +66,8 @@ spec:
 
               mkdir -p /config/custom_components
 
-              if [ "$$(cat "$${installed}" 2>/dev/null)" != "$${EUFY_SECURITY_VERSION}" ]; then
-                rm -rf /tmp/src
-                mkdir -p /tmp/src
-                wget -qO- "https://github.com/fuatakgun/eufy_security/archive/refs/tags/v$${EUFY_SECURITY_VERSION}.tar.gz" | tar xz -C /tmp/src
-                rm -rf /config/custom_components/eufy_security
-                mv "/tmp/src/eufy_security-$${EUFY_SECURITY_VERSION}/custom_components/eufy_security" /config/custom_components/
-                echo "$${EUFY_SECURITY_VERSION}" > "$${installed}"
-              fi
+              install_component fuatakgun/eufy_security eufy_security "$${EUFY_SECURITY_TAG}"
+              install_component make-all/tuya-local tuya_local "$${TUYA_LOCAL_TAG}"
           volumeMounts:
             - name: data
               mountPath: /config

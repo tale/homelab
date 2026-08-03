@@ -41,11 +41,46 @@ gone.
 
 Home Assistant talks to it through the
 [eufy_security](https://github.com/fuatakgun/eufy_security) custom component at
-`ws://eufy-security-ws:3000`. That integration is not in Home Assistant core and
-normally arrives via HACS, which is a UI install onto a volume — exactly the
-kind of state that gets lost. Instead an init container fetches a pinned tag
-into `/config/custom_components` on every pod start. Bumping it is an edit to
-`EUFY_SECURITY_VERSION` in `ha-deployment.yaml`.
+`ws://eufy-security-ws:3000`.
+
+### Custom components
+
+Neither custom component here is in Home Assistant core, and both normally
+arrive via HACS — a UI install onto a volume, exactly the kind of state that
+gets lost. Instead the init container installs each from a pinned git tag into
+`/config/custom_components`, recording the tag in a `.installed_version` marker
+beside the component. A start where the marker already matches does no network
+I/O at all, so a GitHub outage cannot stop Home Assistant from booting.
+
+| Component | Repository | Version env |
+| --- | --- | --- |
+| `eufy_security` | `fuatakgun/eufy_security` | `EUFY_SECURITY_TAG` |
+| `tuya_local` | `make-all/tuya-local` | `TUYA_LOCAL_TAG` |
+
+The tag is passed whole rather than assembled, because the two projects
+disagree about the leading `v`. Adding a third is one `install_component` line
+plus an env var.
+
+Every `$` in that script is written `$$`. Flux runs `postBuild` envsubst over
+the whole build output in strict mode and will otherwise claim the shell's
+variables and fail the Kustomization — see
+[`k8s/infra/controllers/volsync/`](../infra/controllers/volsync/) for why that
+substitution is there at all.
+
+`tuya_local` drives the bulbs directly over the LAN. The alternative, the core
+`tuya` integration, round-trips every command through Tuya's cloud and depends
+on an IoT Platform trial subscription that needs periodic manual renewal — the
+integration dies silently when it lapses.
+
+Setup uses the component's cloud step, which shows a QR code to scan from the
+Smart Life app and returns each device's local key. No Tuya IoT developer
+project is involved, and the cloud is touched only during that handshake;
+control afterwards is local. The keys land in Home Assistant's config entries
+under `.storage` rather than in SOPS — they are recoverable by rescanning, and
+the volume is backed up either way.
+
+Because devices are addressed by IP, the bulbs need reserved DHCP leases, and
+Home Assistant needs a route into whichever VLAN they sit on.
 
 ### Configuration
 
