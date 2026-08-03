@@ -23,13 +23,29 @@ recorder:
 homekit:
   - name: Home Assistant Bridge
     port: 21063
+    ip_address: !include homekit_host_ip.yaml
+    advertise_ip: !include homekit_host_ip.yaml
     filter:
       include_domains:
         - binary_sensor
         - light
-        - lock
+
+  - name: Front Door Lock
+    port: 21064
+    mode: accessory
+    ip_address: !include homekit_host_ip.yaml
+    advertise_ip: !include homekit_host_ip.yaml
+    filter:
       include_entities:
         - lock.front_door
+
+  - name: Garage Door Lock
+    port: 21065
+    mode: accessory
+    ip_address: !include homekit_host_ip.yaml
+    advertise_ip: !include homekit_host_ip.yaml
+    filter:
+      include_entities:
         - lock.garage_door
 
 automation: !include automations.yaml

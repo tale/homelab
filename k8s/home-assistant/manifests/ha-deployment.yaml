@@ -35,6 +35,8 @@ spec:
         - name: bootstrap-config
           image: alpine:3.22
           env:
+            - name: LAN_INTERFACE
+              value: "enp0s31f6"
             - name: EUFY_SECURITY_TAG
               value: "v8.2.4"
             - name: TUYA_LOCAL_TAG
@@ -63,6 +65,13 @@ spec:
               for file in automations.yaml scenes.yaml scripts.yaml; do
                 [ -e "/config/$${file}" ] || : > "/config/$${file}"
               done
+
+              lan_ip=$$(ip -4 -o addr show "$${LAN_INTERFACE}" 2>/dev/null | awk '{print $$4}' | cut -d/ -f1)
+              if [ -z "$${lan_ip}" ]; then
+                echo "no IPv4 address on $${LAN_INTERFACE}; HomeKit would advertise an unreachable address" >&2
+                exit 1
+              fi
+              echo "$${lan_ip}" > /config/homekit_host_ip.yaml
 
               mkdir -p /config/custom_components
 

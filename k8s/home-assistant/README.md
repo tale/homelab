@@ -25,6 +25,17 @@ provide, so Scrypted pairs with Apple Home directly as a second accessory.
 Two bridges in the Home app is the cost of that split, and it is the right
 trade. Routing the camera through Home Assistant gives up HKSV entirely.
 
+The locks are published in `mode: accessory` on their own ports rather than
+through the bridge. A lock command travels to Eufy's cloud and back before the
+state confirms, which routinely outlives HomeKit's patience — the unlock
+succeeds and the Home app reports a timeout anyway. Home Assistant warns about
+exactly this on every start, and accessory mode is its recommended answer: a
+slow device on a shared bridge degrades everything behind that bridge.
+
+They stay in `include_entities` rather than an `include_domains: [lock]`
+because `eufy_security` marks its locks `entity_category: diagnostic`, and the
+HomeKit component skips categorised entities unless they are named explicitly.
+
 ### Eufy locks
 
 `eufy-security-client` reaches the newer locks (C33 and relatives) over Eufy's
