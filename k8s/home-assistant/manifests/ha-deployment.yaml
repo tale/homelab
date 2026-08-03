@@ -45,18 +45,18 @@ spec:
               installed=/config/custom_components/eufy_security/.installed_version
 
               for file in automations.yaml scenes.yaml scripts.yaml; do
-                [ -e "/config/$file" ] || : > "/config/$file"
+                [ -e "/config/$${file}" ] || : > "/config/$${file}"
               done
 
               mkdir -p /config/custom_components
 
-              if [ "$(cat "$installed" 2>/dev/null)" != "$EUFY_SECURITY_VERSION" ]; then
+              if [ "$$(cat "$${installed}" 2>/dev/null)" != "$${EUFY_SECURITY_VERSION}" ]; then
                 rm -rf /tmp/src
                 mkdir -p /tmp/src
-                wget -qO- "https://github.com/fuatakgun/eufy_security/archive/refs/tags/v${EUFY_SECURITY_VERSION}.tar.gz" | tar xz -C /tmp/src
+                wget -qO- "https://github.com/fuatakgun/eufy_security/archive/refs/tags/v$${EUFY_SECURITY_VERSION}.tar.gz" | tar xz -C /tmp/src
                 rm -rf /config/custom_components/eufy_security
-                mv "/tmp/src/eufy_security-${EUFY_SECURITY_VERSION}/custom_components/eufy_security" /config/custom_components/
-                echo "$EUFY_SECURITY_VERSION" > "$installed"
+                mv "/tmp/src/eufy_security-$${EUFY_SECURITY_VERSION}/custom_components/eufy_security" /config/custom_components/
+                echo "$${EUFY_SECURITY_VERSION}" > "$${installed}"
               fi
           volumeMounts:
             - name: data
