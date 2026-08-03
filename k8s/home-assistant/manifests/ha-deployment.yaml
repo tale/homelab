@@ -38,7 +38,7 @@ spec:
             - name: EUFY_SECURITY_TAG
               value: "v8.2.4"
             - name: TUYA_LOCAL_TAG
-              value: "2026.7.2"
+              value: "2026.4.1"
           command:
             - sh
             - -eu

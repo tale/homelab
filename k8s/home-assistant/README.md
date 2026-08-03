@@ -57,6 +57,18 @@ I/O at all, so a GitHub outage cannot stop Home Assistant from booting.
 | `eufy_security` | `fuatakgun/eufy_security` | `EUFY_SECURITY_TAG` |
 | `tuya_local` | `make-all/tuya-local` | `TUYA_LOCAL_TAG` |
 
+`tuya_local` is held at `2026.4.1` deliberately. Every release from `2026.5.0`
+onward, master included, ships `except TypeError, ValueError:` in
+`helpers/device_config.py` — Python 2 syntax that raises `SyntaxError` on
+import, so the integration cannot load at all. `2026.4.1` is the newest tag
+that compiles and it still has the cloud/QR setup step. Verify a newer tag
+imports before bumping:
+
+```sh
+curl -sL https://github.com/make-all/tuya-local/archive/refs/tags/<tag>.tar.gz \
+  | tar xz -C /tmp && python3 -m compileall -q /tmp/tuya-local-<tag>/custom_components/tuya_local
+```
+
 The tag is passed whole rather than assembled, because the two projects
 disagree about the leading `v`. Adding a third is one `install_component` line
 plus an env var.
