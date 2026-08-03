@@ -1889,7 +1889,7 @@ spec:
             },
             "overrides": []
           },
-          "description": "Span between the oldest restorable point and the newest base backup, both from the Wasabi object store."
+          "description": "Span between the oldest restorable point and the newest base backup, both from the B2 object store."
         },
         {
           "id": 27,
@@ -2085,7 +2085,7 @@ spec:
             },
             "overrides": []
           },
-          "description": "WAL waiting to ship to Wasabi. A climbing number means archiving is stalled and the data directory is filling."
+          "description": "WAL waiting to ship to B2. A climbing number means archiving is stalled and the data directory is filling."
         },
         {
           "id": 30,

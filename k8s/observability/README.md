@@ -5,7 +5,9 @@ Grafana for dashboards, and Pushover for anything that actually needs me.
 
 ### Setup
 
-- **VMSingle** for metrics — 90d retention on 150Gi, backed up to Wasabi
+- **VMSingle** for metrics — 90d retention on 150Gi, deliberately not backed up:
+  metrics are derived and self-regenerating, so losing them costs history rather
+  than capability
 - **vmagent** scrapes everything and writes straight to VMSingle
 - **vmalert** + **VMAlertmanager** evaluate rules and deliver to Pushover
 - **VictoriaLogs** for logs — 90d on 50Gi, fed by a Fluent Bit DaemonSet

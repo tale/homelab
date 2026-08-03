@@ -8,7 +8,6 @@ resources:
   - manifests/grafana-http-route.yaml
   - manifests/pushover-secret.sops.yaml
   - manifests/grafana-db-credentials.sops.yaml
-  - manifests/vmbackup-credentials.sops.yaml
   - manifests/vmagent-rbac.yaml
   - manifests/vlogs.yaml
   - manifests/grafana.yaml

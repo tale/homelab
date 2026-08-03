@@ -52,7 +52,7 @@ controller, while the `.cfg` is the only officially supported path into a fresh
 one.
 
 Credentials come from the shared `volsync-b2` secret — see
-[`k8s/infra/configs/volsync/`](../infra/configs/volsync/). `manifests/restic-credentials.yaml`
+[`k8s/infra/controllers/volsync/`](../infra/controllers/volsync/). `manifests/restic-credentials.yaml`
 holds only the repository paths; the endpoint, bucket, keys, and password are
 substituted by Flux at apply time.
 

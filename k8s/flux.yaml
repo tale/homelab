@@ -33,6 +33,10 @@ spec:
     provider: sops
     secretRef:
       name: sops-age
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: volsync-b2
 ---
 apiVersion: fluxcd.controlplane.io/v1
 kind: ResourceSet

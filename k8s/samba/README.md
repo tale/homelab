@@ -31,7 +31,7 @@ mover schedules onto that same node.
 Only ~66Gi of the 500Gi is in use, so the job is not expensive.
 
 Credentials come from the shared `volsync-b2` secret — see
-[`k8s/infra/configs/volsync/`](../infra/configs/volsync/).
+[`k8s/infra/controllers/volsync/`](../infra/controllers/volsync/).
 
 The first sync moves ~66Gi and will take considerably longer than the nightly
 runs that follow. Verify before trusting it:

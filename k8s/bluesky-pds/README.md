@@ -57,7 +57,7 @@ a `VolumeSnapshot` is atomic across every file at one point in time, which is th
 crash-consistent state SQLite recovery expects.
 
 Credentials come from the shared `volsync-b2` secret — see
-[`k8s/infra/configs/volsync/`](../infra/configs/volsync/).
+[`k8s/infra/controllers/volsync/`](../infra/controllers/volsync/).
 
 > `RESTIC_PASSWORD` is the only thing that can decrypt these backups, and it is
 > now shared across every repository. The age key in `~/.config/sops/age/keys.txt`

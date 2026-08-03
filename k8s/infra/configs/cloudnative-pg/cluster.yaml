@@ -20,29 +20,29 @@ spec:
   externalClusters:
     - name: central-postgres-archive
       barmanObjectStore:
-        serverName: central-postgres
-        destinationPath: s3://tale-home/cnpg/
-        endpointURL: https://s3.wasabisys.com
+        serverName: central-postgres-r1
+        destinationPath: s3://${B2_BUCKET}/cnpg/
+        endpointURL: https://${B2_ENDPOINT}
         s3Credentials:
           accessKeyId:
-            name: cnpg-wasabi-credentials
+            name: cnpg-b2-credentials
             key: ACCESS_KEY_ID
           secretAccessKey:
-            name: cnpg-wasabi-credentials
+            name: cnpg-b2-credentials
             key: ACCESS_SECRET_KEY
         wal:
           compression: gzip
   backup:
     barmanObjectStore:
       serverName: central-postgres-r1
-      destinationPath: s3://tale-home/cnpg/
-      endpointURL: https://s3.wasabisys.com
+      destinationPath: s3://${B2_BUCKET}/cnpg/
+      endpointURL: https://${B2_ENDPOINT}
       s3Credentials:
         accessKeyId:
-          name: cnpg-wasabi-credentials
+          name: cnpg-b2-credentials
           key: ACCESS_KEY_ID
         secretAccessKey:
-          name: cnpg-wasabi-credentials
+          name: cnpg-b2-credentials
           key: ACCESS_SECRET_KEY
       wal:
         compression: gzip
