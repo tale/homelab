@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: blocky-db-uri
-  namespace: default
+  namespace: networking
 stringData:
   uri: ENC[AES256_GCM,data:ZSa2/LBIdJeymN9lo4CzFWGoY9Pcv5ixLOfgMtBOSl+ow+ULr4h3h0sJmDh3WufuHwg9mVMpjXRReFkhjBQn+OEARd+CweS9GGzFTExsYD25IXOZL5loJqYo+S0AJ6B+d7EcZ52zl1IOOg5PiiphC1swc2XT83HPlNpejyHx0OZX7gVMrlf5xjFuHfTY7zviKM431FdyZ45TBAwCxw==,iv:lLTYSiqrmPE+Ec5Tcj1qF9XnRAOMAWMK+0xJhE7fYcA=,tag:kSUFgNLkqyV8O/VVEeOFPQ==,type:str]
 sops:

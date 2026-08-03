@@ -46,7 +46,7 @@ spec:
       copyMethod: Snapshot
 
     - app: omada-mongodb
-      namespace: default
+      namespace: networking
       pvc: omada-mongodb-dump
       repository: omada-mongodb
       schedule: "30 2 * * *"
@@ -54,7 +54,7 @@ spec:
       copyMethod: Snapshot
 
     - app: omada-controller-data
-      namespace: default
+      namespace: networking
       pvc: data-omada-controller-0
       repository: omada-controller
       schedule: "45 2 * * *"

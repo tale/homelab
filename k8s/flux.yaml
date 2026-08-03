@@ -48,9 +48,6 @@ spec:
     - app: authentik
       path: ./k8s/authentik
       dependsOn: [{ "name": "infra-configs" }]
-    - app: blocky
-      path: ./k8s/blocky
-      dependsOn: [{ "name": "infra-configs" }]
     - app: bluesky-pds
       path: ./k8s/bluesky-pds
       dependsOn: [{ "name": "infra-configs" }]
@@ -63,12 +60,18 @@ spec:
     - app: observability
       path: ./k8s/observability
       dependsOn: [{ "name": "infra-configs" }]
-    - app: omada-controller
-      path: ./k8s/omada-controller
-      dependsOn: [{ "name": "infra-configs" }]
     - app: wakapi
       path: ./k8s/wakapi
       dependsOn: [{ "name": "infra-configs" }]
+    - app: networking
+      path: ./k8s/networking
+      dependsOn: [{ "name": "infra-configs" }]
+    - app: blocky
+      path: ./k8s/networking/blocky
+      dependsOn: [{ "name": "infra-configs" }, { "name": "networking" }]
+    - app: omada-controller
+      path: ./k8s/networking/omada-controller
+      dependsOn: [{ "name": "infra-configs" }, { "name": "networking" }]
     - app: home-automation
       path: ./k8s/home-automation
       dependsOn: [{ "name": "infra-configs" }]

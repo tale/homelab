@@ -114,3 +114,13 @@ spec:
   type: oci
   url: oci://ghcr.io/bjw-s-labs/helm
   interval: 1h
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: mbentley
+  namespace: flux-system
+spec:
+  type: oci
+  url: oci://registry-1.docker.io/mbentley
+  interval: 1h

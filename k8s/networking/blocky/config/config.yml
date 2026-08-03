@@ -1,0 +1,39 @@
+ports:
+  dns: 53
+  tls: 853
+  http: 4000
+caching:
+  minTime: 60s
+  maxItemsCount: 10000
+  prefetching: yes
+  prefetchMaxItemsCount: 2500
+redis:
+  address: blocky-redis:6379
+clientLookup:
+  upstream: 10.0.0.1
+  singleNameOrder:
+    - 1
+upstreams:
+  groups:
+    default:
+      - tcp-tls:1.1.1.1:853
+      - tcp-tls:8.8.8.8:853
+      - 9.9.9.9
+blocking:
+  denylists:
+    ads:
+      - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+      - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/pro.txt
+    fake-news:
+      - https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-only/hosts
+  clientGroupsBlock:
+    default:
+      - ads
+      - fake-news
+prometheus:
+  enable: true
+queryLog:
+  type: postgresql
+  target: __DB_URI__
+  logRetentionDays: 90
+  flushInterval: 30s

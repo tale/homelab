@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: omada-mongodb-init
-  namespace: default
+  namespace: networking
 data:
   init-omada-user.sh: |
     #!/bin/bash

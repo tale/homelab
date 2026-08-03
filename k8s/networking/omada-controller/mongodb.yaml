@@ -1,0 +1,70 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: omada-mongodb
+  namespace: networking
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: 5.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    defaultPodOptions:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+
+    controllers:
+      omada-mongodb:
+        type: deployment
+        strategy: Recreate
+        containers:
+          mongodb:
+            image:
+              repository: mongo
+              tag: "8"
+            env:
+              MONGO_INITDB_ROOT_USERNAME: root
+              MONGO_INITDB_DATABASE: omada
+              OMADA_DB_USER: omada
+              MONGO_INITDB_ROOT_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: omada-db-secret
+                    key: mongodb-root-password
+              OMADA_DB_PASS:
+                valueFrom:
+                  secretKeyRef:
+                    name: omada-db-secret
+                    key: mongodb-passwords
+            resources:
+              requests:
+                cpu: 250m
+                memory: 256Mi
+              limits:
+                cpu: "1"
+                memory: 1Gi
+
+    service:
+      app:
+        controller: omada-mongodb
+        ports:
+          mongodb:
+            port: 27017
+            targetPort: 27017
+
+    persistence:
+      data:
+        existingClaim: omada-mongodb-data
+        globalMounts:
+          - path: /data/db
+      init-scripts:
+        type: configMap
+        name: omada-mongodb-init
+        globalMounts:
+          - path: /docker-entrypoint-initdb.d

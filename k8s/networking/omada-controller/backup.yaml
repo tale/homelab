@@ -1,23 +1,10 @@
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: omada-mongodb-dump
-  namespace: default
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: cluster-nvmf
-  resources:
-    requests:
-      storage: 2Gi
----
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: omada-mongodb-dump
-  namespace: default
+  namespace: networking
 spec:
-  schedule: "0 2 * * *"
+  schedule: 0 2 * * *
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 3
@@ -36,17 +23,10 @@ spec:
               command:
                 - sh
                 - -c
-                - >-
-                  mongodump
-                  --host=omada-mongodb
-                  --username=root
-                  --password="$MONGO_ROOT_PASSWORD"
-                  --authenticationDatabase=admin
-                  --db=omada
-                  --gzip
-                  --archive=/dump/omada.archive.gz.tmp
-                  && mv -f /dump/omada.archive.gz.tmp /dump/omada.archive.gz
-                  && ls -l /dump/omada.archive.gz
+                - mongodump --host=omada-mongodb --username=root --password="$MONGO_ROOT_PASSWORD"
+                  --authenticationDatabase=admin --db=omada --gzip --archive=/dump/omada.archive.gz.tmp
+                  && mv -f /dump/omada.archive.gz.tmp /dump/omada.archive.gz && ls -l
+                  /dump/omada.archive.gz
               env:
                 - name: MONGO_ROOT_PASSWORD
                   valueFrom:

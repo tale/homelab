@@ -2,11 +2,11 @@ apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: Backend
 metadata:
   name: omada-controller-tls
-  namespace: default
+  namespace: networking
 spec:
   endpoints:
     - fqdn:
-        hostname: omada-controller.default.svc.cluster.local
+        hostname: omada-controller.networking.svc.cluster.local
         port: 8043
   tls:
     insecureSkipVerify: true
@@ -15,12 +15,12 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: omada-controller
-  namespace: default
+  namespace: networking
 spec:
   parentRefs:
     - name: envoy-gw
       sectionName: https
-      namespace: default
+      namespace: networking
   hostnames:
     - omada.tale.me
   rules:

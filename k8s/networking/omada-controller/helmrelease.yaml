@@ -1,18 +1,8 @@
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: mbentley
-  namespace: default
-spec:
-  type: oci
-  url: oci://registry-1.docker.io/mbentley
-  interval: 1h
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: omada-controller
-  namespace: default
+  namespace: networking
 spec:
   interval: 1h
   chart:
@@ -22,6 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: mbentley
+        namespace: flux-system
   upgrade:
     serverSideApply: enabled
   rollback:
