@@ -1,0 +1,161 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: samba
+  namespace: home-automation
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: 5.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+  values:
+    defaultPodOptions:
+      dnsPolicy: ClusterFirstWithHostNet
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+
+    controllers:
+      samba:
+        type: deployment
+        strategy: Recreate
+        containers:
+          samba:
+            image:
+              repository: ghcr.io/crazy-max/samba
+              tag: 4.21.4
+              pullPolicy: IfNotPresent
+            env:
+              TZ: America/New_York
+              SAMBA_SERVER_STRING: Local home storage
+              WSDD2_ENABLE: "1"
+              WSDD2_HOSTNAME: tale-home
+              WSDD2_NETBIOS_NAME: TALE-HOME
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 445
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 6
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 445
+                  initialDelaySeconds: 3
+                  periodSeconds: 5
+                  timeoutSeconds: 2
+                  failureThreshold: 3
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: false
+              runAsUser: 0
+              runAsGroup: 0
+              capabilities:
+                add:
+                  - ALL
+                  - NET_ADMIN
+                  - NET_BIND_SERVICE
+                  - NET_RAW
+                  - SETUID
+                  - SETGID
+                  - CHOWN
+                  - FOWNER
+              seccompProfile:
+                type: RuntimeDefault
+          openssh-server:
+            image:
+              repository: lscr.io/linuxserver/openssh-server
+              tag: latest
+              pullPolicy: IfNotPresent
+            env:
+              PUID: "1000"
+              PGID: "1000"
+              TZ: America/New_York
+              PUBLIC_KEY_URL: https://github.com/tale.keys
+              SUDO_ACCESS: "false"
+              PASSWORD_ACCESS: "false"
+              USER_NAME: tale
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 2222
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 6
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 2222
+                  initialDelaySeconds: 3
+                  periodSeconds: 5
+                  timeoutSeconds: 2
+                  failureThreshold: 3
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: false
+              runAsUser: 0
+              runAsGroup: 0
+              capabilities:
+                add: ["ALL"]
+              seccompProfile:
+                type: RuntimeDefault
+
+    service:
+      app:
+        controller: samba
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
+        annotations:
+          metallb.io/address-pool: samba-pool
+        ports:
+          smb:
+            port: 445
+            targetPort: 445
+            protocol: TCP
+          wsdd2:
+            port: 3702
+            targetPort: 3702
+            protocol: UDP
+          ssh:
+            port: 22
+            targetPort: 2222
+            protocol: TCP
+
+    persistence:
+      data:
+        accessMode: ReadWriteOnce
+        size: 500Gi
+        storageClass: cluster-nvmf
+        retain: true
+        advancedMounts:
+          samba:
+            samba:
+              - path: /samba
+            openssh-server:
+              - path: /data
+      config:
+        type: secret
+        name: samba-config
+        advancedMounts:
+          samba:
+            samba:
+              - path: /data/config.yml
+                subPath: config.yml
+                readOnly: true

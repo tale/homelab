@@ -63,7 +63,7 @@ spec:
 
     - app: smb-store
       namespace: home-automation
-      pvc: smb-store
+      pvc: samba
       repository: smb-store
       schedule: "0 5 * * *"
       cacheCapacity: 4Gi
