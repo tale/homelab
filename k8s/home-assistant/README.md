@@ -102,8 +102,13 @@ Home Assistant needs a route into whichever VLAN they sit on.
 ### Configuration
 
 `config/configuration.yaml` is committed and mounted read-only from a generated
-ConfigMap. Home Assistant never writes to that file, so nothing fights over it,
-and kustomize's name hash means an edit rolls the pod automatically.
+ConfigMap. Home Assistant never writes to that file, so nothing fights over it.
+
+The workload is the `bjw-s` `app-template` chart rather than hand-written
+manifests. `kustomizeconfig.yaml` teaches kustomize to rewrite the generated
+ConfigMap's hashed name into `persistence.config.name` in the HelmRelease
+values, so the config stays a normal file in git and an edit to it still rolls
+the pod — the property the name hash gives a plain Deployment.
 
 What stays on the PVC is what Home Assistant owns: `.storage/` (entity registry,
 config entries, and the HomeKit pairing keys), plus `automations.yaml`,

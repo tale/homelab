@@ -2,18 +2,16 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - manifests/pvcs.yaml
-  - manifests/ha-deployment.yaml
-  - manifests/ha-http-route.yaml
+  - manifests/namespace.yaml
+  - helmrelease.yaml
   - manifests/ha-db-secret.sops.yaml
   - manifests/eufy-config.sops.yaml
-  - manifests/eufy-deployment.yaml
-  - manifests/eufy-svc.yaml
-  - manifests/scrypted-deployment.yaml
-  - manifests/scrypted-svc.yaml
 
 configMapGenerator:
   - name: home-assistant-config
     namespace: home-automation
     files:
       - config/configuration.yaml
+
+configurations:
+  - kustomizeconfig.yaml

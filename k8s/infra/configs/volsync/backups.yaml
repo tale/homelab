@@ -15,7 +15,7 @@ spec:
 
     - app: home-assistant
       namespace: home-automation
-      pvc: home-assistant-data
+      pvc: home-assistant
       repository: home-assistant
       schedule: "15 3 * * *"
       cacheCapacity: 2Gi
@@ -23,7 +23,7 @@ spec:
 
     - app: eufy-security-ws
       namespace: home-automation
-      pvc: eufy-ws-data
+      pvc: eufy-security-ws
       repository: eufy-security-ws
       schedule: "30 3 * * *"
       cacheCapacity: 1Gi
@@ -31,7 +31,7 @@ spec:
 
     - app: scrypted
       namespace: home-automation
-      pvc: scrypted-data
+      pvc: scrypted
       repository: scrypted
       schedule: "45 3 * * *"
       cacheCapacity: 1Gi
