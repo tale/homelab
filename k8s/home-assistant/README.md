@@ -84,12 +84,6 @@ The tag is passed whole rather than assembled, because the two projects
 disagree about the leading `v`. Adding a third is one `install_component` line
 plus an env var.
 
-Every `$` in that script is written `$$`. Flux runs `postBuild` envsubst over
-the whole build output in strict mode and will otherwise claim the shell's
-variables and fail the Kustomization — see
-[`k8s/infra/controllers/volsync/`](../infra/controllers/volsync/) for why that
-substitution is there at all.
-
 `tuya_local` drives the bulbs directly over the LAN. The alternative, the core
 `tuya` integration, round-trips every command through Tuya's cloud and depends
 on an IoT Platform trial subscription that needs periodic manual renewal — the
@@ -133,10 +127,9 @@ is backed up instead.
 
 ### Backups
 
-Three `ReplicationSource`s, staggered nightly, using the shared retention from
-[`k8s/components/volsync-defaults`](../components/volsync-defaults/) and the
-shared B2 credentials described in
-[`k8s/infra/controllers/volsync/`](../infra/controllers/volsync/).
+Three `ReplicationSource`s, staggered nightly, generated with everything else
+by the `volsync-backups` ResourceSet in
+[`k8s/infra/configs/volsync/`](../infra/configs/volsync/).
 
 | Source | PVC | Schedule | What is in it |
 | --- | --- | --- | --- |
@@ -144,15 +137,15 @@ shared B2 credentials described in
 | `eufy-security-ws` | `eufy-ws-data` | 03:30 | Eufy session tokens and trusted-device state |
 | `scrypted` | `scrypted-data` | 03:45 | Scrypted plugins, Ring auth, HKSV pairing |
 
-`copyMethod: Snapshot` comes from the component, so the movers read a snapshot
-rather than the live volume. All three are small, and all three are
+`copyMethod: Snapshot` is the ResourceSet default, so the movers read a
+snapshot rather than the live volume. All three are small, and all three are
 database-shaped enough to care about a torn read.
 
 Losing any of these volumes means re-pairing in the Home app, since the HomeKit
 accessory keys live in them. That is the whole reason they are backed up.
 
-The Samba share in this same namespace has its own `ReplicationSource` under
-[`k8s/samba`](../samba/); it is unrelated to home automation beyond sharing a
+The Samba share in this same namespace is backed up by the same ResourceSet,
+with `copyMethod: Direct`; it is unrelated to home automation beyond sharing a
 namespace.
 
 ### Restoring

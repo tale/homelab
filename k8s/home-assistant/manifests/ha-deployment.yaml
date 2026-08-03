@@ -47,36 +47,36 @@ spec:
             - -c
             - |
               install_component() {
-                repo=$$1
-                component=$$2
-                tag=$$3
-                installed=/config/custom_components/$${component}/.installed_version
+                repo=$1
+                component=$2
+                tag=$3
+                installed=/config/custom_components/${component}/.installed_version
 
-                if [ "$$(cat "$${installed}" 2>/dev/null)" != "$${tag}" ]; then
+                if [ "$(cat "${installed}" 2>/dev/null)" != "${tag}" ]; then
                   rm -rf /tmp/src
                   mkdir -p /tmp/src
-                  wget -qO- "https://github.com/$${repo}/archive/refs/tags/$${tag}.tar.gz" | tar xz -C /tmp/src
-                  rm -rf "/config/custom_components/$${component}"
-                  mv "/tmp/src/$$(basename "$${repo}")-$${tag#v}/custom_components/$${component}" /config/custom_components/
-                  echo "$${tag}" > "$${installed}"
+                  wget -qO- "https://github.com/${repo}/archive/refs/tags/${tag}.tar.gz" | tar xz -C /tmp/src
+                  rm -rf "/config/custom_components/${component}"
+                  mv "/tmp/src/$(basename "${repo}")-${tag#v}/custom_components/${component}" /config/custom_components/
+                  echo "${tag}" > "${installed}"
                 fi
               }
 
               for file in automations.yaml scenes.yaml scripts.yaml; do
-                [ -e "/config/$${file}" ] || : > "/config/$${file}"
+                [ -e "/config/${file}" ] || : > "/config/${file}"
               done
 
-              lan_ip=$$(ip -4 -o addr show "$${LAN_INTERFACE}" 2>/dev/null | awk '{print $$4}' | cut -d/ -f1)
-              if [ -z "$${lan_ip}" ]; then
-                echo "no IPv4 address on $${LAN_INTERFACE}; HomeKit would advertise an unreachable address" >&2
+              lan_ip=$(ip -4 -o addr show "${LAN_INTERFACE}" 2>/dev/null | awk '{print $4}' | cut -d/ -f1)
+              if [ -z "${lan_ip}" ]; then
+                echo "no IPv4 address on ${LAN_INTERFACE}; HomeKit would advertise an unreachable address" >&2
                 exit 1
               fi
-              echo "$${lan_ip}" > /config/homekit_host_ip.yaml
+              echo "${lan_ip}" > /config/homekit_host_ip.yaml
 
               mkdir -p /config/custom_components
 
-              install_component fuatakgun/eufy_security eufy_security "$${EUFY_SECURITY_TAG}"
-              install_component make-all/tuya-local tuya_local "$${TUYA_LOCAL_TAG}"
+              install_component fuatakgun/eufy_security eufy_security "${EUFY_SECURITY_TAG}"
+              install_component make-all/tuya-local tuya_local "${TUYA_LOCAL_TAG}"
           volumeMounts:
             - name: data
               mountPath: /config

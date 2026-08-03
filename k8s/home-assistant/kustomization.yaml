@@ -11,14 +11,9 @@ resources:
   - manifests/eufy-svc.yaml
   - manifests/scrypted-deployment.yaml
   - manifests/scrypted-svc.yaml
-  - manifests/restic-credentials.yaml
-  - manifests/backup.yaml
 
 configMapGenerator:
   - name: home-assistant-config
     namespace: home-automation
     files:
       - config/configuration.yaml
-
-components:
-  - ../components/volsync-defaults

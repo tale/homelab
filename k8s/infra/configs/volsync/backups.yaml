@@ -10,6 +10,51 @@ spec:
       pvc: bluesky-pds-data
       schedule: "0 3 * * *"
       cacheCapacity: 1Gi
+
+    - app: home-assistant
+      namespace: home-automation
+      pvc: home-assistant-data
+      schedule: "15 3 * * *"
+      cacheCapacity: 2Gi
+
+    - app: eufy-security-ws
+      namespace: home-automation
+      pvc: eufy-ws-data
+      schedule: "30 3 * * *"
+      cacheCapacity: 1Gi
+
+    - app: scrypted
+      namespace: home-automation
+      pvc: scrypted-data
+      schedule: "45 3 * * *"
+      cacheCapacity: 1Gi
+
+    - app: vanilla-backups
+      namespace: minecraft
+      pvc: vanilla-backups
+      repository: minecraft-vanilla
+      schedule: "0 4 * * *"
+      cacheCapacity: 2Gi
+
+    - app: omada-mongodb
+      namespace: default
+      pvc: omada-mongodb-dump
+      schedule: "30 2 * * *"
+      cacheCapacity: 1Gi
+
+    - app: omada-controller-data
+      namespace: default
+      pvc: data-omada-controller-0
+      repository: omada-controller
+      schedule: "45 2 * * *"
+      cacheCapacity: 2Gi
+
+    - app: smb-store
+      namespace: home-automation
+      pvc: smb-store
+      schedule: "0 5 * * *"
+      cacheCapacity: 4Gi
+      copyMethod: Direct
   resources:
     - apiVersion: v1
       kind: Secret
@@ -17,7 +62,7 @@ spec:
         name: << inputs.app >>-restic
         namespace: << inputs.namespace >>
       stringData:
-        RESTIC_REPOSITORY: s3:https://${B2_ENDPOINT}/${B2_BUCKET}/volsync/<< inputs.app >>
+        RESTIC_REPOSITORY: s3:https://${B2_ENDPOINT}/${B2_BUCKET}/volsync/<< inputs.repository | default inputs.app >>
         RESTIC_PASSWORD: ${RESTIC_PASSWORD}
         AWS_ACCESS_KEY_ID: ${B2_KEY_ID}
         AWS_SECRET_ACCESS_KEY: ${B2_APP_KEY}
@@ -33,7 +78,7 @@ spec:
         restic:
           repository: << inputs.app >>-restic
           cacheCapacity: << inputs.cacheCapacity | quote >>
-          copyMethod: Snapshot
+          copyMethod: << inputs.copyMethod | default "Snapshot" >>
           volumeSnapshotClassName: cluster-nvmf-snapshot
           storageClassName: cluster-nvmf-ephemeral
           cacheStorageClassName: cluster-nvmf-ephemeral

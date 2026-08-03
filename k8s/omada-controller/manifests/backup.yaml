@@ -66,29 +66,3 @@ spec:
             - name: dump
               persistentVolumeClaim:
                 claimName: omada-mongodb-dump
----
-apiVersion: volsync.backube/v1alpha1
-kind: ReplicationSource
-metadata:
-  name: omada-mongodb
-  namespace: default
-spec:
-  sourcePVC: omada-mongodb-dump
-  trigger:
-    schedule: "30 2 * * *"
-  restic:
-    repository: omada-mongodb-restic
-    cacheCapacity: 1Gi
----
-apiVersion: volsync.backube/v1alpha1
-kind: ReplicationSource
-metadata:
-  name: omada-controller-data
-  namespace: default
-spec:
-  sourcePVC: data-omada-controller-0
-  trigger:
-    schedule: "45 2 * * *"
-  restic:
-    repository: omada-controller-restic
-    cacheCapacity: 2Gi

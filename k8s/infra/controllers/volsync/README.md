@@ -59,11 +59,27 @@ account master key.
 
 ### Adding a backup
 
-1. Add a `ReplicationSource` to the app, and include
-   `components: - ../components/volsync-defaults` in its kustomization for the
-   shared `copyMethod`, prune interval, and retention.
-2. Add a `restic-credentials.yaml` alongside it — copy an existing one and change
-   the secret name, namespace, and repository path. No SOPS involved.
+Add an entry to the `volsync-backups` ResourceSet in
+[`k8s/infra/configs/volsync/`](../../configs/volsync/). It emits the restic
+Secret and the `ReplicationSource` for each input:
+
+```yaml
+    - app: home-assistant
+      namespace: home-automation
+      pvc: home-assistant-data
+      schedule: "15 3 * * *"
+      cacheCapacity: 2Gi
+```
+
+`repository` defaults to `app` and only needs setting where the bucket path
+already differs; `copyMethod` defaults to `Snapshot`. Repository paths are
+load-bearing — changing one starts an empty repository and orphans the history.
+
+Because every restic credential now lives under `infra-configs`, no application
+Kustomization needs `postBuild.substituteFrom` any more, and none of them run
+envsubst. Shell scripts and Grafana placeholders in application manifests can
+use plain `${VAR}` again. Only manifests under `k8s/infra/configs` are
+substituted, so `$$` escaping is required there and nowhere else.
 
 ### Rotating the B2 key
 

@@ -11,16 +11,3 @@ spec:
   resources:
     requests:
       storage: "15Gi"
----
-apiVersion: "volsync.backube/v1alpha1"
-kind: "ReplicationSource"
-metadata:
-  name: "vanilla-backups"
-  namespace: "minecraft"
-spec:
-  sourcePVC: "vanilla-backups"
-  trigger:
-    schedule: "0 4 * * *"
-  restic:
-    repository: "vanilla-restic"
-    cacheCapacity: "2Gi"

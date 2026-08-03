@@ -34,7 +34,7 @@ complexity than it saves in space.
 Schedules stagger across the 02:00 hour — dump at 02:00, MongoDB sync at 02:30,
 controller volume at 02:45 — so a slow `mongodump` never overlaps its own sync.
 `copyMethod`, retention, and prune interval come from the shared
-`components/volsync-defaults`.
+the `volsync-backups` ResourceSet.
 
 #### Auto Backup
 
