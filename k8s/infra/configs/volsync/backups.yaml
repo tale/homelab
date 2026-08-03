@@ -1,0 +1,44 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: ResourceSet
+metadata:
+  name: volsync-backups
+  namespace: flux-system
+spec:
+  inputs:
+    - app: bluesky-pds
+      namespace: bluesky-pds
+      pvc: bluesky-pds-data
+      schedule: "0 3 * * *"
+      cacheCapacity: 1Gi
+  resources:
+    - apiVersion: v1
+      kind: Secret
+      metadata:
+        name: << inputs.app >>-restic
+        namespace: << inputs.namespace >>
+      stringData:
+        RESTIC_REPOSITORY: s3:https://${B2_ENDPOINT}/${B2_BUCKET}/volsync/<< inputs.app >>
+        RESTIC_PASSWORD: ${RESTIC_PASSWORD}
+        AWS_ACCESS_KEY_ID: ${B2_KEY_ID}
+        AWS_SECRET_ACCESS_KEY: ${B2_APP_KEY}
+    - apiVersion: volsync.backube/v1alpha1
+      kind: ReplicationSource
+      metadata:
+        name: << inputs.app >>
+        namespace: << inputs.namespace >>
+      spec:
+        sourcePVC: << inputs.pvc >>
+        trigger:
+          schedule: << inputs.schedule | quote >>
+        restic:
+          repository: << inputs.app >>-restic
+          cacheCapacity: << inputs.cacheCapacity | quote >>
+          copyMethod: Snapshot
+          volumeSnapshotClassName: cluster-nvmf-snapshot
+          storageClassName: cluster-nvmf-ephemeral
+          cacheStorageClassName: cluster-nvmf-ephemeral
+          pruneIntervalDays: 14
+          retain:
+            daily: 7
+            weekly: 5
+            monthly: 6

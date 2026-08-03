@@ -4,9 +4,4 @@ kind: Kustomization
 resources:
   - manifests/pds-secrets.sops.yaml
   - manifests/pds-http-route.yaml
-  - manifests/restic-credentials.yaml
-  - manifests/backup.yaml
   - helmrelease.yaml
-
-components:
-  - ../components/volsync-defaults
