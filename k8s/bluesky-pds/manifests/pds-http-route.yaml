@@ -9,7 +9,7 @@ spec:
   parentRefs:
     - name: envoy-gw
       sectionName: https
-      namespace: default
+      namespace: networking
   hostnames:
     - pds.tale.me
   rules:

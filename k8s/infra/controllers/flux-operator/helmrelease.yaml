@@ -36,7 +36,7 @@ spec:
         enabled: true
         parentRefs:
           - name: envoy-gw
-            namespace: default
+            namespace: networking
             sectionName: https
         hostnames:
           - flux.tale.me

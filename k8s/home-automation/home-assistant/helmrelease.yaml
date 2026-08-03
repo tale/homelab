@@ -96,7 +96,7 @@ spec:
           - home.tale.me
         parentRefs:
           - name: envoy-gw
-            namespace: default
+            namespace: networking
             sectionName: https
         rules:
           - backendRefs:

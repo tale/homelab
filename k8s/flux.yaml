@@ -66,6 +66,9 @@ spec:
     - app: networking
       path: ./k8s/networking
       dependsOn: [{ "name": "infra-configs" }]
+    - app: gateway
+      path: ./k8s/networking/gateway
+      dependsOn: [{ "name": "infra-configs" }, { "name": "networking" }]
     - app: blocky
       path: ./k8s/networking/blocky
       dependsOn: [{ "name": "infra-configs" }, { "name": "networking" }]
