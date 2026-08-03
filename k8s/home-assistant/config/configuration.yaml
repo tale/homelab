@@ -25,9 +25,11 @@ homekit:
     port: 21063
     filter:
       include_domains:
-        - alarm_control_panel
         - binary_sensor
         - lock
+      include_entities:
+        - lock.front_door
+        - lock.garage_door
 
 automation: !include automations.yaml
 scene: !include scenes.yaml
