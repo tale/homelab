@@ -46,9 +46,14 @@ spec:
           ROOT_URL: "https://git.tale.me"
           LANDING_PAGE: login
         service:
-          DISABLE_REGISTRATION: true
+          DISABLE_REGISTRATION: false
           ALLOW_ONLY_EXTERNAL_REGISTRATION: true
           REQUIRE_SIGNIN_VIEW: true
+          ENABLE_INTERNAL_SIGNIN: false
+        oauth2_client:
+          ENABLE_AUTO_REGISTRATION: true
+          ACCOUNT_LINKING: auto
+          USERNAME: preferred_username
         database:
           DB_TYPE: postgres
           HOST: central-postgres-rw.cnpg-system.svc.cluster.local:5432
@@ -75,3 +80,5 @@ spec:
           existingSecret: forgejo-oidc
           iconUrl: "https://auth.tale.me/static/dist/assets/icons/icon.png"
           scopes: "openid profile email"
+          groupClaimName: groups
+          adminGroup: Homelab Superadmins

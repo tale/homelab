@@ -4,6 +4,27 @@ metadata:
   name: authentik-blueprints
   namespace: authentik
 data:
+  groups.yaml: |
+    version: 1
+    metadata:
+      name: Tale - Groups
+    entries:
+      - model: authentik_core.group
+        id: homelab-superadmins
+        identifiers:
+          name: Homelab Superadmins
+        attrs:
+          is_superuser: true
+          users:
+            - !Find [authentik_core.user, [username, tale]]
+
+      - model: authentik_core.group
+        id: homelab-users
+        identifiers:
+          name: Homelab Users
+        attrs:
+          is_superuser: false
+
   oidc-providers.yaml: |
     version: 1
     metadata:
