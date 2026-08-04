@@ -26,7 +26,7 @@ data:
             excludearchived: true
     destination:
       gitea:
-        - url: https://git.tale.me
+        - url: http://forgejo-http.devtools.svc.cluster.local:3000
           token_file: /run/gickup/forgejo-token
           createorg: true
           lfs: true

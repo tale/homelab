@@ -68,6 +68,10 @@ spec:
       schedule: "0 2 * * *"
       cacheCapacity: 2Gi
       copyMethod: Snapshot
+      moverSecurityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
 
     - app: smb-store
       namespace: home-automation
@@ -100,6 +104,7 @@ spec:
           repository: << inputs.app >>-restic
           cacheCapacity: << inputs.cacheCapacity | quote >>
           copyMethod: << inputs.copyMethod >>
+          moverSecurityContext: << index inputs "moverSecurityContext" | default dict | toJson >>
           volumeSnapshotClassName: cluster-nvmf-snapshot
           storageClassName: cluster-nvmf-ephemeral
           cacheStorageClassName: cluster-nvmf-ephemeral

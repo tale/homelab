@@ -7,6 +7,7 @@ metadata:
     app.kubernetes.io/name: gickup
 spec:
   schedule: 0 */3 * * *
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:
