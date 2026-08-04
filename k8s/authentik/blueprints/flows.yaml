@@ -17,6 +17,19 @@ entries:
     identifiers:
       name: tale-skip-mfa-if-passkey
 
+  - model: authentik_policies_expression.expressionpolicy
+    id: deny-password-authentication
+    identifiers:
+      name: tale-deny-password-authentication
+    attrs:
+      expression: return False
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      order: 0
+      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      policy: !KeyOf deny-password-authentication
+
   - model: authentik_flows.flow
     id: recovery-flow
     identifiers:
