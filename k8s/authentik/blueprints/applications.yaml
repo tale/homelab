@@ -25,6 +25,16 @@ context:
           [managed, goauthentik.io/providers/oauth2/scope-profile],
         ]
 entries:
+  - model: authentik_core.application
+    state: absent
+    identifiers:
+      slug: hubble
+
+  - model: authentik_providers_oauth2.oauth2provider
+    state: absent
+    identifiers:
+      name: Provider for Hubble
+
   - model: authentik_providers_oauth2.oauth2provider
     id: flux-provider
     identifiers:

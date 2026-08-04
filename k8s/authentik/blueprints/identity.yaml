@@ -15,7 +15,8 @@ entries:
       name: Homelab Superadmins
     attrs:
       is_superuser: true
-      parent: !KeyOf homelab-users
+      parents:
+        - !KeyOf homelab-users
       users:
         - !Find [authentik_core.user, [username, tale]]
 
