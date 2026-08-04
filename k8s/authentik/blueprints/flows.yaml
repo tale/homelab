@@ -69,9 +69,9 @@ entries:
     identifiers:
       name: tale-authentication-identification
     attrs:
-      user_fields:
-        - email
-        - username
+      user_fields: []
+      sources:
+        - !Find [authentik_core.source, [slug, authentik-built-in]]
       webauthn_stage: !KeyOf passkey-validation
       recovery_flow: !KeyOf recovery-flow
 
@@ -84,12 +84,6 @@ entries:
     identifiers:
       order: 10
       stage: !KeyOf authentication-identification
-      target: !KeyOf authentication-flow
-
-  - model: authentik_flows.flowstagebinding
-    identifiers:
-      order: 30
-      stage: !KeyOf passkey-validation
       target: !KeyOf authentication-flow
 
   - model: authentik_flows.flowstagebinding
