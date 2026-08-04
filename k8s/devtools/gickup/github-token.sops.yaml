@@ -5,7 +5,7 @@ metadata:
   namespace: devtools
 type: Opaque
 stringData:
-  github-token: ENC[AES256_GCM,data:fwv7GUMSzwTbK3a1OWKt72cwANkLIOqVbyOJr8skgQFmR7NqzciMxg==,iv:8LKwxaFUZUQjj2FUAIMJQqXOkAmdepCK2cDFM0EcBPw=,tag:JQlMgkwZJ3lFdIS4wc7iLA==,type:str]
+  github-token: ENC[AES256_GCM,data:ROiCH+QUjNe8zqy+a9Xwse2sjE6FSJhvjAWOdq41zkkdhmGaQmxkbg==,iv:Waw5GAu+rWtZhzzAMhwsuLsEp7tM8zSwYXfH4TIhjDg=,tag:lMyj0zjsORtXkfj8oEt0GA==,type:str]
 sops:
   age:
     - recipient: age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
@@ -17,7 +17,7 @@ sops:
         TUhJcWdZa1lKRVlMODEvU2YwaXZrNjAKtxz49FS6n1tSKWDr4FnzoVBfsNk1qUOg
         CIQ3XfkY5HgaQRhu5yRm6zW80MZx1WK1UUGqv+6CHrBRtWKVzLXJ1g==
         -----END AGE ENCRYPTED FILE-----
-  lastmodified: "2026-08-04T16:09:25Z"
-  mac: ENC[AES256_GCM,data:8MQE0lR3MVyRt7jOuZ9XebPScucQ6OXINnC45idSPyNe466Srmb+4I4S8IbwcIKOBi9Pp3TQ7c6oapGehsi71qvXB9qefKr3rZj1f35ZwX76hU89crvqhT3G+uvwLQ9odFLSeuBr1yjRPjp6pqIGXOJi6ps8veh/Kqk8JODq2uY=,iv:Vx6FcaTD5EtFxJi7Q8I7kCp7SzqEskYTimQXroYg/5o=,tag:FBES83c9BFmKdXDLIgoOKw==,type:str]
+  lastmodified: "2026-08-04T18:42:04Z"
+  mac: ENC[AES256_GCM,data:wQQ/4/mEF2EXJzNvXzsZuhJ1mRxhCZ3tLK4v+tsE/MIi0D47YTExQuWWETpbBR4F9meDdp7D9kI2VmwqjvAeby1sZGAZamt8uD4jxKJ0fgPLQWINBxsytJBMYP8x/go734H3K6MrJXkrr99UTR1j5zH9TJREpDciCS11+8IuQ7A=,iv:cuvRwK83ocsrVysu8LGOEq9HEeHcU9WWZcRj5pG9C14=,tag:yIUA1eJIW35P0WjNGimOSA==,type:str]
   encrypted_regex: ^(data|stringData)$
   version: 3.10.2
