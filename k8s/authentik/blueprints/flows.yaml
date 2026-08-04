@@ -24,10 +24,15 @@ entries:
     attrs:
       expression: return False
 
+  - model: authentik_flows.flow
+    id: legacy-authentication-flow
+    identifiers:
+      slug: default-authentication-flow
+
   - model: authentik_policies.policybinding
     identifiers:
       order: 0
-      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+      target: !KeyOf legacy-authentication-flow
       policy: !KeyOf deny-password-authentication
 
   - model: authentik_flows.flow
