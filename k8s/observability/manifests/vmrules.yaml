@@ -186,6 +186,24 @@ spec:
           annotations:
             summary: "CNPG backup for {{ $labels.pod }} is over 48h old"
 
+        - alert: VolsyncBackupStale
+          expr: volsync_volume_out_of_sync{role="source"} == 1
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "volsync {{ $labels.obj_namespace }}/{{ $labels.obj_name }} has missed its backup schedule"
+
+        - alert: GickupMirrorStale
+          expr: >-
+            absent(kube_job_status_completion_time{namespace="devtools", job_name=~"gickup.*"})
+            or time() - max(kube_job_status_completion_time{namespace="devtools", job_name=~"gickup.*"}) > 24 * 3600
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: "Gickup has not completed a successful mirror in over 24h"
+
         - alert: CiliumEndpointsNotReady
           expr: sum by (endpoint_state) (cilium_endpoint_state{endpoint_state!="ready"}) > 0
           for: 15m
