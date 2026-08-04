@@ -11,12 +11,12 @@ data:
           includeorgs:
             - tale
             - chariz
-            - sileo
+            - Sileo
             - zbrateam
             - cnstr
-            - codegrounds
+            - Codegrounds
             - repostandards
-            - aemulo
+            - Aemulo
             - aet-vthacks
             - ghostty-org
           starred: false
