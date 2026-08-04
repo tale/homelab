@@ -60,9 +60,12 @@ spec:
     - app: observability
       path: ./k8s/observability
       dependsOn: [{ "name": "infra-configs" }]
-    - app: wakapi
-      path: ./k8s/wakapi
+    - app: devtools
+      path: ./k8s/devtools
       dependsOn: [{ "name": "infra-configs" }]
+    - app: wakapi
+      path: ./k8s/devtools/wakapi
+      dependsOn: [{ "name": "infra-configs" }, { "name": "devtools" }]
     - app: networking
       path: ./k8s/networking
       dependsOn: [{ "name": "infra-configs" }]

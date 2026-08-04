@@ -1,0 +1,147 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: wakapi
+  namespace: devtools
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: 5.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    defaultPodOptions:
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+    controllers:
+      wakapi:
+        type: deployment
+        strategy: Recreate
+        containers:
+          wakapi:
+            image:
+              repository: ghcr.io/muety/wakapi
+              tag: 2.17.3
+              pullPolicy: IfNotPresent
+            env:
+              ENVIRONMENT: production
+              WAKAPI_LEADERBOARD_ENABLED: "false"
+              WAKAPI_AVATAR_URL_TEMPLATE: https://github.com/{username}.png?size=256
+              WAKAPI_LISTEN_IPV4: 0.0.0.0
+              WAKAPI_LISTEN_IPV6: "-"
+              WAKAPI_PUBLIC_URL: https://wakatime.tale.me
+              WAKAPI_TRUST_REVERSE_PROXY_IPS: 0.0.0.0/0
+
+              WAKAPI_DB_TYPE: postgres
+              WAKAPI_DB_HOST: central-postgres-rw.cnpg-system.svc.cluster.local
+              WAKAPI_DB_PORT: "5432"
+              WAKAPI_DB_NAME: wakapi
+              WAKAPI_DB_USER: app
+              WAKAPI_DB_SSL: "true"
+              WAKAPI_DB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: wakapi-db-credentials
+                    key: password
+
+              WAKAPI_OIDC_ALLOW_SIGNUP: "true"
+              WAKAPI_OIDC_PROVIDERS_0_NAME: authentik
+              WAKAPI_OIDC_PROVIDERS_0_DISPLAY_NAME: Authentik
+              WAKAPI_OIDC_PROVIDERS_0_ENDPOINT: https://auth.tale.me/application/o/waka-time/
+              WAKAPI_OIDC_PROVIDERS_0_USERNAME_CLAIM: preferred_username
+              WAKAPI_OIDC_PROVIDERS_0_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: wakapi-oidc
+                    key: client-id
+              WAKAPI_OIDC_PROVIDERS_0_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: wakapi-oidc
+                    key: client-secret
+
+              WAKAPI_PASSWORD_SALT:
+                valueFrom:
+                  secretKeyRef:
+                    name: wakapi-secrets
+                    key: password-salt
+
+              WAKAPI_MAIL_ENABLED: "true"
+              WAKAPI_MAIL_SENDER: Wakapi <noreply@tale.me>
+              WAKAPI_MAIL_SMTP_HOST: email-smtp.us-east-1.amazonaws.com
+              WAKAPI_MAIL_SMTP_PORT: "587"
+              WAKAPI_MAIL_SMTP_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: wakapi-secrets
+                    key: smtp-user
+              WAKAPI_MAIL_SMTP_PASS:
+                valueFrom:
+                  secretKeyRef:
+                    name: wakapi-secrets
+                    key: smtp-pass
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: 3000
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: 3000
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+
+    service:
+      app:
+        controller: wakapi
+        ports:
+          http:
+            port: 3000
+            targetPort: 3000
+
+    route:
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        hostnames:
+          - wakatime.tale.me
+        parentRefs:
+          - name: envoy-gw
+            namespace: networking
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: 3000
