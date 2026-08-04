@@ -1,0 +1,26 @@
+version: 1
+metadata:
+  name: Tale - Identity
+entries:
+  - model: authentik_core.group
+    id: homelab-users
+    identifiers:
+      name: Homelab Users
+    attrs:
+      is_superuser: false
+
+  - model: authentik_core.group
+    id: homelab-superadmins
+    identifiers:
+      name: Homelab Superadmins
+    attrs:
+      is_superuser: true
+      parent: !KeyOf homelab-users
+      users:
+        - !Find [authentik_core.user, [username, tale]]
+
+  - model: authentik_core.user
+    identifiers:
+      username: akadmin
+    attrs:
+      is_active: false

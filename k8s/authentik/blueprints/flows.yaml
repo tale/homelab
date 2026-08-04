@@ -1,0 +1,127 @@
+version: 1
+metadata:
+  name: Tale - Flows
+entries:
+  - model: authentik_stages_password.passwordstage
+    state: absent
+    identifiers:
+      name: tale-authentication-password
+
+  - model: authentik_policies_expression.expressionpolicy
+    state: absent
+    identifiers:
+      name: tale-skip-password-if-passkey
+
+  - model: authentik_policies_expression.expressionpolicy
+    state: absent
+    identifiers:
+      name: tale-skip-mfa-if-passkey
+
+  - model: authentik_flows.flow
+    id: recovery-flow
+    identifiers:
+      slug: tale-recovery
+    attrs:
+      name: Tale Account Recovery
+      title: Recover your account
+      designation: recovery
+      authentication: require_unauthenticated
+
+  - model: authentik_flows.flow
+    id: authentication-flow
+    identifiers:
+      slug: tale-passkey-authentication
+    attrs:
+      name: Tale Passkey Login
+      title: Welcome back
+      designation: authentication
+      authentication: none
+
+  - model: authentik_stages_authenticator_validate.authenticatorvalidatestage
+    id: passkey-validation
+    identifiers:
+      name: tale-passkey-validation
+    attrs:
+      device_classes:
+        - webauthn
+      not_configured_action: deny
+
+  - model: authentik_stages_identification.identificationstage
+    id: authentication-identification
+    identifiers:
+      name: tale-authentication-identification
+    attrs:
+      user_fields:
+        - email
+        - username
+      webauthn_stage: !KeyOf passkey-validation
+      recovery_flow: !KeyOf recovery-flow
+
+  - model: authentik_stages_user_login.userloginstage
+    id: user-login
+    identifiers:
+      name: tale-authentication-login
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      order: 10
+      stage: !KeyOf authentication-identification
+      target: !KeyOf authentication-flow
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      order: 30
+      stage: !KeyOf passkey-validation
+      target: !KeyOf authentication-flow
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      order: 100
+      stage: !KeyOf user-login
+      target: !KeyOf authentication-flow
+
+  - model: authentik_stages_identification.identificationstage
+    id: recovery-identification
+    identifiers:
+      name: tale-recovery-identification
+    attrs:
+      user_fields:
+        - email
+
+  - model: authentik_stages_email.emailstage
+    id: recovery-email
+    identifiers:
+      name: tale-recovery-email
+    attrs:
+      use_global_settings: true
+      activate_user_on_success: true
+      token_expiry: minutes=30
+      subject: Recover your Tale account
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      order: 10
+      stage: !KeyOf recovery-identification
+      target: !KeyOf recovery-flow
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      order: 20
+      stage: !KeyOf recovery-email
+      target: !KeyOf recovery-flow
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      order: 30
+      stage:
+        !Find [
+          authentik_stages_authenticator_webauthn.authenticatorwebauthnstage,
+          [name, default-authenticator-webauthn-setup],
+        ]
+      target: !KeyOf recovery-flow
+
+  - model: authentik_flows.flowstagebinding
+    identifiers:
+      order: 100
+      stage: !KeyOf user-login
+      target: !KeyOf recovery-flow

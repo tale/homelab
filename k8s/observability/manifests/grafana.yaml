@@ -31,7 +31,7 @@ spec:
       token_url: https://auth.tale.me/application/o/token/
       email_attribute_path: email
       login_attribute_path: preferred_username
-      skip_org_role_sync: "true"
+      role_attribute_path: "contains(groups[*], 'Homelab Superadmins') && 'Admin' || 'Viewer'"
   deployment:
     spec:
       template:

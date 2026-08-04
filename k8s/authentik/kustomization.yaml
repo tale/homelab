@@ -6,6 +6,17 @@ resources:
   - manifests/authentik-secrets.sops.yaml
   - manifests/authentik-oidc-secrets.sops.yaml
   - manifests/authentik-http-route.yaml
-  - manifests/authentik-blueprints.yaml
   - manifests/authentik-data-pvc.yaml
   - manifests/vmrule.yaml
+
+configMapGenerator:
+  - name: authentik-blueprints
+    namespace: authentik
+    files:
+      - blueprints/brand.yaml
+      - blueprints/identity.yaml
+      - blueprints/flows.yaml
+      - blueprints/applications.yaml
+
+configurations:
+  - kustomizeconfig.yaml
