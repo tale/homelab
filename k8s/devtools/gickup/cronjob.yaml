@@ -1,0 +1,93 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: gickup
+  namespace: devtools
+  labels:
+    app.kubernetes.io/name: gickup
+spec:
+  schedule: 0 */3 * * *
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: gickup
+        spec:
+          restartPolicy: OnFailure
+          initContainers:
+            - name: mint-token
+              image: alpine/curl:8.21.0
+              imagePullPolicy: IfNotPresent
+              command:
+                - sh
+                - -eu
+                - -c
+                - |
+                  api="http://forgejo-http.devtools.svc.cluster.local:3000/api/v1/users/${FORGEJO_USER}/tokens"
+                  curl -sf -u "${FORGEJO_USER}:${FORGEJO_PASSWORD}" -X DELETE "${api}/gickup" || true
+                  curl -sf -u "${FORGEJO_USER}:${FORGEJO_PASSWORD}" -X POST "${api}" \
+                    -H 'Content-Type: application/json' \
+                    -d '{"name":"gickup","scopes":["write:organization","write:repository","write:user"]}' \
+                    | grep -o '"sha1":"[^"]*"' | cut -d'"' -f4 > /run/gickup/forgejo-token
+                  test -s /run/gickup/forgejo-token
+              env:
+                - name: FORGEJO_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: forgejo-admin
+                      key: username
+                - name: FORGEJO_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: forgejo-admin
+                      key: password
+              volumeMounts:
+                - name: token
+                  mountPath: /run/gickup
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                runAsUser: 1000
+                runAsGroup: 1000
+                capabilities:
+                  drop:
+                    - ALL
+                seccompProfile:
+                  type: RuntimeDefault
+          containers:
+            - name: gickup
+              image: buddyspencer/gickup:latest
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: TZ
+                  value: America/New_York
+                - name: GICKUP_GITHUB_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: gickup-secrets
+                      key: github-token
+              volumeMounts:
+                - name: config
+                  mountPath: /gickup/conf.yml
+                  subPath: conf.yml
+                - name: token
+                  mountPath: /run/gickup
+                  readOnly: true
+              securityContext:
+                allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                runAsUser: 1000
+                runAsGroup: 1000
+                capabilities:
+                  drop:
+                    - ALL
+                seccompProfile:
+                  type: RuntimeDefault
+          volumes:
+            - name: config
+              configMap:
+                name: gickup-config
+            - name: token
+              emptyDir:
+                medium: Memory

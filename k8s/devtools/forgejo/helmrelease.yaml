@@ -1,18 +1,8 @@
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: forgejo
-  namespace: forgejo
-spec:
-  type: oci
-  url: oci://code.forgejo.org/forgejo-helm
-  interval: 1h
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: forgejo
-  namespace: forgejo
+  namespace: devtools
 spec:
   interval: 1h
   chart:
@@ -22,8 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: forgejo
-  install:
-    createNamespace: true
+        namespace: flux-system
   upgrade:
     serverSideApply: enabled
   rollback:
@@ -43,6 +32,10 @@ spec:
       enabled: true
       size: 25Gi
     gitea:
+      admin:
+        existingSecret: forgejo-admin
+        email: noreply@tale.me
+        passwordMode: keepUpdated
       metrics:
         enabled: true
         serviceMonitor:

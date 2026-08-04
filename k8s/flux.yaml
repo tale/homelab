@@ -51,9 +51,6 @@ spec:
     - app: bluesky-pds
       path: ./k8s/bluesky-pds
       dependsOn: [{ "name": "infra-configs" }]
-    - app: forgejo
-      path: ./k8s/forgejo
-      dependsOn: [{ "name": "infra-configs" }]
     - app: minecraft
       path: ./k8s/minecraft
       dependsOn: [{ "name": "infra-configs" }]
@@ -63,6 +60,12 @@ spec:
     - app: devtools
       path: ./k8s/devtools
       dependsOn: [{ "name": "infra-configs" }]
+    - app: forgejo
+      path: ./k8s/devtools/forgejo
+      dependsOn: [{ "name": "infra-configs" }, { "name": "devtools" }]
+    - app: gickup
+      path: ./k8s/devtools/gickup
+      dependsOn: [{ "name": "infra-configs" }, { "name": "forgejo" }]
     - app: wakapi
       path: ./k8s/devtools/wakapi
       dependsOn: [{ "name": "infra-configs" }, { "name": "devtools" }]

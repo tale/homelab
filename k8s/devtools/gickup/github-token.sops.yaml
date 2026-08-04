@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gickup-secrets
+  namespace: devtools
+type: Opaque
+stringData:
+  github-token: ENC[AES256_GCM,data:fwv7GUMSzwTbK3a1OWKt72cwANkLIOqVbyOJr8skgQFmR7NqzciMxg==,iv:8LKwxaFUZUQjj2FUAIMJQqXOkAmdepCK2cDFM0EcBPw=,tag:JQlMgkwZJ3lFdIS4wc7iLA==,type:str]
+sops:
+  age:
+    - recipient: age1694wse79axvlhlll9te66wqx0xzqcwu0age2dewtdfv9mu07jfxq0wmlzr
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBDSm5FN0JYMWY3a3JBcnAz
+        d2Jid3RDU09DaEUvSFc2UWFrQTNGb1lZOWtrCkY0c0FoNWNyOFQ3T3dCdVhqSVZk
+        OW93K1VoM0tHMnBXeFhOTkZ0SFB1bTgKLS0tIHl3WWNIbjJhSnp0V1E1aCsyTjdE
+        TUhJcWdZa1lKRVlMODEvU2YwaXZrNjAKtxz49FS6n1tSKWDr4FnzoVBfsNk1qUOg
+        CIQ3XfkY5HgaQRhu5yRm6zW80MZx1WK1UUGqv+6CHrBRtWKVzLXJ1g==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-08-04T16:09:25Z"
+  mac: ENC[AES256_GCM,data:8MQE0lR3MVyRt7jOuZ9XebPScucQ6OXINnC45idSPyNe466Srmb+4I4S8IbwcIKOBi9Pp3TQ7c6oapGehsi71qvXB9qefKr3rZj1f35ZwX76hU89crvqhT3G+uvwLQ9odFLSeuBr1yjRPjp6pqIGXOJi6ps8veh/Kqk8JODq2uY=,iv:Vx6FcaTD5EtFxJi7Q8I7kCp7SzqEskYTimQXroYg/5o=,tag:FBES83c9BFmKdXDLIgoOKw==,type:str]
+  encrypted_regex: ^(data|stringData)$
+  version: 3.10.2

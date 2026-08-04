@@ -61,6 +61,14 @@ spec:
       cacheCapacity: 2Gi
       copyMethod: Snapshot
 
+    - app: forgejo
+      namespace: devtools
+      pvc: gitea-shared-storage
+      repository: forgejo
+      schedule: "0 2 * * *"
+      cacheCapacity: 2Gi
+      copyMethod: Snapshot
+
     - app: smb-store
       namespace: home-automation
       pvc: samba
