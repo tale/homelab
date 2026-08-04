@@ -9,6 +9,9 @@ resources:
   - manifests/authentik-data-pvc.yaml
   - manifests/vmrule.yaml
 
+generatorOptions:
+  disableNameSuffixHash: true
+
 configMapGenerator:
   - name: authentik-blueprints
     namespace: authentik
@@ -17,6 +20,3 @@ configMapGenerator:
       - blueprints/identity.yaml
       - blueprints/flows.yaml
       - blueprints/applications.yaml
-
-configurations:
-  - kustomizeconfig.yaml
