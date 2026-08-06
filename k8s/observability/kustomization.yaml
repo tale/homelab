@@ -25,3 +25,36 @@ resources:
   - manifests/flux-scrape.yaml
   - manifests/blackbox.yaml
   - manifests/vmrules.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: grafana-dashboard-overview
+    namespace: observability-system
+    files:
+      - dashboards/overview.json
+  - name: grafana-dashboard-public
+    namespace: observability-system
+    files:
+      - dashboards/public.json
+  - name: grafana-dashboard-kubernetes
+    namespace: observability-system
+    files:
+      - dashboards/kubernetes.json
+  - name: grafana-dashboard-network
+    namespace: observability-system
+    files:
+      - dashboards/network.json
+  - name: grafana-dashboard-storage
+    namespace: observability-system
+    files:
+      - dashboards/storage.json
+  - name: grafana-dashboard-postgres
+    namespace: observability-system
+    files:
+      - dashboards/postgres.json
+  - name: grafana-dashboard-monitoring
+    namespace: observability-system
+    files:
+      - dashboards/monitoring.json
