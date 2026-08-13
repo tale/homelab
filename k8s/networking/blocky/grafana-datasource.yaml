@@ -10,7 +10,7 @@ spec:
   allowCrossNamespaceImport: true
   datasource:
     name: Blocky Postgres
-    type: postgres
+    type: grafana-postgresql-datasource
     access: proxy
     url: central-postgres-rw.cnpg-system.svc.cluster.local:5432
     database: blocky
@@ -19,9 +19,9 @@ spec:
     jsonData:
       sslmode: require
     secureJsonData:
-      password: "${BLOCKY_DB_PASSWORD}"
+      password: "${password}"
   valuesFrom:
-    - targetPath: "datasource.secureJsonData.password"
+    - targetPath: "secureJsonData.password"
       valueFrom:
         secretKeyRef:
           name: blocky-db-credentials
