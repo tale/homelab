@@ -28,14 +28,15 @@ spec:
               tag: "3.22"
             env:
               LAN_INTERFACE: enp0s31f6
-              EUFY_SECURITY_TAG: v8.2.4
-              TUYA_LOCAL_TAG: 2026.4.1
+              EUFY_SECURITY_REF: v8.2.4
+              TUYA_LOCAL_REF: 2026.4.1
+              HA_SCRYPTED_REF: d97c417843c33341d0eb2ddd5326c6ebf58d36b4
             command:
               - sh
               - -eu
               - -c
             args:
-              - "install_component() {\n  repo=$1\n  component=$2\n  tag=$3\n  installed=/config/custom_components/${component}/.installed_version\n\n  if [ \"$(cat \"${installed}\" 2>/dev/null)\" != \"${tag}\" ]; then\n    rm -rf /tmp/src\n    mkdir -p /tmp/src\n    wget -qO- \"https://github.com/${repo}/archive/refs/tags/${tag}.tar.gz\" | tar xz -C /tmp/src\n    rm -rf \"/config/custom_components/${component}\"\n    mv \"/tmp/src/$(basename \"${repo}\")-${tag#v}/custom_components/${component}\" /config/custom_components/\n    echo \"${tag}\" > \"${installed}\"\n  fi\n}\n\nfor file in automations.yaml scenes.yaml scripts.yaml; do\n  [ -e \"/config/${file}\" ] || : > \"/config/${file}\"\ndone\n\nlan_ip=$(ip -4 -o addr show \"${LAN_INTERFACE}\" 2>/dev/null | awk '{print $4}' | cut -d/ -f1)\nif [ -z \"${lan_ip}\" ]; then\n  echo \"no IPv4 address on ${LAN_INTERFACE}; HomeKit would advertise an unreachable address\" >&2\n  exit 1\nfi\necho \"${lan_ip}\" > /config/homekit_host_ip.yaml\n\nmkdir -p /config/custom_components\n\ninstall_component fuatakgun/eufy_security eufy_security \"${EUFY_SECURITY_TAG}\"\ninstall_component make-all/tuya-local tuya_local \"${TUYA_LOCAL_TAG}\"\n"
+              - "install_component() {\n  repo=$1\n  component=$2\n  ref=$3\n  installed=/config/custom_components/${component}/.installed_version\n\n  if [ \"$(cat \"${installed}\" 2>/dev/null)\" != \"${ref}\" ]; then\n    rm -rf /tmp/src\n    mkdir -p /tmp/src\n    wget -qO- \"https://github.com/${repo}/archive/${ref}.tar.gz\" | tar xz -C /tmp/src\n    rm -rf \"/config/custom_components/${component}\"\n    mv \"/tmp/src/$(basename \"${repo}\")-${ref#v}/custom_components/${component}\" /config/custom_components/\n    echo \"${ref}\" > \"${installed}\"\n  fi\n}\n\nfor file in automations.yaml scenes.yaml scripts.yaml; do\n  [ -e \"/config/${file}\" ] || : > \"/config/${file}\"\ndone\n\nlan_ip=$(ip -4 -o addr show \"${LAN_INTERFACE}\" 2>/dev/null | awk '{print $4}' | cut -d/ -f1)\nif [ -z \"${lan_ip}\" ]; then\n  echo \"no IPv4 address on ${LAN_INTERFACE}; HomeKit would advertise an unreachable address\" >&2\n  exit 1\nfi\necho \"${lan_ip}\" > /config/homekit_host_ip.yaml\n\nmkdir -p /config/custom_components\n\ninstall_component fuatakgun/eufy_security eufy_security \"${EUFY_SECURITY_REF}\"\ninstall_component make-all/tuya-local tuya_local \"${TUYA_LOCAL_REF}\"\ninstall_component koush/ha_scrypted scrypted \"${HA_SCRYPTED_REF}\"\n"
             securityContext:
               allowPrivilegeEscalation: false
               runAsNonRoot: false
