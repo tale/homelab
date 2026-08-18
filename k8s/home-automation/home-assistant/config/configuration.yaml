@@ -1,7 +1,6 @@
 go2rtc:
 history:
 logbook:
-media_source:
 stream:
 sun:
 zeroconf:
@@ -14,13 +13,7 @@ homeassistant:
   unit_system: us_customary
   external_url: https://home.tale.me
   internal_url: https://home.tale.me
-
-http:
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 127.0.0.1
-    - 10.244.0.0/16
-    - 172.31.42.0/24
+  packages: !include_dir_named packages
 
 lovelace:
   dashboards:

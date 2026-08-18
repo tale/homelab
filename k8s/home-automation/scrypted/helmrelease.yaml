@@ -21,6 +21,74 @@ spec:
       scrypted:
         type: deployment
         strategy: Recreate
+        initContainers:
+          seed-user:
+            image:
+              repository: ghcr.io/koush/scrypted
+              tag: latest
+              pullPolicy: IfNotPresent
+            env:
+              NODE_PATH: /server/node_modules
+              SEED_DB: /server/volume/scrypted.db
+              SEED_USERNAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: home-assistant-secrets
+                    key: scrypted_username
+              SEED_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: home-assistant-secrets
+                    key: scrypted_password
+            command:
+              - sh
+              - -eu
+              - -c
+            args:
+              - |
+                cat > /tmp/seed.js <<'JS'
+                const { Level } = require("level");
+                const crypto = require("crypto");
+
+                const sha256 = (value) => crypto.createHash("sha256").update(value).digest().toString("hex");
+
+                (async () => {
+                  const username = process.env.SEED_USERNAME;
+                  const password = process.env.SEED_PASSWORD;
+                  const db = new Level(process.env.SEED_DB);
+                  await db.open();
+                  const key = `ScryptedUser/${username}`;
+
+                  let existing;
+                  try {
+                    existing = JSON.parse(await db.get(key));
+                  } catch (e) {}
+
+                  if (existing && sha256(existing.salt + password) === existing.passwordHash) {
+                    await db.close();
+                    return;
+                  }
+
+                  const salt = crypto.randomBytes(64).toString("base64");
+                  await db.put(key, JSON.stringify({
+                    _id: username,
+                    _documentType: "ScryptedUser",
+                    salt,
+                    passwordHash: sha256(salt + password),
+                    passwordDate: Date.now(),
+                    token: existing?.token || crypto.randomBytes(16).toString("hex"),
+                  }));
+                  await db.close();
+                })();
+                JS
+                node /tmp/seed.js
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: false
+              runAsUser: 0
+              runAsGroup: 0
+              seccompProfile:
+                type: RuntimeDefault
         containers:
           scrypted:
             image:
