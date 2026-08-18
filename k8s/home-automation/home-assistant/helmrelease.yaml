@@ -48,7 +48,7 @@ spec:
           home-assistant:
             image:
               repository: ghcr.io/home-assistant/home-assistant
-              tag: stable
+              tag: "2026.8.2"
               pullPolicy: IfNotPresent
             env:
               TZ: America/New_York
