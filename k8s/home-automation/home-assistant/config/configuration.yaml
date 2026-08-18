@@ -1,4 +1,10 @@
-default_config:
+go2rtc:
+history:
+logbook:
+media_source:
+stream:
+sun:
+zeroconf:
 
 homeassistant:
   name: Home
@@ -15,6 +21,15 @@ http:
     - 127.0.0.1
     - 10.244.0.0/16
     - 172.31.42.0/24
+
+lovelace:
+  dashboards:
+    lovelace:
+      mode: yaml
+      filename: ui-lovelace.yaml
+      title: Overview
+      icon: mdi:view-dashboard
+      show_in_sidebar: true
 
 recorder:
   db_url: !secret recorder_db_url

@@ -1,0 +1,11 @@
+strategy:
+  type: home
+  favorite_entities:
+    - lock.front_door
+    - lock.garage_door
+    - light.hallway
+    - light.bar
+    - light.back_door
+    - light.theater
+  hide_welcome_message: true
+  hide_suggested_entities: true

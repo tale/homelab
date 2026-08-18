@@ -124,6 +124,9 @@ spec:
               - path: /config/configuration.yaml
                 subPath: configuration.yaml
                 readOnly: true
+              - path: /config/ui-lovelace.yaml
+                subPath: ui-lovelace.yaml
+                readOnly: true
       secrets:
         type: secret
         name: home-assistant-secrets

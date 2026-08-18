@@ -10,6 +10,7 @@ configMapGenerator:
     namespace: home-automation
     files:
       - config/configuration.yaml
+      - config/ui-lovelace.yaml
 
 configurations:
   - kustomizeconfig.yaml
