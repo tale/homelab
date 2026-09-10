@@ -5,6 +5,7 @@ metadata:
   namespace: devtools
 spec:
   interval: 1h
+  timeout: 20m
   chart:
     spec:
       chart: app-template
