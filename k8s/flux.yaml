@@ -63,6 +63,9 @@ spec:
     - app: forgejo
       path: ./k8s/devtools/forgejo
       dependsOn: [{ "name": "infra-configs" }, { "name": "devtools" }]
+    - app: gitlab
+      path: ./k8s/devtools/gitlab
+      dependsOn: [{ "name": "infra-configs" }, { "name": "devtools" }]
     - app: gickup
       path: ./k8s/devtools/gickup
       dependsOn: [{ "name": "infra-configs" }, { "name": "forgejo" }]
