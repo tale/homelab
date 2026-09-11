@@ -5,7 +5,7 @@ metadata:
   namespace: devtools
 spec:
   interval: 1h
-  timeout: 20m
+  timeout: 30m
   chart:
     spec:
       chart: app-template
@@ -31,8 +31,8 @@ spec:
         containers:
           gitlab:
             image:
-              repository: docker.io/gitlab/gitlab-ce
-              tag: 19.3.1-ce.0
+              repository: docker.io/gitlab/gitlab-ee
+              tag: 19.3.2-ee.0
               pullPolicy: IfNotPresent
             env:
               GITLAB_ROOT_PASSWORD:
@@ -54,24 +54,25 @@ spec:
                 sidekiq['max_concurrency'] = 9
                 postgresql['shared_buffers'] = '256MB'
                 gitlab_rails['gitlab_shell_ssh_port'] = 22
+                gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8', '10.244.0.0/16', '172.31.42.0/24']
             probes:
               startup:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /-/health
+                    path: /-/liveness
                     port: 80
                   initialDelaySeconds: 60
                   periodSeconds: 10
                   timeoutSeconds: 5
-                  failureThreshold: 60
+                  failureThreshold: 90
               liveness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /-/health
+                    path: /-/liveness
                     port: 80
                   periodSeconds: 30
                   timeoutSeconds: 10
@@ -136,3 +137,22 @@ spec:
             timeouts:
               request: 300s
               backendRequest: 300s
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: gitlab
+            patch: |
+              - op: add
+                path: /spec/progressDeadlineSeconds
+                value: 1800
+              - op: add
+                path: /spec/template/spec/containers/0/env/-
+                value:
+                  name: GITLAB_ACTIVATION_CODE
+                  valueFrom:
+                    secretKeyRef:
+                      name: gitlab-license
+                      key: activation-code
+                      optional: true
