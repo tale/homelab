@@ -203,6 +203,8 @@ entries:
       <<: *oauth2-defaults
       client_secret: !Env AUTHENTIK_OIDC_SECRET_AUTOBRR
       name: Provider for autobrr
+      grant_types:
+        - authorization_code
       redirect_uris:
         - matching_mode: strict
           url: https://autobrr.tale.me/api/auth/oidc/callback
