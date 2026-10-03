@@ -35,6 +35,11 @@ spec:
   values:
     global:
       env:
+        - name: AUTHENTIK_OIDC_SECRET_AUTOBRR
+          valueFrom:
+            secretKeyRef:
+              name: authentik-oidc-secrets
+              key: AUTHENTIK_OIDC_SECRET_AUTOBRR
         - name: AUTHENTIK_SECRET_KEY
           valueFrom:
             secretKeyRef:

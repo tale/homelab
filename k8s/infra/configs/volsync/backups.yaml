@@ -5,6 +5,18 @@ metadata:
   namespace: flux-system
 spec:
   inputs:
+    - app: autobrr
+      namespace: autobrr
+      pvc: autobrr
+      repository: autobrr
+      schedule: "15 4 * * *"
+      cacheCapacity: 1Gi
+      copyMethod: Snapshot
+      moverSecurityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
     - app: bluesky-pds
       namespace: bluesky-pds
       pvc: bluesky-pds-data

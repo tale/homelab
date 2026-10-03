@@ -23,6 +23,7 @@ Configuration for my homelab mini-cluster running on
 
 **Apps** (`k8s/`)
 
+- [autobrr](./k8s/autobrr/) — Download automation with Authentik SSO
 - [Authentik](./k8s/authentik/) — Identity provider / SSO (OIDC) for cluster apps
 - [Blocky](./k8s/blocky/) — DNS proxy and ad-blocker
 - [Bluesky PDS](./k8s/bluesky-pds/) — Personal Data Server for atproto
@@ -41,6 +42,8 @@ flowchart TD
     infra_controllers[infra-controllers]
     infra_configs[infra-configs]
     infra_configs --> infra_controllers
+    autobrr --> infra_configs
+    autobrr --> authentik
     authentik --> infra_configs
     blocky --> infra_configs
     bluesky_pds[bluesky-pds] --> infra_configs

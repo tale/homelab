@@ -45,6 +45,9 @@ metadata:
   namespace: flux-system
 spec:
   inputs:
+    - app: autobrr
+      path: ./k8s/autobrr
+      dependsOn: [{ "name": "infra-configs" }, { "name": "authentik" }]
     - app: authentik
       path: ./k8s/authentik
       dependsOn: [{ "name": "infra-configs" }]

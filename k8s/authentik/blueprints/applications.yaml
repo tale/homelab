@@ -194,3 +194,29 @@ entries:
       order: 0
       target: !KeyOf wakatime-app
       group: !Find [authentik_core.group, [name, Homelab Users]]
+
+  - model: authentik_providers_oauth2.oauth2provider
+    id: autobrr-provider
+    identifiers:
+      client_id: AkOEBAIlsqEuoeg_cR6q_th1JPAqxg5a8Y6_PHEN
+    attrs:
+      <<: *oauth2-defaults
+      client_secret: !Env AUTHENTIK_OIDC_SECRET_AUTOBRR
+      name: Provider for autobrr
+      redirect_uris:
+        - matching_mode: strict
+          url: https://autobrr.tale.me/api/auth/oidc/callback
+
+  - model: authentik_core.application
+    id: autobrr-app
+    identifiers:
+      slug: autobrr
+    attrs:
+      name: autobrr
+      provider: !KeyOf autobrr-provider
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      order: 0
+      target: !KeyOf autobrr-app
+      group: !Find [authentik_core.group, [name, Homelab Superadmins]]

@@ -1,0 +1,120 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: autobrr
+  namespace: autobrr
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: 5.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    defaultPodOptions:
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+
+    controllers:
+      autobrr:
+        type: deployment
+        strategy: Recreate
+        containers:
+          autobrr:
+            image:
+              repository: ghcr.io/autobrr/autobrr
+              tag: v1.87.0
+              pullPolicy: IfNotPresent
+            env:
+              TZ: America/Los_Angeles
+              AUTOBRR__HOST: 0.0.0.0
+              AUTOBRR__PORT: "7474"
+              AUTOBRR__LOG_LEVEL: INFO
+              AUTOBRR__DATABASE_TYPE: sqlite
+              AUTOBRR__OIDC_ENABLED: "true"
+              AUTOBRR__OIDC_ISSUER: https://auth.tale.me/application/o/autobrr/
+              AUTOBRR__OIDC_REDIRECT_URL: https://autobrr.tale.me/api/auth/oidc/callback
+              AUTOBRR__OIDC_DISABLE_BUILT_IN_LOGIN: "true"
+              AUTOBRR__OIDC_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: autobrr-oidc
+                    key: client-id
+              AUTOBRR__OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: autobrr-oidc
+                    key: client-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/healthz/liveness
+                    port: 7474
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/healthz/readiness
+                    port: 7474
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+
+    service:
+      app:
+        controller: autobrr
+        ports:
+          http:
+            port: 7474
+            targetPort: 7474
+
+    route:
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        hostnames:
+          - autobrr.tale.me
+        parentRefs:
+          - name: envoy-gw
+            namespace: networking
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: 7474
+
+    persistence:
+      config:
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: cluster-nvmf
+        retain: true
+        globalMounts:
+          - path: /config
