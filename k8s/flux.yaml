@@ -50,7 +50,7 @@ spec:
       dependsOn: [{ "name": "infra-configs" }, { "name": "authentik" }]
     - app: qui
       path: ./k8s/qui
-      dependsOn: [{ "name": "infra-configs" }, { "name": "authentik" }]
+      dependsOn: [{ "name": "infra-configs" }, { "name": "authentik" }, { "name": "autobrr" }]
     - app: authentik
       path: ./k8s/authentik
       dependsOn: [{ "name": "infra-configs" }]

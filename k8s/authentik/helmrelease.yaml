@@ -91,6 +91,9 @@ spec:
       enabled: false
     redis:
       enabled: true
+    worker:
+      deploymentStrategy:
+        type: Recreate
     server:
       deploymentStrategy:
         type: Recreate
