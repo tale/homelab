@@ -93,7 +93,10 @@ spec:
       enabled: true
     worker:
       deploymentStrategy:
-        type: Recreate
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 0
+          maxUnavailable: 1
     server:
       deploymentStrategy:
         type: Recreate
