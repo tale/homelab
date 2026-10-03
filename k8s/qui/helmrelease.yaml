@@ -1,0 +1,132 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: qui
+  namespace: qui
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: 5.0.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    defaultPodOptions:
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+
+    controllers:
+      qui:
+        type: deployment
+        strategy: Recreate
+        containers:
+          qui:
+            image:
+              repository: ghcr.io/autobrr/qui
+              tag: v1.30.0
+              pullPolicy: IfNotPresent
+            env:
+              TZ: America/Los_Angeles
+              QUI__HOST: 0.0.0.0
+              QUI__PORT: "7476"
+              QUI__LOG_LEVEL: INFO
+              QUI__SESSION_COOKIE_SECURE: "true"
+              QUI__DATA_DIR: /config
+              QUI__DATABASE_ENGINE: postgres
+              QUI__DATABASE_HOST: central-postgres-rw.cnpg-system.svc.cluster.local
+              QUI__DATABASE_PORT: "5432"
+              QUI__DATABASE_NAME: qui
+              QUI__DATABASE_USER: app
+              QUI__DATABASE_SSL_MODE: require
+              QUI__DATABASE_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: qui-db-credentials
+                    key: password
+              QUI__OIDC_ENABLED: "true"
+              QUI__OIDC_ISSUER: https://auth.tale.me/application/o/qui/
+              QUI__OIDC_REDIRECT_URL: https://qui.tale.me/api/auth/oidc/callback
+              QUI__OIDC_DISABLE_BUILT_IN_LOGIN: "true"
+              QUI__OIDC_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: qui-oidc
+                    key: client-id
+              QUI__OIDC_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: qui-oidc
+                    key: client-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz/liveness
+                    port: 7476
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz/readiness
+                    port: 7476
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+
+    service:
+      app:
+        controller: qui
+        ports:
+          http:
+            port: 7476
+            targetPort: 7476
+
+    route:
+      app:
+        annotations:
+          external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
+        hostnames:
+          - qui.tale.me
+        parentRefs:
+          - name: envoy-gw
+            namespace: networking
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: 7476
+
+    persistence:
+      config:
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: cluster-nvmf
+        retain: true
+        globalMounts:
+          - path: /config

@@ -222,3 +222,31 @@ entries:
       order: 0
       target: !KeyOf autobrr-app
       group: !Find [authentik_core.group, [name, Homelab Superadmins]]
+
+  - model: authentik_providers_oauth2.oauth2provider
+    id: qui-provider
+    identifiers:
+      client_id: XvzJVY62Z6oPyTGGPmoQvktyPgDnoiC_YWwSONGJ
+    attrs:
+      <<: *oauth2-defaults
+      client_secret: !Env AUTHENTIK_OIDC_SECRET_QUI
+      name: Provider for qui
+      grant_types:
+        - authorization_code
+      redirect_uris:
+        - matching_mode: strict
+          url: https://qui.tale.me/api/auth/oidc/callback
+
+  - model: authentik_core.application
+    id: qui-app
+    identifiers:
+      slug: qui
+    attrs:
+      name: qui
+      provider: !KeyOf qui-provider
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      order: 0
+      target: !KeyOf qui-app
+      group: !Find [authentik_core.group, [name, Homelab Superadmins]]

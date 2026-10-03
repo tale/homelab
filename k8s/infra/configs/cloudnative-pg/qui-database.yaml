@@ -1,0 +1,10 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: central-postgres-qui
+  namespace: cnpg-system
+spec:
+  name: qui
+  owner: app
+  cluster:
+    name: central-postgres

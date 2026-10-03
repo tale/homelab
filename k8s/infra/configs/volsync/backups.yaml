@@ -5,6 +5,18 @@ metadata:
   namespace: flux-system
 spec:
   inputs:
+    - app: qui
+      namespace: qui
+      pvc: qui
+      repository: qui
+      schedule: "30 4 * * *"
+      cacheCapacity: 1Gi
+      copyMethod: Snapshot
+      moverSecurityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
     - app: autobrr
       namespace: autobrr
       pvc: autobrr
