@@ -5,6 +5,10 @@ metadata:
   namespace: autobrr
 spec:
   interval: 1h
+  install:
+    strategy:
+      name: RetryOnFailure
+      retryInterval: 1m
   chart:
     spec:
       chart: app-template

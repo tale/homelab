@@ -5,3 +5,13 @@ resources:
   - namespace.yaml
   - helmrelease.yaml
   - oidc.sops.yaml
+  - db-credentials.sops.yaml
+
+configMapGenerator:
+  - name: autobrr-migration
+    namespace: autobrr
+    files:
+      - migrate-postgres.py
+
+configurations:
+  - kustomizeconfig.yaml
