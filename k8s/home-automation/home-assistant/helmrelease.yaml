@@ -31,7 +31,7 @@ spec:
               EUFY_SECURITY_REF: v8.2.4
               TUYA_LOCAL_REF: 2026.4.1
               HA_SCRYPTED_REF: d97c417843c33341d0eb2ddd5326c6ebf58d36b4
-              DISABLED_ENTITY_MATCHES: T8113N632105314A T8113N6321053916
+              DISABLED_ENTITY_MATCHES: T8113N632105314A T8113N6321053916 T8010N1320520685
             command:
               - sh
               - -eu

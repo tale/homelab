@@ -24,8 +24,8 @@ spec:
         containers:
           eufy-security-ws:
             image:
-              repository: bropat/eufy-security-ws
-              tag: 3.1.0
+              repository: ghcr.io/tale/eufy-security-ws
+              tag: mqtt-lock@sha256:42e716982fec30e2d6524f5e81ef60550c32553019196eea05ef186bba631064
               pullPolicy: IfNotPresent
             envFrom:
               - secretRef:
