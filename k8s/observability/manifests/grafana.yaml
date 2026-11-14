@@ -9,9 +9,6 @@ spec:
   config:
     server:
       root_url: "https://grafana.tale.me"
-    rendering:
-      server_url: http://grafana-image-renderer.observability-system.svc.cluster.local:8081/render
-      callback_url: http://grafana-service.observability-system.svc.cluster.local:3000/
     database:
       type: postgres
       host: central-postgres-rw.cnpg-system.svc.cluster.local:5432
@@ -51,11 +48,6 @@ spec:
                     secretKeyRef:
                       name: grafana-db-credentials
                       key: password
-                - name: GF_RENDERING_RENDERER_TOKEN
-                  valueFrom:
-                    secretKeyRef:
-                      name: grafana-renderer-token
-                      key: token
               volumeMounts:
                 - name: grafana-oidc
                   mountPath: /etc/secrets/auth_generic_oauth

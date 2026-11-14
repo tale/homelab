@@ -70,12 +70,13 @@ spec:
             summary: "CNPG primary {{ $labels.pod }} has no streaming replica"
 
         - alert: DNSDown
-          expr: sum(up{job="blocky"}) == 0
+          expr: sum(up{job="blocky"}) == 0 or absent(up{job="blocky"})
           for: 5m
           labels:
             severity: critical
           annotations:
-            summary: "Every Blocky replica is down — LAN DNS is broken"
+            summary: "No Blocky replicas are reporting metrics"
+            description: "All scrapes failed or targets disappeared. Check DNS availability and Blocky scrape discovery."
 
         - alert: UPSOnBattery
           expr: network_ups_tools_ups_status{flag="OB"} == 1

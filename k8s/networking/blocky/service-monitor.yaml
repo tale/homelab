@@ -8,7 +8,8 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: me.tale.blocky
+      app.kubernetes.io/instance: blocky
+      app.kubernetes.io/service: blocky-http
   endpoints:
     - port: http
       path: /metrics

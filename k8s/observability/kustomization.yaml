@@ -4,18 +4,14 @@ kind: Kustomization
 resources:
   - helmrelease.yaml
   - manifests/grafana-oidc.sops.yaml
-  - manifests/grafana-renderer-token.sops.yaml
   - manifests/grafana-http-route.yaml
   - manifests/pushover-secret.sops.yaml
   - manifests/grafana-db-credentials.sops.yaml
   - manifests/vmagent-rbac.yaml
   - manifests/vlogs.yaml
   - manifests/grafana.yaml
-  - manifests/grafana-renderer.yaml
-  - manifests/grafana-live-image.yaml
   - manifests/grafana-datasources.yaml
   - manifests/grafana-overview.yaml
-  - manifests/grafana-public.yaml
   - manifests/grafana-kubernetes.yaml
   - manifests/grafana-network.yaml
   - manifests/grafana-storage.yaml
@@ -34,10 +30,6 @@ configMapGenerator:
     namespace: observability-system
     files:
       - dashboards/overview.json
-  - name: grafana-dashboard-public
-    namespace: observability-system
-    files:
-      - dashboards/public.json
   - name: grafana-dashboard-kubernetes
     namespace: observability-system
     files:

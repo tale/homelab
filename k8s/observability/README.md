@@ -64,6 +64,13 @@ the folders were only ever grouping things that were always opened together.
 | Postgres | CNPG traffic, replication, WAL, archiver |
 | Monitoring Health | the metrics pipeline watching itself |
 
+The overview has 12 panels: six current-health tiles, tables for alerts, Flux
+problems and endpoint checks, then CPU, memory and storage capacity. Diagnostic
+traffic, database, DNS and ingestion charts stay on the linked detail boards.
+Health tiles use instant queries so an earlier healthy sample cannot mask a
+missing current result. Blocky reporting explicitly shows zero for missing
+targets; it measures scrape reachability, not successful DNS resolution.
+
 The imports all went the same way: written for clusters that look nothing like
 this one, and mostly empty. Alertmanager assumed a gossip cluster, the Kubernetes
 Views pair leaned on `windows_*` metrics and recording rules `defaultRules`
@@ -88,7 +95,8 @@ Panels are validated against live data before they land, and the check has to go
 through Grafana's `/api/ds/query` rather than straight to VictoriaMetrics:
 querying VM directly validates the PromQL but not the panel's datasource
 reference, which is exactly how 103 broken CloudNativePG panels once passed an
-audit. The bar is zero empty panels.
+audit. Health and capacity panels must return data; exception tables may be
+empty when there are no matching problems.
 
 ### Panel design
 
@@ -101,9 +109,9 @@ generator rather than remembered:
   contrast. A panel that would need a ninth colour gets a `topk(8, …)` cap
   instead — that is why the namespace and route panels are capped.
 - **Colour follows the entity, not its rank.** Panels whose series are known up
-  front pin each name to a slot explicitly (28 panels). Panels whose series are
+  front pin each name to a slot explicitly. Panels whose series are
   discovered at query time — `{{node}}`, `{{namespace}}`, `{{job}}` — use
-  `palette-classic-by-name` (72 panels), so a series keeps its colour when the
+  `palette-classic-by-name`, so a series keeps its colour when the
   set changes. Note the trade-off: by-name draws from *Grafana's* classic
   palette, not the validated one above, because there is no way to hand Grafana
   a custom palette for series it has not seen yet. Stable identity was judged
@@ -136,62 +144,11 @@ stats query only buckets over ranges up to an hour. Past that it silently
 collapses to a single value, which Grafana then draws as one bar jammed against
 the right edge of the panel. Ungrouped stats bucket correctly at any range.
 
-That is why the overview carries two log panels rather than one. `Log Error Rate`
-is ungrouped, so it can be a real time series over any window. `Log Errors by
-Namespace` is an instant query rendered as a bar gauge, sorted and capped at
-eight, because grouping is exactly what breaks the range form.
-
-Note also that the filter is a whole-word match on `error OR panic OR fatal`, not
-a structured severity level — LogsQL word-matching means it will not fire on
-`errorless`, but it will happily count an application logging the word "error" in
-normal operation.
-
-### The public board
-
-`homelab-public` is the one dashboard meant for strangers. It is linked from the
-repo README and published through Grafana's public-dashboard feature, which means
-anonymous visitors execute its queries against VictoriaMetrics on every page load.
-Three rules follow from that, and they are written into the manifest's header:
-aggregates only, cheap queries only, and no template variables (public dashboards
-do not support them, and an unresolved variable renders the board empty).
-
-Publishing is **not declarative** — the Grafana operator has no field for it, so
-the share was created once through the API:
-
-```sh
-curl -u "$creds" -X POST \
-  "$GRAFANA/api/dashboards/uid/homelab-public/public-dashboards" \
-  -H 'Content-Type: application/json' \
-  -d '{"isEnabled":true,"annotationsEnabled":false,"timeSelectionEnabled":true,"share":"public"}'
-```
-
-The returned `accessToken` is what the README links to. Rebuilding this cluster
-means re-publishing and updating that link.
-
-The image in the README is served from `https://grafana.tale.me/live/homelab.png`
-by [`manifests/grafana-live-image.yaml`](manifests/grafana-live-image.yaml): an
-nginx and a sidecar that re-renders the public board every five minutes. The
-sidecar holds no Grafana credentials — it renders the public URL, which needs no
-auth — and it validates the PNG magic bytes rather than the status code, because
-the renderer will happily return HTTP 200 with a PDF, an error card, or a
-truncated file.
-
-It renders 2200x805 rather than the whole board. Grafana's grid is proportional,
-so a wider render does not show more — it just produces a banner instead of a
-tall block that swallows the README. 805px lands immediately above the Ingress
-row header, so nothing is sliced in half; reordering the public board's rows
-means re-measuring it.
-
-One trap worth knowing: setting `AUTH_TOKEN` on the renderer so the sidecar can
-call it directly also stops *Grafana* rendering, and Grafana reports it as
-"no image renderer found/installed" rather than as an auth failure. Both sides
-read the same secret — see `GF_RENDERING_RENDERER_TOKEN` in
-[`manifests/grafana.yaml`](manifests/grafana.yaml).
-
-The `/live/` path is a second rule on the existing HTTPRoute rather than a new
-hostname, so it needs no extra certificate or DNS record. Gateway API matches the
-longest prefix first, so it wins over the catch-all that sends everything else to
-Grafana behind Authentik.
+Use Grafana Explore with VictoriaLogs for log investigation. Log-volume charts
+are omitted from the overview because counts alone do not identify a failure.
+For longer ranges, use ungrouped stats for trends and instant grouped stats for
+namespace totals. A filter such as `error OR panic OR fatal` matches whole words,
+not structured severity, so normal messages containing "error" also count.
 
 ### Scrape dependencies
 
