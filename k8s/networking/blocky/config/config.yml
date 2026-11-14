@@ -33,7 +33,4 @@ blocking:
 prometheus:
   enable: true
 queryLog:
-  type: postgresql
-  target: __DB_URI__
-  logRetentionDays: 90
-  flushInterval: 30s
+  type: none

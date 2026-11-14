@@ -2699,7 +2699,7 @@
         },
         "overrides": []
       },
-      "description": "blocky's query log dominates this and grows continuously; it is capped by a 90d retention in blocky's own config, not by Postgres."
+      "description": "Database size over time. Use sustained growth to identify applications that need retention or storage adjustments."
     }
   ]
 }

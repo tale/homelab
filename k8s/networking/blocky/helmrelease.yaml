@@ -22,23 +22,6 @@ spec:
     controllers:
       blocky:
         type: daemonset
-        initContainers:
-          config-builder:
-            image:
-              repository: busybox
-              tag: "1.36"
-            command: ["sh", "-c"]
-            args:
-              - |
-                DB_URI=$(cat /secrets/uri)
-                sed "s|__DB_URI__|${DB_URI}|g" /config-template/config.yml > /config/config.yml
-            securityContext:
-              allowPrivilegeEscalation: false
-              runAsNonRoot: true
-              runAsUser: 1000
-              runAsGroup: 1000
-              capabilities:
-                drop: ["ALL"]
         containers:
           blocky:
             image:
@@ -129,26 +112,12 @@ spec:
             targetPort: 6379
 
     persistence:
-      config-template:
+      config:
         type: configMap
         name: blocky-config
         advancedMounts:
           blocky:
-            config-builder:
-              - path: /config-template
-      db-secret:
-        type: secret
-        name: blocky-db-uri
-        advancedMounts:
-          blocky:
-            config-builder:
-              - path: /secrets
-      rendered-config:
-        type: emptyDir
-        advancedMounts:
-          blocky:
-            config-builder:
-              - path: /config
             blocky:
               - path: /app/config.yml
                 subPath: config.yml
+                readOnly: true
