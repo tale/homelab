@@ -6,9 +6,21 @@ metadata:
   labels:
     dashboards: "homelab"
 spec:
+  version: "13.3.1"
   config:
     server:
       root_url: "https://grafana.tale.me"
+    users:
+      home_page: /d/homelab-overview
+    snapshots:
+      enabled: "false"
+    public_dashboards:
+      enabled: "false"
+    unified_alerting:
+      enabled: "false"
+    plugins:
+      preinstall_disabled: "true"
+      disable_plugins: grafana-lokiexplore-app,grafana-metricsdrilldown-app,grafana-pyroscope-app,grafana-exploretraces-app
     database:
       type: postgres
       host: central-postgres-rw.cnpg-system.svc.cluster.local:5432

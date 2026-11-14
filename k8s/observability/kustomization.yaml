@@ -10,6 +10,7 @@ resources:
   - manifests/vmagent-rbac.yaml
   - manifests/vlogs.yaml
   - manifests/grafana.yaml
+  - manifests/grafana-navigation.yaml
   - manifests/grafana-datasources.yaml
   - manifests/grafana-overview.yaml
   - manifests/grafana-kubernetes.yaml
@@ -26,6 +27,10 @@ generatorOptions:
   disableNameSuffixHash: true
 
 configMapGenerator:
+  - name: grafana-navigation
+    namespace: observability-system
+    files:
+      - scripts/sync-stars.py
   - name: grafana-dashboard-overview
     namespace: observability-system
     files:

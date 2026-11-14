@@ -71,6 +71,19 @@ Health tiles use instant queries so an earlier healthy sample cannot mask a
 missing current result. Blocky reporting explicitly shows zero for missing
 targets; it measures scrape reachability, not successful DNS resolution.
 
+Grafana opens the overview by default. Every five minutes, `grafana-navigation`
+adds dashboards tagged `homelab` to every active organization user's Starred
+sidebar, including users created after deployment. It preserves personal stars;
+unstarring a managed dashboard lasts only until the next run. The job exits
+between runs and uses the existing operator-managed admin credentials.
+
+Grafana is pinned to 13.3.1 because 13.0.1 restricts the stars API to the signed-in
+user. The newer API permits organization admins to manage other users' stars.
+No direct Grafana database writes are needed. Explore stays available, while
+unused Drilldown plugins, snapshots, public dashboards and Grafana-managed
+alerting are disabled. Alert evaluation and Pushover delivery remain in vmalert
+and Alertmanager. Grafana's alert-management UI is unavailable with this setting.
+
 The imports all went the same way: written for clusters that look nothing like
 this one, and mostly empty. Alertmanager assumed a gossip cluster, the Kubernetes
 Views pair leaned on `windows_*` metrics and recording rules `defaultRules`

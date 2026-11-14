@@ -2580,8 +2580,9 @@
           "expr": "max by (datname) (cnpg_pg_database_size_bytes)",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
-          "range": true,
-          "legendFormat": "{{datname}}"
+          "range": false,
+          "legendFormat": "{{datname}}",
+          "instant": true
         }
       ],
       "options": {
@@ -2621,7 +2622,8 @@
           "min": 0
         },
         "overrides": []
-      }
+      },
+      "description": "Current database sizes. Deleted databases remain visible only in the historical growth chart."
     },
     {
       "id": 37,
