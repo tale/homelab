@@ -49,119 +49,71 @@ then a dead monitoring stack looks exactly like a healthy cluster.
 
 ### Dashboards
 
-Every dashboard is a hand-written `GrafanaDashboard` CR. There are no community
-imports left.
+The six provisioned dashboards live in the `Homelab` folder. The overview is
+Grafana's home page; every five minutes, `grafana-navigation` stars dashboards
+tagged `homelab` for active organization users. Personal stars are preserved.
 
-All six live in one `Homelab` folder. Six dashboards do not need a folder tree —
-the folders were only ever grouping things that were always opened together.
-
-| Dashboard | Covers |
+| Dashboard | Default view |
 |---|---|
-| Homelab Overview | is anything wrong, and where |
-| Kubernetes | workloads, capacity, restarts |
-| Network | gateway, DNS, reachability, Cilium |
-| Storage & Backups | pools, PVCs, OpenEBS, backup freshness |
-| Postgres | CNPG traffic, replication, WAL, archiver |
-| Monitoring Health | the metrics pipeline watching itself |
+| Homelab Overview | Alerts, reconciliation, reachability and node capacity |
+| Kubernetes | Workload readiness, restarts, resource use and node requests |
+| Network | Gateway errors, DNS activity, endpoint checks and packet drops |
+| Storage & Backups | Pool/PVC capacity and current backup sources |
+| Postgres | Availability, replication, backups and database sizes |
+| Monitoring Health | Failed scrapes, ingestion, capacity and Pushover failures |
 
-The overview has 12 panels: six current-health tiles, tables for alerts, Flux
-problems and endpoint checks, then CPU, memory and storage capacity. Diagnostic
-traffic, database, DNS and ingestion charts stay on the linked detail boards.
-Health tiles use instant queries so an earlier healthy sample cannot mask a
-missing current result. Blocky reporting explicitly shows zero for missing
-targets; it measures scrape reachability, not successful DNS resolution.
+Troubleshooting charts are in collapsed rows. Cardinality analysis is in its
+own collapsed row because it scans all current metric series. Current status
+uses instant queries; historical charts retain deleted resources within the
+selected time range. Historical top-k charts select their series at the end of
+that range. Resource rankings use current tables.
 
-Grafana opens the overview by default. Every five minutes, `grafana-navigation`
-adds dashboards tagged `homelab` to every active organization user's Starred
-sidebar, including users created after deployment. It preserves personal stars;
-unstarring a managed dashboard lasts only until the next run. The job exits
-between runs and uses the existing operator-managed admin credentials.
+HTTP probes run inside the cluster and follow redirects; a successful SSO
+redirect does not establish application health. Blocky reporting counts metrics
+targets, not successful DNS queries. Backup timestamps and mover results do not
+verify that a restore will succeed.
 
-Grafana is pinned to 13.3.1 because 13.0.1 restricts the stars API to the signed-in
-user. The newer API permits organization admins to manage other users' stars.
-No direct Grafana database writes are needed. Explore stays available, while
-unused Drilldown plugins, snapshots, public dashboards and Grafana-managed
-alerting are disabled. Alert evaluation and Pushover delivery remain in vmalert
-and Alertmanager. Grafana's alert-management UI is unavailable with this setting.
+The existing kube-state-metrics deployment watches VolSync ReplicationSources
+and exports their current identity, last successful sync and next scheduled
+sync. The backup table and VolSync summaries use this inventory to exclude
+removed sources and restore destinations. No additional exporter is deployed.
 
-The imports all went the same way: written for clusters that look nothing like
-this one, and mostly empty. Alertmanager assumed a gossip cluster, the Kubernetes
-Views pair leaned on `windows_*` metrics and recording rules `defaultRules`
-turned off, the VictoriaMetrics quartet spent 44 panels on Kafka and persistent
-queues, and Node Exporter Full wanted collectors Talos does not ship.
+Grafana is pinned to 13.3.1, which supports organization admins managing other
+users' stars. The navigation job uses the operator-managed admin credentials;
+it does not write directly to Grafana's database. Explore remains available.
+Unused Drilldown apps, snapshots, public dashboards and Grafana-managed
+alerting are disabled; vmalert and Alertmanager handle alert delivery.
 
-Two failure modes are worth remembering, because both produced a dashboard that
-looked fine in review and rendered blank in the browser:
+### Dashboard validation
 
-- **Datasource references.** The operator rewrites an import's panels to
-  `{"uid": "<datasourceName>"}`. If the datasource has a generated UUID instead
-  of a matching `uid`, every panel silently resolves to nothing. The `uid`
-  fields in [`manifests/grafana-datasources.yaml`](manifests/grafana-datasources.yaml)
-  are load-bearing for this reason.
-- **The `cluster` label.** vmagent stamps `cluster: homelab` as an external
-  label, which displaces any exporter that publishes its own `cluster` to
-  `exported_cluster`. CloudNativePG's board keyed its `$cluster` variable on it
-  and resolved to `homelab`. Relabelling it back does not work — external labels
-  are applied after metric relabeling and always win.
+- Validate JSON and render `kubectl kustomize k8s/observability`.
+- Validate changed queries through Grafana's `/api/ds/query`, including nested
+  panels in collapsed rows. Check current results and the selected time range.
+- Check labels, units and source availability, not just query success. A missing
+  exporter must not become a healthy zero. Empty exception tables use explicit
+  messages only when their source is reporting.
+- Test exception tables with matching problems, no problems and unavailable
+  telemetry. Empty-state rows must disappear when any real result is present.
+- Counter event totals use `increase_prometheus` so replacing an exporter does
+  not count an existing lifetime total as new events.
+- Check table joins and empty states in Grafana. Fields named `Value #A` depend
+  on query references; null field text does not replace an absent data frame.
+- Render the pinned Helm chart when changing kube-state-metrics configuration.
+  Validate custom-resource metrics against actual resources before deployment.
 
-Panels are validated against live data before they land, and the check has to go
-through Grafana's `/api/ds/query` rather than straight to VictoriaMetrics:
-querying VM directly validates the PromQL but not the panel's datasource
-reference, which is exactly how 103 broken CloudNativePG panels once passed an
-audit. Health and capacity panels must return data; exception tables may be
-empty when there are no matching problems.
-
-### Panel design
-
-The look is a design system, not per-panel taste, so it is applied by the
-generator rather than remembered:
-
-- **Categorical palette** — eight fixed hues assigned in slot order, never
-  cycled. Validated against Grafana's dark panel surface (`#181b1f`): worst
-  adjacent CVD ΔE 8.4, worst adjacent normal-vision ΔE 19.3, all eight clear 3:1
-  contrast. A panel that would need a ninth colour gets a `topk(8, …)` cap
-  instead — that is why the namespace and route panels are capped.
-- **Colour follows the entity, not its rank.** Panels whose series are known up
-  front pin each name to a slot explicitly. Panels whose series are
-  discovered at query time — `{{node}}`, `{{namespace}}`, `{{job}}` — use
-  `palette-classic-by-name`, so a series keeps its colour when the
-  set changes. Note the trade-off: by-name draws from *Grafana's* classic
-  palette, not the validated one above, because there is no way to hand Grafana
-  a custom palette for series it has not seen yet. Stable identity was judged
-  worth more than the validated hexes; the validated palette governs the
-  fixed-series panels and every status colour.
-- **Status colours are reserved** — good `#0ca30c`, warning `#fab219`, serious
-  `#ec835a`, critical `#d03b3b`. They mean state, never identity, and never
-  double as a series colour.
-- **One measure per axis.** Never two scales on one plot: bytes/s and records/s
-  became separate WAL panels, and log rows and log bytes separate storage
-  panels, because sharing an axis invents a relationship between them.
-- **2px lines, no legend on a single series** (the title already names it),
-  recessive axes, a 2px gap between stacked bands.
-- **Stat tiles are 4 or 6 columns wide** and never stretch past 8 — a number
-  spanning half the screen reads as a mistake. Every row band sums to exactly
-  24 columns, enforced by a layout pass, so there is no ragged gutter.
-
-Geometry and colour are both checked by script before publishing. That catches
-overlaps, ragged bands and unvalidated hues — but it does not catch everything,
-and a round of real screenshots turned up four things no lint would have found:
-a join that invented null table rows and painted them red, a stat tile printing
-its whole label set instead of a pod name, response classes coloured from the
-categorical ramp so 3xx read as red and 5xx as a pale tint, and "No data" on
-panels whose empty state is the *good* one. Those now have `noValue` text.
+Datasource UIDs in
+[`manifests/grafana-datasources.yaml`](manifests/grafana-datasources.yaml) must
+match their names: the operator rewrites dashboard datasource references to
+those UIDs. vmagent's external `cluster: homelab` label displaces exporter
+`cluster` labels to `exported_cluster`; scope queries accordingly.
 
 ### Logs
 
-VictoriaLogs panels have one sharp edge worth writing down: a **grouped** LogsQL
-stats query only buckets over ranges up to an hour. Past that it silently
-collapses to a single value, which Grafana then draws as one bar jammed against
-the right edge of the panel. Ungrouped stats bucket correctly at any range.
-
-Use Grafana Explore with VictoriaLogs for log investigation. Log-volume charts
-are omitted from the overview because counts alone do not identify a failure.
-For longer ranges, use ungrouped stats for trends and instant grouped stats for
-namespace totals. A filter such as `error OR panic OR fatal` matches whole words,
-not structured severity, so normal messages containing "error" also count.
+Use Explore with VictoriaLogs for log investigation. Log volume alone does not
+identify a failure. Grouped LogsQL stats queries over ranges longer than an hour
+can collapse to one bucket; use ungrouped stats for longer trends and instant
+grouped stats for totals. Text searches such as `error OR panic OR fatal` match
+words rather than structured severity.
 
 ### Scrape dependencies
 

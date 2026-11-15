@@ -81,9 +81,9 @@
   },
   "panels": [
     {
-      "id": 1,
+      "id": 100,
       "type": "row",
-      "title": "Cluster",
+      "title": "Workload Health",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -96,10 +96,10 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "Nodes Ready",
+      "title": "Nodes Ready (Cluster)",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 4,
         "x": 0,
         "y": 1
@@ -110,7 +110,8 @@
           "expr": "sum(kube_node_status_condition{condition=\"Ready\",status=\"true\"})",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
-          "range": true
+          "range": false,
+          "instant": true
         }
       ],
       "options": {
@@ -153,18 +154,20 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "noValue": "No data"
         },
         "overrides": []
-      }
+      },
+      "description": "Expected: three ready nodes; unaffected by namespace selection."
     },
     {
       "id": 3,
       "type": "stat",
-      "title": "Running Pods",
+      "title": "Pods Not Ready",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 4,
         "x": 4,
         "y": 1
@@ -172,10 +175,11 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "count(kube_pod_status_phase{phase=\"Running\"} == 1)",
+          "expr": "((count((kube_pod_status_ready{condition=\"true\",namespace=~\"${namespace:regex}\"} == 0) and on(namespace,pod) (kube_pod_status_phase{phase=~\"Running|Pending\"} == 1))) or vector(0)) and on () (min(up{job=\"kube-state-metrics\"}) == 1)",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
-          "range": true
+          "range": false,
+          "instant": true
         }
       ],
       "options": {
@@ -205,24 +209,34 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "text",
+                "color": "#0ca30c",
                 "value": null
+              },
+              {
+                "color": "#fab219",
+                "value": 1
+              },
+              {
+                "color": "#d03b3b",
+                "value": 4
               }
             ]
           },
           "mappings": [],
-          "decimals": 0
+          "decimals": 0,
+          "noValue": "No data"
         },
         "overrides": []
-      }
+      },
+      "description": "Nonterminal pods without Ready=True in the selected namespaces."
     },
     {
       "id": 4,
       "type": "stat",
-      "title": "Not Running",
+      "title": "Pending / Failed Pods",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 4,
         "x": 8,
         "y": 1
@@ -230,10 +244,11 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "count(kube_pod_status_phase{phase=~\"Pending|Failed|Unknown\"} == 1) or vector(0)",
+          "expr": "((count(kube_pod_status_phase{phase=~\"Pending|Failed|Unknown\",namespace=~\"${namespace:regex}\"} == 1)) or vector(0)) and on () (min(up{job=\"kube-state-metrics\"}) == 1)",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
-          "range": true
+          "range": false,
+          "instant": true
         }
       ],
       "options": {
@@ -276,7 +291,8 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "noValue": "No data"
         },
         "overrides": []
       }
@@ -287,7 +303,7 @@
       "title": "Unavailable Replicas",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 4,
         "x": 12,
         "y": 1
@@ -295,10 +311,11 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(kube_deployment_status_replicas_unavailable) + sum(kube_daemonset_status_number_unavailable) + sum(kube_statefulset_status_replicas) - sum(kube_statefulset_status_replicas_ready)",
+          "expr": "((sum(kube_deployment_status_replicas_unavailable{namespace=~\"${namespace:regex}\"}) or vector(0)) + (sum(kube_daemonset_status_number_unavailable{namespace=~\"${namespace:regex}\"}) or vector(0)) + (sum(clamp_min(kube_statefulset_replicas{namespace=~\"${namespace:regex}\"} - kube_statefulset_status_replicas_ready, 0)) or vector(0))) and on () (min(up{job=\"kube-state-metrics\"}) == 1)",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
-          "range": true
+          "range": false,
+          "instant": true
         }
       ],
       "options": {
@@ -341,11 +358,12 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "noValue": "No data"
         },
         "overrides": []
       },
-      "description": "Deployments, DaemonSets and StatefulSets that owe the cluster a pod."
+      "description": "Desired replicas without a ready pod in the selected namespaces."
     },
     {
       "id": 6,
@@ -353,7 +371,7 @@
       "title": "Restarts (1h)",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 4,
         "x": 16,
         "y": 1
@@ -361,10 +379,11 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(increase(kube_pod_container_status_restarts_total[1h]))",
+          "expr": "((sum(increase_prometheus(kube_pod_container_status_restarts_total{namespace=~\"${namespace:regex}\"}[1h]))) or vector(0)) and on () (min(up{job=\"kube-state-metrics\"}) == 1)",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
-          "range": true
+          "range": false,
+          "instant": true
         }
       ],
       "options": {
@@ -408,7 +427,8 @@
             ]
           },
           "mappings": [],
-          "decimals": 0
+          "decimals": 0,
+          "noValue": "No data"
         },
         "overrides": []
       }
@@ -416,10 +436,10 @@
     {
       "id": 7,
       "type": "stat",
-      "title": "OOMKilled",
+      "title": "Last Exit OOM (24h)",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 5,
+        "h": 4,
         "w": 4,
         "x": 20,
         "y": 1
@@ -427,10 +447,11 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "count(kube_pod_container_status_terminated_reason{reason=\"OOMKilled\"} == 1) or vector(0)",
+          "expr": "((count((kube_pod_container_status_last_terminated_reason{reason=\"OOMKilled\",namespace=~\"${namespace:regex}\"} == 1) and on(namespace,pod,container) (kube_pod_container_status_last_terminated_timestamp > time() - 86400))) or vector(0)) and on () (min(up{job=\"kube-state-metrics\"}) == 1)",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
-          "range": true
+          "range": false,
+          "instant": true
         }
       ],
       "options": {
@@ -469,22 +490,105 @@
               }
             ]
           },
-          "mappings": []
+          "mappings": [],
+          "noValue": "No data"
         },
         "overrides": []
       },
-      "description": "Containers whose last exit was the kernel reclaiming their memory."
+      "description": "Containers whose most recent termination was an OOM kill within 24 hours. This is not a count of every OOM event."
     },
     {
-      "id": 8,
+      "id": 14,
+      "type": "table",
+      "title": "Restarting Containers (24h)",
+      "datasource": "VictoriaMetrics",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(topk(15, sum by (namespace, pod, container) (increase_prometheus(kube_pod_container_status_restarts_total{namespace=~\"${namespace:regex}\"}[24h])) > 0)) or on () (label_replace(vector(0), \"pod\", \"No restarts in 24h\", \"\", \"\") and on () (min(up{job=\"kube-state-metrics\"}) == 1))",
+          "datasource": "VictoriaMetrics",
+          "editorMode": "code",
+          "range": false,
+          "format": "table",
+          "instant": true
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": true,
+            "minWidth": 80
+          },
+          "noValue": "\u2014"
+        },
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "namespace",
+                "pod",
+                "container",
+                "Value"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "namespace": 0,
+              "pod": 1,
+              "container": 2,
+              "Value": 3
+            },
+            "renameByName": {
+              "Value": "restarts"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "restarts",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "description": "Estimated counter increase over 24 hours for the selected namespaces."
+    },
+    {
+      "id": 101,
       "type": "row",
-      "title": "Workloads",
+      "title": "Resource Usage",
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 6
+        "y": 15
       },
       "panels": []
     },
@@ -497,12 +601,12 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 7
+        "y": 16
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(8, sum by (namespace) (rate(container_cpu_usage_seconds_total{container!=\"\",namespace=~\"$namespace\"}[5m])))",
+          "expr": "((sum by (namespace) (rate(container_cpu_usage_seconds_total{container!=\"\",container!=\"POD\",namespace=~\"${namespace:regex}\"}[5m]))) and (topk(8, sum by (namespace) (rate(container_cpu_usage_seconds_total{container!=\"\",container!=\"POD\",namespace=~\"${namespace:regex}\"}[5m]))) @ end()))",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": true,
@@ -527,7 +631,7 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
+          "unit": "suffix: cores",
           "color": {
             "mode": "palette-classic-by-name"
           },
@@ -544,11 +648,11 @@
           "decimals": 2,
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "linear",
             "lineWidth": 0,
             "fillOpacity": 55,
             "showPoints": "never",
-            "spanNulls": true,
+            "spanNulls": false,
             "pointSize": 8,
             "stacking": {
               "mode": "normal",
@@ -561,7 +665,8 @@
             "thresholdsStyle": {
               "mode": "off"
             }
-          }
+          },
+          "noValue": "No data"
         },
         "overrides": []
       }
@@ -575,12 +680,12 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 7
+        "y": 16
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(8, sum by (namespace) (container_memory_working_set_bytes{container!=\"\",namespace=~\"$namespace\"}))",
+          "expr": "((sum by (namespace) (container_memory_working_set_bytes{container!=\"\",container!=\"POD\",namespace=~\"${namespace:regex}\"})) and (topk(8, sum by (namespace) (container_memory_working_set_bytes{container!=\"\",container!=\"POD\",namespace=~\"${namespace:regex}\"})) @ end()))",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": true,
@@ -621,11 +726,11 @@
           "mappings": [],
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "linear",
             "lineWidth": 0,
             "fillOpacity": 55,
             "showPoints": "never",
-            "spanNulls": true,
+            "spanNulls": false,
             "pointSize": 8,
             "stacking": {
               "mode": "normal",
@@ -638,345 +743,239 @@
             "thresholdsStyle": {
               "mode": "off"
             }
-          }
+          },
+          "noValue": "No data"
         },
         "overrides": []
       }
     },
     {
       "id": 11,
-      "type": "timeseries",
+      "type": "table",
       "title": "Top Pods by CPU",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 12,
         "x": 0,
-        "y": 15
+        "y": 24
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10, sum by (namespace, pod) (rate(container_cpu_usage_seconds_total{container!=\"\",namespace=~\"$namespace\"}[5m])))",
-          "datasource": "VictoriaMetrics",
-          "editorMode": "code",
-          "range": true,
-          "legendFormat": "{{namespace}}/{{pod}}"
-        }
-      ],
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "calcs": [
-            "mean",
-            "max",
-            "lastNotNull"
-          ]
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "palette-classic-by-name"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "mappings": [],
-          "decimals": 3,
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "fillOpacity": 8,
-            "showPoints": "never",
-            "spanNulls": true,
-            "pointSize": 8,
-            "stacking": {
-              "mode": "none",
-              "group": "A"
-            },
-            "axisPlacement": "auto",
-            "gradientMode": "opacity",
-            "axisBorderShow": false,
-            "axisColorMode": "text",
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          }
-        },
-        "overrides": []
-      }
-    },
-    {
-      "id": 12,
-      "type": "timeseries",
-      "title": "Top Pods by Memory",
-      "datasource": "VictoriaMetrics",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 15
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "topk(10, sum by (namespace, pod) (container_memory_working_set_bytes{container!=\"\",namespace=~\"$namespace\"}))",
-          "datasource": "VictoriaMetrics",
-          "editorMode": "code",
-          "range": true,
-          "legendFormat": "{{namespace}}/{{pod}}"
-        }
-      ],
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "calcs": [
-            "mean",
-            "max",
-            "lastNotNull"
-          ]
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "bytes",
-          "color": {
-            "mode": "palette-classic-by-name"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "mappings": [],
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "fillOpacity": 8,
-            "showPoints": "never",
-            "spanNulls": true,
-            "pointSize": 8,
-            "stacking": {
-              "mode": "none",
-              "group": "A"
-            },
-            "axisPlacement": "auto",
-            "gradientMode": "opacity",
-            "axisBorderShow": false,
-            "axisColorMode": "text",
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          }
-        },
-        "overrides": []
-      }
-    },
-    {
-      "id": 13,
-      "type": "timeseries",
-      "title": "CPU Throttling",
-      "datasource": "VictoriaMetrics",
-      "gridPos": {
-        "h": 7,
-        "w": 12,
-        "x": 0,
-        "y": 23
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "topk(10, sum by (namespace, pod) (rate(container_cpu_cfs_throttled_seconds_total{container!=\"\",namespace=~\"$namespace\"}[5m])))",
-          "datasource": "VictoriaMetrics",
-          "editorMode": "code",
-          "range": true,
-          "legendFormat": "{{namespace}}/{{pod}}"
-        }
-      ],
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true,
-          "calcs": [
-            "mean",
-            "max",
-            "lastNotNull"
-          ]
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "palette-classic-by-name"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "mappings": [],
-          "decimals": 3,
-          "custom": {
-            "drawStyle": "line",
-            "lineInterpolation": "smooth",
-            "lineWidth": 2,
-            "fillOpacity": 8,
-            "showPoints": "never",
-            "spanNulls": true,
-            "pointSize": 8,
-            "stacking": {
-              "mode": "none",
-              "group": "A"
-            },
-            "axisPlacement": "auto",
-            "gradientMode": "opacity",
-            "axisBorderShow": false,
-            "axisColorMode": "text",
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "description": "Seconds per second a container spent frozen against its CPU limit."
-    },
-    {
-      "id": 14,
-      "type": "table",
-      "title": "Restarting Containers (24h)",
-      "datasource": "VictoriaMetrics",
-      "gridPos": {
-        "h": 7,
-        "w": 12,
-        "x": 12,
-        "y": 23
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "topk(15, sum by (namespace, pod, container) (increase(kube_pod_container_status_restarts_total{namespace=~\"$namespace\"}[24h])) > 0)",
+          "expr": "topk(10, sum by (namespace, pod) (rate(container_cpu_usage_seconds_total{container!=\"\",container!=\"POD\",namespace=~\"${namespace:regex}\"}[5m])))",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": false,
-          "format": "table",
-          "instant": true
+          "legendFormat": "{{namespace}}/{{pod}}",
+          "instant": true,
+          "format": "table"
         }
       ],
       "options": {
         "showHeader": true,
+        "cellHeight": "sm",
         "footer": {
           "show": false
-        },
-        "cellHeight": "sm"
+        }
       },
       "fieldConfig": {
         "defaults": {
           "custom": {
             "align": "auto",
-            "filterable": false,
-            "minWidth": 130
+            "filterable": true,
+            "minWidth": 80
           },
-          "noValue": "No container restarts in 24h"
+          "noValue": "\u2014"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cores"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "suffix: cores"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
       },
       "transformations": [
         {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "namespace",
+                "pod",
+                "Value"
+              ]
+            }
+          }
+        },
+        {
           "id": "organize",
           "options": {
-            "excludeByName": {
-              "Time": true,
-              "__name__": true
+            "indexByName": {
+              "namespace": 0,
+              "pod": 1,
+              "Value": 2
             },
             "renameByName": {
-              "Value": "restarts"
+              "Value": "cores"
             }
           }
         },
         {
           "id": "sortBy",
           "options": {
-            "fields": {},
             "sort": [
               {
-                "field": "restarts",
+                "field": "cores",
                 "desc": true
               }
             ]
           }
         }
-      ],
-      "description": "Empty is the correct state."
+      ]
     },
     {
-      "id": 15,
+      "id": 12,
+      "type": "table",
+      "title": "Top Pods by Memory",
+      "datasource": "VictoriaMetrics",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, sum by (namespace, pod) (container_memory_working_set_bytes{container!=\"\",container!=\"POD\",namespace=~\"${namespace:regex}\"}))",
+          "datasource": "VictoriaMetrics",
+          "editorMode": "code",
+          "range": false,
+          "legendFormat": "{{namespace}}/{{pod}}",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": true,
+            "minWidth": 80
+          },
+          "noValue": "\u2014"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "working set"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "namespace",
+                "pod",
+                "Value"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "namespace": 0,
+              "pod": 1,
+              "Value": 2
+            },
+            "renameByName": {
+              "Value": "working set"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "working set",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 102,
       "type": "row",
-      "title": "Capacity",
+      "title": "Node Capacity",
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 30
+        "y": 34
       },
       "panels": []
     },
     {
       "id": 16,
       "type": "bargauge",
-      "title": "Pod Slots Used per Node",
+      "title": "Pod Slots Used (Cluster)",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 8,
         "x": 0,
-        "y": 31
+        "y": 35
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "count by (node) (kube_pod_info) / max by (node) (kube_node_status_allocatable{resource=\"pods\"}) * 100",
+          "expr": "count by(node)(kube_pod_info{node!=\"\"} and on(namespace,pod) (max by(namespace,pod)(kube_pod_status_phase{phase=~\"Running|Pending\"} == 1))) / max by(node)(kube_node_status_allocatable{resource=\"pods\"}) * 100",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
-          "range": true,
-          "legendFormat": "{{node}}"
+          "range": false,
+          "legendFormat": "{{node}}",
+          "instant": true
         }
       ],
       "options": {
@@ -1026,30 +1025,33 @@
           "mappings": [],
           "decimals": 1,
           "min": 0,
-          "max": 100
+          "max": 100,
+          "noValue": "No data"
         },
         "overrides": []
-      }
+      },
+      "description": "Scheduled nonterminal pods divided by each node's allocatable pod limit."
     },
     {
       "id": 17,
       "type": "bargauge",
-      "title": "CPU Requests per Node",
+      "title": "CPU Requests (Cluster)",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 8,
         "x": 8,
-        "y": 31
+        "y": 35
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (node) (kube_pod_container_resource_requests{resource=\"cpu\"}) / max by (node) (kube_node_status_allocatable{resource=\"cpu\"}) * 100",
+          "expr": "sum by(node)(kube_pod_container_resource_requests{resource=\"cpu\",node!=\"\"} and on(namespace,pod) (max by(namespace,pod)(kube_pod_status_phase{phase=~\"Running|Pending\"} == 1))) / max by(node)(kube_node_status_allocatable{resource=\"cpu\"}) * 100",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
-          "range": true,
-          "legendFormat": "{{node}}"
+          "range": false,
+          "legendFormat": "{{node}}",
+          "instant": true
         }
       ],
       "options": {
@@ -1099,30 +1101,33 @@
           "mappings": [],
           "decimals": 1,
           "min": 0,
-          "max": 100
+          "max": 100,
+          "noValue": "No data"
         },
         "overrides": []
-      }
+      },
+      "description": "Regular-container requests for nonterminal pods. Excludes init-container reservation and pod overhead; this is not exact scheduler accounting."
     },
     {
       "id": 18,
       "type": "bargauge",
-      "title": "Memory Requests per Node",
+      "title": "Memory Requests (Cluster)",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 8,
         "x": 16,
-        "y": 31
+        "y": 35
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (node) (kube_pod_container_resource_requests{resource=\"memory\"}) / max by (node) (kube_node_status_allocatable{resource=\"memory\"}) * 100",
+          "expr": "sum by(node)(kube_pod_container_resource_requests{resource=\"memory\",node!=\"\"} and on(namespace,pod) (max by(namespace,pod)(kube_pod_status_phase{phase=~\"Running|Pending\"} == 1))) / max by(node)(kube_node_status_allocatable{resource=\"memory\"}) * 100",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
-          "range": true,
-          "legendFormat": "{{node}}"
+          "range": false,
+          "legendFormat": "{{node}}",
+          "instant": true
         }
       ],
       "options": {
@@ -1172,10 +1177,108 @@
           "mappings": [],
           "decimals": 1,
           "min": 0,
-          "max": 100
+          "max": 100,
+          "noValue": "No data"
         },
         "overrides": []
-      }
+      },
+      "description": "Regular-container requests for nonterminal pods. Excludes init-container reservation and pod overhead; this is not exact scheduler accounting."
+    },
+    {
+      "id": 103,
+      "type": "row",
+      "title": "CPU Diagnostics",
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 43
+      },
+      "panels": [
+        {
+          "id": 13,
+          "type": "timeseries",
+          "title": "CPU Throttled Time",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 44
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "((sum by (namespace, pod) (rate(container_cpu_cfs_throttled_seconds_total{container!=\"\",container!=\"POD\",namespace=~\"${namespace:regex}\"}[5m]))) and (topk(10, sum by (namespace, pod) (rate(container_cpu_cfs_throttled_seconds_total{container!=\"\",container!=\"POD\",namespace=~\"${namespace:regex}\"}[5m]))) @ end()))",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": true,
+              "legendFormat": "{{namespace}}/{{pod}}"
+            }
+          ],
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "calcs": [
+                "mean",
+                "max",
+                "lastNotNull"
+              ]
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "suffix: s/s",
+              "color": {
+                "mode": "palette-classic-by-name"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "text",
+                    "value": null
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 3,
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "lineWidth": 2,
+                "fillOpacity": 8,
+                "showPoints": "never",
+                "spanNulls": false,
+                "pointSize": 8,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                },
+                "axisPlacement": "auto",
+                "gradientMode": "opacity",
+                "axisBorderShow": false,
+                "axisColorMode": "text",
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "noValue": "No data"
+            },
+            "overrides": []
+          },
+          "description": "Throttled seconds per second, summed across each pod. Not a percentage of CPU usage."
+        }
+      ]
     }
-  ]
+  ],
+  "description": "Workload health and resource use. Namespace selection applies to workloads; node capacity is cluster-wide.",
+  "version": 1
 }

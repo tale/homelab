@@ -81,7 +81,7 @@
     {
       "id": 3,
       "type": "stat",
-      "title": "Active Alerts",
+      "title": "Firing Alerts",
       "datasource": "VictoriaMetrics",
       "gridPos": {
         "h": 4,
@@ -92,7 +92,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(count(ALERTS{alertstate=\"firing\",severity=~\"critical|warning\"}) or vector(0)) and on () (sum(up{job=\"vmalert-victoria-metrics-k8s-stack\"}) > 0)",
+          "expr": "((count(ALERTS{alertstate=\"firing\",severity=~\"critical|warning\"})) or vector(0)) and on () (min(up{job=\"vmalert-victoria-metrics-k8s-stack\"}) == 1)",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": false,
@@ -109,7 +109,7 @@
         },
         "orientation": "horizontal",
         "textMode": "auto",
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "none",
         "justifyMode": "auto",
         "wideLayout": true,
@@ -126,12 +126,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "#0ca30c",
+                "color": "text",
                 "value": null
-              },
-              {
-                "color": "#fab219",
-                "value": 1
               }
             ]
           },
@@ -140,14 +136,14 @@
         },
         "overrides": []
       },
-      "description": "Firing critical and warning alerts. Pending alerts appear in the table below. No data means the alert evaluator is not reporting.",
       "links": [
         {
           "title": "Monitoring",
           "url": "/d/homelab-monitoring?${__url_time_range}",
           "targetBlank": false
         }
-      ]
+      ],
+      "description": "Warning and critical alerts. Pending alerts appear in the table."
     },
     {
       "id": 2,
@@ -215,19 +211,19 @@
         },
         "overrides": []
       },
-      "description": "All three, or something is wrong.",
       "links": [
         {
           "title": "Kubernetes",
           "url": "/d/homelab-kubernetes?${__url_time_range}",
           "targetBlank": false
         }
-      ]
+      ],
+      "description": "Expected: three ready nodes."
     },
     {
       "id": 11,
       "type": "stat",
-      "title": "Endpoints Reachable",
+      "title": "HTTP Checks Passing",
       "datasource": "VictoriaMetrics",
       "gridPos": {
         "h": 4,
@@ -238,7 +234,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(probe_success{probe_group=\"published\"}) / count(probe_success{probe_group=\"published\"}) * 100",
+          "expr": "sum(probe_success{probe_group=\"published\"})",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": false,
@@ -264,7 +260,7 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "percent",
+          "unit": "none",
           "color": {
             "mode": "thresholds"
           },
@@ -276,34 +272,31 @@
                 "value": null
               },
               {
-                "color": "#ec835a",
-                "value": 99
-              },
-              {
                 "color": "#0ca30c",
-                "value": 100
+                "value": 8
               }
             ]
           },
           "mappings": [],
           "decimals": 0,
-          "noValue": "No data"
+          "noValue": "No data",
+          "max": 8
         },
         "overrides": []
       },
-      "description": "Every hostname published through the gateway, probed end to end: DNS, routing, certificate, backend.",
       "links": [
         {
           "title": "Network",
           "url": "/d/homelab-network?${__url_time_range}",
           "targetBlank": false
         }
-      ]
+      ],
+      "description": "Expected: eight published HTTP endpoints, checked from inside the cluster. A successful SSO redirect does not test the application behind it."
     },
     {
       "id": 8,
       "type": "stat",
-      "title": "Postgres Backup Age",
+      "title": "Base Backup Age",
       "datasource": "VictoriaMetrics",
       "gridPos": {
         "h": 4,
@@ -314,7 +307,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "time() - min(cnpg_collector_last_available_backup_timestamp > 0)",
+          "expr": "time() - max(cnpg_collector_last_available_backup_timestamp > 0)",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": false,
@@ -366,19 +359,19 @@
         },
         "overrides": []
       },
-      "description": "Postgres base backup age. VolSync replication sources are on the Storage board.",
       "links": [
         {
           "title": "Storage & Backups",
           "url": "/d/homelab-storage?${__url_time_range}",
           "targetBlank": false
         }
-      ]
+      ],
+      "description": "Age of the latest reported Postgres base backup."
     },
     {
       "id": 9,
       "type": "stat",
-      "title": "UPS",
+      "title": "UPS Power",
       "datasource": "VictoriaMetrics",
       "gridPos": {
         "h": 4,
@@ -389,7 +382,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "max(network_ups_tools_ups_status{flag=\"OB\"})",
+          "expr": "max(network_ups_tools_ups_status{flag=\"OL\"}) + 2 * max(network_ups_tools_ups_status{flag=\"OB\"}) + 4 * max(network_ups_tools_ups_status{flag=~\"LB|FSD|OFF|OVER|RB|SD\"})",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": false,
@@ -433,14 +426,36 @@
               "type": "value",
               "options": {
                 "0": {
-                  "text": "On Line",
-                  "color": "#0ca30c",
+                  "text": "Unknown",
+                  "color": "#fab219",
                   "index": 0
                 },
                 "1": {
-                  "text": "ON BATTERY",
-                  "color": "#d03b3b",
+                  "text": "Online",
+                  "color": "#0ca30c",
                   "index": 1
+                },
+                "2": {
+                  "text": "On battery",
+                  "color": "#fab219",
+                  "index": 2
+                },
+                "3": {
+                  "text": "On battery",
+                  "color": "#fab219",
+                  "index": 3
+                }
+              }
+            },
+            {
+              "type": "range",
+              "options": {
+                "from": 4,
+                "to": 7,
+                "result": {
+                  "text": "Check UPS",
+                  "color": "#d03b3b",
+                  "index": 4
                 }
               }
             }
@@ -455,7 +470,8 @@
           "url": "/d/homelab-network?${__url_time_range}",
           "targetBlank": false
         }
-      ]
+      ],
+      "description": "Online and on-battery flags; low battery, shutdown, overload or replacement flags require attention."
     },
     {
       "id": 36,
@@ -523,30 +539,30 @@
         },
         "overrides": []
       },
-      "description": "Expected: three reporting replicas. Zero also catches missing scrape targets. This checks monitoring reachability, not DNS resolution; see Network for DNS traffic and blocking.",
       "links": [
         {
           "title": "Network",
           "url": "/d/homelab-network?${__url_time_range}",
           "targetBlank": false
         }
-      ]
+      ],
+      "description": "Reporting metrics targets, expected: three. This does not test DNS resolution."
     },
     {
       "id": 49,
       "type": "table",
-      "title": "Alerts Requiring Attention",
+      "title": "Alerts",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 8,
-        "w": 8,
+        "h": 10,
+        "w": 24,
         "x": 0,
         "y": 4
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "ALERTS{severity=~\"critical|warning\",alertstate=~\"firing|pending\"}",
+          "expr": "(ALERTS{severity=~\"critical|warning\",alertstate=~\"firing|pending\"}) or on () (label_replace(vector(0), \"alertname\", \"No firing or pending alerts\", \"\", \"\") and on () (min(up{job=\"vmalert-victoria-metrics-k8s-stack\"}) == 1))",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": false,
@@ -556,21 +572,58 @@
       ],
       "options": {
         "showHeader": true,
+        "cellHeight": "sm",
         "footer": {
           "show": false
-        },
-        "cellHeight": "sm"
+        }
       },
       "fieldConfig": {
         "defaults": {
           "custom": {
             "align": "auto",
-            "filterable": false,
-            "minWidth": 130
+            "filterable": true,
+            "minWidth": 80
           },
-          "noValue": "No active alerts"
+          "noValue": "\u2014"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "severity"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "critical": {
+                        "text": "critical",
+                        "color": "#d03b3b"
+                      },
+                      "warning": {
+                        "text": "warning",
+                        "color": "#fab219"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          }
+        ]
       },
       "transformations": [
         {
@@ -583,6 +636,7 @@
                 "alertname",
                 "namespace",
                 "pod",
+                "container",
                 "node",
                 "instance",
                 "job",
@@ -598,7 +652,15 @@
             "indexByName": {
               "severity": 0,
               "alertstate": 1,
-              "alertname": 2
+              "alertname": 2,
+              "namespace": 3,
+              "pod": 4,
+              "container": 5,
+              "node": 6,
+              "instance": 7,
+              "job": 8,
+              "persistentvolumeclaim": 9,
+              "name": 10
             },
             "renameByName": {
               "alertstate": "state",
@@ -618,30 +680,30 @@
           }
         }
       ],
-      "description": "Firing and pending alerts with their affected resources. Empty is normal when the Active Alerts tile is zero.",
       "links": [
         {
           "title": "Monitoring",
           "url": "/d/homelab-monitoring?${__url_time_range}",
           "targetBlank": false
         }
-      ]
+      ],
+      "description": "Warning and critical alerts, including pending rules. Container identifies separate alerts within the same pod."
     },
     {
       "id": 25,
       "type": "table",
-      "title": "Flux Resources Not Ready",
+      "title": "Flux Reconciliation",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 4
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 14
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "flux_resource_info{ready=\"False\"} or flux_resource_info{suspended=\"True\"}",
+          "expr": "(flux_resource_info{ready=\"False\",suspended!=\"True\"}) or on () (label_replace(vector(0), \"name\", \"No reconciliation failures\", \"\", \"\") and on () (min(up{job=\"flux-system/flux-operator\"}) == 1 and on() count(flux_resource_info) > 0))",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": false,
@@ -651,38 +713,42 @@
       ],
       "options": {
         "showHeader": true,
+        "cellHeight": "sm",
         "footer": {
           "show": false
-        },
-        "cellHeight": "sm"
+        }
       },
       "fieldConfig": {
         "defaults": {
           "custom": {
             "align": "auto",
-            "filterable": false,
-            "minWidth": 130
+            "filterable": true,
+            "minWidth": 80
           },
-          "noValue": "Everything reconciled"
+          "noValue": "\u2014"
         },
         "overrides": []
       },
       "transformations": [
         {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "kind",
+                "exported_namespace",
+                "name"
+              ]
+            }
+          }
+        },
+        {
           "id": "organize",
           "options": {
-            "excludeByName": {
-              "Time": true,
-              "__name__": true,
-              "job": true,
-              "cluster": true,
-              "prometheus": true,
-              "Value": true,
-              "instance": true,
-              "pod": true,
-              "container": true,
-              "endpoint": true,
-              "namespace": true
+            "indexByName": {
+              "kind": 0,
+              "exported_namespace": 1,
+              "name": 2
             },
             "renameByName": {
               "exported_namespace": "namespace"
@@ -690,23 +756,23 @@
           }
         }
       ],
-      "description": "Anything Flux cannot reconcile, plus anything deliberately suspended. Empty is the correct state."
+      "description": "Unsuspended resources reporting Ready=False. Suspended resources are listed under diagnostics."
     },
     {
       "id": 24,
       "type": "table",
-      "title": "Endpoint & Internet Checks",
+      "title": "Endpoint Checks",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 4
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 14
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "probe_success{probe_group=~\"published|internet\"}",
+          "expr": "label_replace(max by(instance)(probe_success{probe_group=~\"published|internet|appliances\"}), \"endpoint\", \"$1\", \"instance\", \"(?:https?://)?(.*)\")",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": false,
@@ -715,7 +781,7 @@
         },
         {
           "refId": "B",
-          "expr": "probe_duration_seconds{probe_group=~\"published|internet\"}",
+          "expr": "label_replace(max by(instance)(probe_duration_seconds{probe_group=~\"published|internet|appliances\"}), \"endpoint\", \"$1\", \"instance\", \"(?:https?://)?(.*)\")",
           "datasource": "VictoriaMetrics",
           "editorMode": "code",
           "range": false,
@@ -725,37 +791,27 @@
       ],
       "options": {
         "showHeader": true,
+        "cellHeight": "sm",
         "footer": {
           "show": false
-        },
-        "cellHeight": "sm"
+        }
       },
       "fieldConfig": {
         "defaults": {
           "custom": {
             "align": "auto",
-            "filterable": false,
-            "minWidth": 130
-          }
+            "filterable": true,
+            "minWidth": 80
+          },
+          "noValue": "\u2014"
         },
         "overrides": [
           {
             "matcher": {
               "id": "byName",
-              "options": "up"
+              "options": "status"
             },
             "properties": [
-              {
-                "id": "custom.cellOptions",
-                "value": {
-                  "type": "color-background",
-                  "mode": "gradient"
-                }
-              },
-              {
-                "id": "custom.width",
-                "value": 90
-              },
               {
                 "id": "mappings",
                 "value": [
@@ -763,30 +819,46 @@
                     "type": "value",
                     "options": {
                       "0": {
-                        "text": "DOWN",
-                        "color": "#d03b3b",
-                        "index": 0
+                        "text": "Failed",
+                        "color": "#d03b3b"
                       },
                       "1": {
-                        "text": "up",
-                        "color": "#0ca30c",
-                        "index": 1
+                        "text": "Passing",
+                        "color": "#0ca30c"
                       }
                     }
                   }
                 ]
               },
               {
-                "id": "thresholds",
+                "id": "custom.cellOptions",
                 "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "#d03b3b",
-                      "value": null
-                    }
-                  ]
+                  "type": "color-text"
                 }
+              },
+              {
+                "id": "custom.width",
+                "value": 95
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "duration"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              },
+              {
+                "id": "custom.width",
+                "value": 100
               }
             ]
           }
@@ -794,9 +866,10 @@
       },
       "transformations": [
         {
-          "id": "seriesToColumns",
+          "id": "joinByField",
           "options": {
-            "byField": "instance"
+            "byField": "endpoint",
+            "mode": "outerTabular"
           }
         },
         {
@@ -804,7 +877,7 @@
           "options": {
             "include": {
               "names": [
-                "instance",
+                "endpoint",
                 "Value #A",
                 "Value #B"
               ]
@@ -814,35 +887,37 @@
         {
           "id": "organize",
           "options": {
-            "excludeByName": {},
+            "indexByName": {
+              "endpoint": 0,
+              "Value #A": 1,
+              "Value #B": 2
+            },
             "renameByName": {
-              "instance": "endpoint",
-              "Value #A": "up",
-              "Value #B": "seconds"
+              "Value #A": "status",
+              "Value #B": "duration"
             }
           }
         },
         {
           "id": "sortBy",
           "options": {
-            "fields": {},
             "sort": [
               {
-                "field": "up",
+                "field": "status",
                 "desc": false
               }
             ]
           }
         }
       ],
-      "description": "Published services and internet probes, with failures first. Probes run from inside the cluster.",
       "links": [
         {
           "title": "Network",
           "url": "/d/homelab-network?${__url_time_range}",
           "targetBlank": false
         }
-      ]
+      ],
+      "description": "Checks run inside the cluster and follow HTTP redirects. These are reachability checks, not application tests."
     },
     {
       "id": 15,
@@ -850,10 +925,10 @@
       "title": "CPU Busy",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 7,
+        "h": 8,
         "w": 8,
         "x": 0,
-        "y": 12
+        "y": 24
       },
       "targets": [
         {
@@ -896,11 +971,11 @@
           "decimals": 1,
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "linear",
             "lineWidth": 2,
             "fillOpacity": 8,
             "showPoints": "never",
-            "spanNulls": true,
+            "spanNulls": false,
             "pointSize": 8,
             "stacking": {
               "mode": "none",
@@ -915,7 +990,8 @@
             }
           },
           "min": 0,
-          "max": 100
+          "max": 100,
+          "noValue": "No data"
         },
         "overrides": []
       },
@@ -933,10 +1009,10 @@
       "title": "Memory Used",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 7,
+        "h": 8,
         "w": 8,
         "x": 8,
-        "y": 12
+        "y": 24
       },
       "targets": [
         {
@@ -979,11 +1055,11 @@
           "decimals": 1,
           "custom": {
             "drawStyle": "line",
-            "lineInterpolation": "smooth",
+            "lineInterpolation": "linear",
             "lineWidth": 2,
             "fillOpacity": 8,
             "showPoints": "never",
-            "spanNulls": true,
+            "spanNulls": false,
             "pointSize": 8,
             "stacking": {
               "mode": "none",
@@ -998,7 +1074,8 @@
             }
           },
           "min": 0,
-          "max": 100
+          "max": 100,
+          "noValue": "No data"
         },
         "overrides": []
       },
@@ -1016,10 +1093,10 @@
       "title": "OpenEBS Pool Used",
       "datasource": "VictoriaMetrics",
       "gridPos": {
-        "h": 7,
+        "h": 8,
         "w": 8,
         "x": 16,
-        "y": 12
+        "y": 24
       },
       "targets": [
         {
@@ -1079,7 +1156,8 @@
           "mappings": [],
           "decimals": 1,
           "min": 0,
-          "max": 100
+          "max": 100,
+          "noValue": "No data"
         },
         "overrides": []
       },
@@ -1090,7 +1168,91 @@
           "targetBlank": false
         }
       ]
+    },
+    {
+      "id": 100,
+      "type": "row",
+      "title": "Diagnostics",
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "panels": [
+        {
+          "id": 50,
+          "type": "table",
+          "title": "Suspended Flux Resources",
+          "datasource": "VictoriaMetrics",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 33
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "(flux_resource_info{suspended=\"True\"}) or on () (label_replace(vector(0), \"name\", \"No suspended resources\", \"\", \"\") and on () (min(up{job=\"flux-system/flux-operator\"}) == 1 and on() count(flux_resource_info) > 0))",
+              "datasource": "VictoriaMetrics",
+              "editorMode": "code",
+              "range": false,
+              "format": "table",
+              "instant": true
+            }
+          ],
+          "options": {
+            "showHeader": true,
+            "cellHeight": "sm",
+            "footer": {
+              "show": false
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "auto",
+                "filterable": true,
+                "minWidth": 80
+              },
+              "noValue": "\u2014"
+            },
+            "overrides": []
+          },
+          "transformations": [
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "kind",
+                    "exported_namespace",
+                    "name"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "indexByName": {
+                  "kind": 0,
+                  "exported_namespace": 1,
+                  "name": 2
+                },
+                "renameByName": {
+                  "exported_namespace": "namespace"
+                }
+              }
+            }
+          ],
+          "description": "Resources intentionally excluded from reconciliation."
+        }
+      ]
     }
   ],
-  "description": "Current health, actionable failures, and capacity. Use the linked dashboards for detailed troubleshooting."
+  "description": "Current health and capacity. Open a detail dashboard to investigate.",
+  "version": 1
 }

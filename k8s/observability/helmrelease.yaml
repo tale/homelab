@@ -176,6 +176,48 @@ spec:
                   regex: "/var/lib/kubelet/pods.+"
     kube-state-metrics:
       enabled: true
+      rbac:
+        extraRules:
+          - apiGroups: ["volsync.backube"]
+            resources: ["replicationsources"]
+            verbs: ["list", "watch"]
+      customResourceState:
+        enabled: true
+        config:
+          kind: CustomResourceStateMetrics
+          spec:
+            resources:
+              - groupVersionKind:
+                  group: volsync.backube
+                  version: v1alpha1
+                  kind: ReplicationSource
+                metricNamePrefix: kube_volsync
+                labelsFromPath:
+                  obj_namespace: [metadata, namespace]
+                  obj_name: [metadata, name]
+                metrics:
+                  - name: source_info
+                    help: Current VolSync backup sources and latest mover result.
+                    each:
+                      type: Info
+                      info:
+                        labelsFromPath:
+                          persistentvolumeclaim: [spec, sourcePVC]
+                          result: [status, latestMoverStatus, result]
+                  - name: source_last_sync_timestamp_seconds
+                    help: Last successful sync time; zero before the first sync.
+                    each:
+                      type: Gauge
+                      gauge:
+                        path: [status, lastSyncTime]
+                        nilIsZero: true
+                  - name: source_next_sync_timestamp_seconds
+                    help: Next scheduled sync time; zero when no sync is scheduled.
+                    each:
+                      type: Gauge
+                      gauge:
+                        path: [status, nextSyncTime]
+                        nilIsZero: true
       metricLabelsAllowlist:
         - namespaces=[*]
         - nodes=[*]

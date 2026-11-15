@@ -153,13 +153,14 @@ spec:
           annotations:
             summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} expires in under 7 days"
 
-        - alert: PodCrashLooping
-          expr: increase(kube_pod_container_status_restarts_total[1h]) > 3
+        - alert: ContainerRestartsHigh
+          # A new exporter must not count existing lifetime restarts as new events.
+          expr: sum by (namespace, pod, container) (increase_prometheus(kube_pod_container_status_restarts_total[1h])) > 3
           for: 30m
           labels:
             severity: warning
           annotations:
-            summary: "{{ $labels.namespace }}/{{ $labels.pod }} restarted {{ $value | humanize }} times in an hour"
+            summary: "{{ $labels.namespace }}/{{ $labels.pod }} container {{ $labels.container }} restarted {{ $value | humanize }} times in an hour"
 
         - alert: PodNotReady
           expr: kube_pod_status_phase{phase=~"Pending|Unknown"} == 1
